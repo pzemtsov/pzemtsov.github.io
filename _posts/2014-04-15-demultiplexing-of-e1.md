@@ -368,7 +368,7 @@ we can replace the `while` loop with a `for` loop, which is my personal aestheti
 Java does not have a true `for` loop in the same sense as Pascal has, and one can switch from one to another freely.
 However, I prefer to follow a convention that `for` loop contains a dedicated loop variable (or variables) with
 explicit initialisation step, increment step, and loop condition, all specified in the loop header. The variable
-mustn't be modified anywhere else. This convention doesn't forbid emergency loop termination using `exit`, though.
+mustn't be modified anywhere else. This convention doesn't forbid emergency loop termination using `break`, though.
 
 Here is the new code:
 
