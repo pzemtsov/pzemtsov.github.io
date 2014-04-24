@@ -27,8 +27,8 @@ to carry 32 streams of 64000 bits/sec, each of which is sufficient for one side 
 combined together using a technique called **[Time Division Multiplexing](http://en.wikipedia.org/wiki/Time-division_multiplexing)**.
 This simply means that time is divided into equal portions and these
 portions are allocated to the streams in round-robin fashion. That's why component streams of the E1 are called **timeslots**. Fortunately for us,
-the unit of transmission was chosen as a very convenient 8 bits, which network designers refer to as an octet but for us programmers these days
-it is simply a byte. This allows us to view an E1 stream as well as its timeslots as byte streams. The source stream (256000 bytes/sec) can be
+the unit of transmission was chosen as a very convenient 8 bits, which allows us to view an E1 stream as well as its
+timeslots as byte streams. The source stream (256000 bytes/sec) can be
 considered a sequence of 32-byte frames, where the n<sup>th</sup> byte of each frame belongs to the n<sup>th</sup> timeslot. This way each timeslot receives 8000 bytes
 per second. These bytes per seconds are not important for the de-multiplexing process itself; I only mention them because I want to compare the
 speed of our de-multiplexer with the actual speed of the stream.
@@ -47,49 +47,17 @@ or roughly 4 microseconds a byte. Assuming a typical clock speed of a modern pro
 to process each incoming byte. We expect much less cycles to be needed for that, so a program in Java must work faster than real time. This doesn't mean
 that optimisation is useless: we can de-multiplex more than one E1 stream on one processor core. Let's see how many we can do.
 
-Program correctness
--------------------
-
-Correctness issues may seem off-topic for this article, which is declared to be about optimisation, not about testing. However, maintaining program
-correctness is one of the key points of the optimisation process. Often programmers (and even more often, managers) are scared of any optimisations,
-considering the risk too high. This approach is summarised in a well-known engineering rule: "Do not fix what is not broken".  This means that if the
-optimisation process isn't preserving the program correctness, the managers will never allow programmers to embark on it, which will make our life
-dull and boring forever. That's why I have to say a few words on the issue.
-
-The performance improvement process starts at a point where there is already a solution that works - or, to be pedantic, that we have reasons to believe works.
-Such a belief may originate from code inspection, ideally performed by several people other than the author of the code. It may originate from formal
-correctness proof (unfortunately, this is very rare, as correctness proving tools are not well developed yet). And, finally, it may originate from extensive
-testing. This is usually what "the program works" means: it has been tested. Program testing is a science on its own, and way too big to be covered in this
-article. Proper testing must include verifying program behaviour on valid and invalid data of various sizes and contents, running it standalone and as part
-of the system, and a lot more - so we'll simply assume that all this has already been done for the solution we start at. We also expect that it will be done
-on whatever better solution we develop.
-
-However, this doesn't mean that we can ignore testing issues completely as we carry on with our improvements. We are not going to run full tests for each
-version we create, but it is always a good idea to run a basic check that at least on some realistic input the new version produces the same result as the
-original version. This is called regression testing, and the original version is called the reference version, since it serves as the reference point for
-comparison. If regression testing is not done, we can end up comparing the performance of a program that works with that of a program that doesn't.
-Such comparisons can only produce meaningless results. That's why regression testing must be considered integral part of the performance improvement process.
-
-Regression testing requires a wise choice of input data. It must as much as possible prevent the accidental producing of a valid result by an incorrect program.
-For instance, an input of all zeroes is very bad in our case, because it produces the output of all zeroes, which can be easily produced by some incorrect
-solution. Filling the input buffer with consecutive byte values (0, 1, 2, .., 255, 0, 1, 2, ...) is better, but it is also vulnerable - imagine a program that
-uses half of the input buffer twice. The best option is to use random data (but even that isn't bullet-proof).
-
-Although testing is a generally accepted absolute criterion of correctness, I still wouldn't underestimate the value of code inspection.
-It happened to me several times that a bug was found by looking at a code rather than by testing. The code inspection is very useful for
-all the versions of code we develop, but it is especially important for the reference implementation. That's why it is crucial that the
-reference implementation is written as simply as possible. If there are mathematical formulae or other formal ways to define results,
-they must be followed strictly, without any optimisation attempts. I would even advise to go as far as employing two people for developing a piece of code,
-exactly one of whom being a performance freak, and the reference implementation being made by the other one.
-
 The reference implementation
 ----------------------------
 
-All our implementations, including the reference one, are designed as classes implementing the common interface `Demux`. There are several reasons for that.
-One is that I want to be pedantic and follow the design patterns that Java promotes. Another is that in this case these patterns are actually useful - the
-interface helps in creating common test and measurement framework. But the main reason will be covered later, when I'll be talking about the test code.
+We are ready to start coding. We'll start with the most naive and straightforward version possible, which we'll
+call the reference implementation. The name indicates that both correctness and performance of other implementations
+will be tested against this one.
 
-The reference implementation iterates over the entire input array and writes bytes, one at a time, to the destination arrays in round-robin fashion, closely
+To simplify the test framework, all the implementations will be designed as classes implementing the common interface
+`Demux`.
+
+The code is very simple; it iterates over the entire input array and writes bytes, one at a time, to the destination arrays in round-robin fashion, closely
 following the logic of a hardware E1 decoder. Here is the code (see class `E1.Reference`):
 
 {% highlight java %}
@@ -166,29 +134,6 @@ The `generate ()` method fills the allocated array with pseudo-random numbers. N
 we get the same sequence of "random" numbers each time we run this method. It won't make any difference for E1 decoding, but it is a good practice to use
 in other cases, where the speed may depend on the input data (a classic example is the array sorting problem).
 
-Then we need a correctness check method:
-
-{% highlight java %}
-    static void check (Demux demux)
-    {
-        byte[] src = generate ();
-        byte[][] dst0 = allocate_dst ();
-        byte[][] dst = allocate_dst ();
-        new Reference ().demux (src, dst0);
-        demux.demux (src, dst);
-        for (int i = 0; i < NUM_TIMESLOTS; i++) {
-            if (! Arrays.equals (dst0[i], dst[i])) {
-                throw new java.lang.RuntimeException ("Results not equal");
-            }
-        }
-    }
-{% endhighlight %}
-
-This method generates input data and feeds it to both reference solution and the solution in question. Then it checks that the results are identical.
-Obviously, there isn't much sense in calling it with `Reference`, because it will compare results of two calls to the same method (although for more
-complex algorithms it could have been a useful test - identical results for identical inputs isn't something that can always be taken for granted).
-However, very soon I'll create other implementations, and the `check()` method will be used to test them.
-
 Next, we need a performance measuring code:
 
 {% highlight java %}
@@ -197,7 +142,6 @@ Next, we need a performance measuring code:
 
     static void measure (Demux demux)
     {
-        check (demux);
         byte[] src = generate ();
         byte[][] dst = allocate_dst ();
 
@@ -224,49 +168,19 @@ And the `main` method:
     }
 {% endhighlight %}
 
+The execution time is printed in milliseconds, because such is the resolution of the standard Java timer.
+I like it when execution time is between 500 ms and 10000 ms. It is long enough to allow sufficient measurement accuracy
+but short enough not to get bored. In our case this can be achieved by setting the `ITERATIONS` parameter to one
+million.
 
-The method `measure ()` executes the de-multiplexing method `ITERATIONS` times and prints the time in milliseconds. We can chose any value for `ITERATIONS`,
-but preferably it must make execution time long enough to allow enough measurement accuracy but short enough not to get bored. I like it when execution
-times are between 500 ms and 10000 ms (we use milliseconds because such is the resolution of the Java timer), in our case this can be achieved by setting
-`ITERATIONS` to one million. But, as is visible from the code, the measurement is done five times (the value of `REPETITIONS`). This is done to handle the
-effect known as [HotSpot](http://en.wikipedia.org/wiki/HotSpot) warm-up. When the Java VM starts executing a program, the byte code is interpreted directly. This is very, very slow. While
-this happens, the VM collects execution statistics and detects code sections where most processor time is spent (hot spots, which gave name to Java's
-JIT compiler). These sections are then compiled into native code and optimised. The process of compiling also uses CPU time, so usually the performance
-of Java programs isn't great at start-up but improves later. We are interested in stable results on well warmed-up HotSpot, that's why we run several
-iterations. 
-
-Now is a good time to give a real reason behind introducing `Demux` interface and wrapping the `demux()` function into a class. What I try to achieve this
-way is to avoid the inlining of this function into the measuring loop. We could have placed all the code from `measure ()` straight into `main ()` and called
-the `demux ()` method directly (let's assume it is static and called `reference_demux ()`, and ignore `check ()` for now):
-
-{% highlight java %}
-    public static void main (String [] args) 
-    {
-        byte[] src = generate ();
-        byte[][] dst = allocate_dst ();
-
-        for (int loop = 0; loop < REPETITIONS; loop ++) {
-            long t0 = System.currentTimeMillis ();
-            for (int i = 0; i < ITERATIONS; i++) {
-                reference_demux (src, dst);
-            }
-            long t = System.currentTimeMillis () - t0;
-            System.out.println (t);
-        }
-    }
-{% endhighlight %}
-
-There is a chance that a compiler will detect that `reference_demux` is small and is only called once, and that it will put its code straight in place of its
-call in `main ()`. Usually this is good as it improves the program execution speed. However, it is bad for performance measurement, because If we later replace
-`reference_demux ()` with some other method, a compiler may make another decision and not inline it. The time measurements then will not be obtained in equal
-conditions. Moreover, really sophisticated compilers may detect that all the iterations do the same thing and do not modify the input - and replace the
-inner loop with just one call to `reference_demux ()`. Some compilers can even detect that the entire call has no visible side effect and remove all the code
-altogether.
-
-A virtual call of the de-multiplexing method makes such behaviour much less likely, although it still does not eliminate the possibility completely.
-A compiler can detect that there is only one class that implements the `Demux` interface, or it can inline `measure ()` into `main ()` and then determine the
-actual type of the parameter of `measure ()`, replace the virtual call with a direct call and then perform inlining. If we ever find that this is happening,
-we must create even more complex structure for calling methods being tested. It wasn't necessary in this example.
+As is visible from the code, we don't just repeat the method execution one million times but also repeat the entire
+measurement five times (the value of `REPETITIONS`). This is done to handle the effect known as
+[HotSpot](http://en.wikipedia.org/wiki/HotSpot) warm-up. When the Java VM starts executing a program, the byte code
+is interpreted directly. This is very, very slow. While this happens, the VM collects execution statistics and detects
+code sections where most processor time is spent (hot spots, which gave name to Java's [JIT compiler](http://en.wikipedia.org/wiki/Just-in-time_compilation)).
+These sections are then compiled into native code and optimised. The process of compiling also uses CPU time, so usually
+the performance of Java programs isn't great at start-up but improves later. We are interested in stable results on
+well warmed-up HotSpot, that's why we run several iterations.
 
 First results
 -------------
@@ -283,8 +197,9 @@ Are they also stable between runs? Let's run it again
     $ Java -server E1
     E1.Reference: 2909 2860 2859 2860 2860
 
-The results, as measured after the warm-up, are still stable. We needn't bother with running the program multiple times (but obviously we must make sure
-that no one else is using the server while we're testing).
+The results, as measured after the warm-up, are still stable. We needn't bother with running the program multiple times,
+provided that the computer conditions are consistent between running different tests (clock frequency and memory
+configuration are the same, the same version of OS is running and no one else is running other tests at the same time).
 
 Just out of curiosity: how much does the HotSpot increase the speed of execution compared to interpreting of the byte code? Java has a special switch to
 turn HotSpot off:
@@ -306,6 +221,31 @@ The speed we achieved is very impressive, probably sufficient for any practical 
 But I'd like to carry on, for three reasons. Firstly, any tricks we discover may be helpful for other de-multiplexing problems, and some of them are much more
 performance-demanding. Secondly, we can learn something of general value, not limited to de-multiplexing. And thirdly, I am still curious: Can it be made
 faster? 
+
+Correctness check
+----------------------
+
+Before writing other implementations, we must add something to our test framework: the basic correctness test. There
+is no use comparing performance of two methods if we are not sure they are doing the same thing (I know for our super-simple
+problem it sounds a bit paranoid, but who knows?). We'll compare results of all our new methods with the results of the `Reference`:
+
+{% highlight java %}
+    static void check (Demux demux)
+    {
+        byte[] src = generate ();
+        byte[][] dst0 = allocate_dst ();
+        byte[][] dst = allocate_dst ();
+        new Reference ().demux (src, dst0);
+        demux.demux (src, dst);
+        for (int i = 0; i < NUM_TIMESLOTS; i++) {
+            if (! Arrays.equals (dst0[i], dst[i])) {
+                throw new java.lang.RuntimeException ("Results not equal");
+            }
+        }
+    }
+{% endhighlight %}
+
+We must still not forget to call this method from `measure ()`.
 
 Source-first solutions
 ----------------------
@@ -349,12 +289,15 @@ obscure way rather than directly using the loop statement. Let's try writing it 
     }
 {% endhighlight %}
 
-Running it, we get the following (I show here the `Reference` output again for convenience):
+Running it, we get the following:
 
-    E1.Reference: 2897 2860 2860 2860 2860
     E1.Src_First_1: 2533 2482 2482 2482 2481
 
-We can see the improvement of 380 ms (13%) over `Reference`.
+And our results for `Reference` were:
+
+    E1.Reference: 2897 2860 2860 2860 2860
+
+We can see the improvement of 380 ms (13%).
 
 Looking closely at the code of `Src_first_1`, we see that we increment `src_pos` in each iteration of the inner loop,
 together with `dst_num`, and we also increment `dst_pos` in the outer loop. This is excessive, for we maintain three
@@ -365,7 +308,7 @@ variables, which are not independent. It is easy to see that these variables mai
 Why not try replacing `src_pos` with the expression on the right hand side? The outer loop then runs on `dst_pos`,
 and we mustn't forget to use the correct loop limit. Since the loop variable isn't modified inside the loop any more,
 we can replace the `while` loop with a `for` loop, which is my personal aesthetic preference. Strictly speaking,
-Java does not have a true `for` loop in the same sense as Pascal has, and one can switch from one to another freely.
+Java does not have a true `for` loop in the same sense as Pascal has - its `for` is just another syntax for `while`.
 However, I prefer to follow a convention that `for` loop contains a dedicated loop variable (or variables) with
 explicit initialisation step, increment step, and loop condition, all specified in the loop header. The variable
 mustn't be modified anywhere else. This convention doesn't forbid emergency loop termination using `break`, though.
