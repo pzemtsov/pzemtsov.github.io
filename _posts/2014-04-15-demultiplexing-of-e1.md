@@ -8,7 +8,7 @@ tags: optimisation performance de-multiplexing java
 I was looking for a simple example problem to demonstrate program optimisation, when I saw a colleague of mine busy with exactly that.
 He had written a routine for de-multiplexing one complex network protocol on high speed data links and found the performance insufficient - so he
 was optimising it. By the time I joined the process he had already improved the speed to be sufficient; I managed to make it a bit faster, too.
-I couldn't use his problem directly as an example, because it was too complex for that, but it reminded me of a much simple problem that could
+I couldn't use his problem directly as an example, because it was too complex for that, but it reminded me of a much simpler problem that could
 demonstrate the same optimisation tricks: the de-multiplexing of E1 streams.
 
 It is a very simple problem indeed. It is very hard to produce a solution longer than twenty lines (I'll try, however). Yet it is a real-world problem
@@ -657,8 +657,9 @@ Let's see if it is correct. Here is a program that unrolls both loops:
 {% endhighlight %}
 
 
-Again, I didn't show the whole method, as it is 553 lines long - too long for this article. This proves that it is
-really possible to write a very long program for a simple task if you try hard enough. How fast does this version run?
+Again, I didn't show the whole method, as it is 553 lines long - too long for this article (lines are wider in the
+repository, otherwise it would be even longer). This proves that it is really possible to write a very long program
+for a simple task if you try hard enough. How fast does this version run?
 
     E1.Unrolled_2_Full: 15935 15880 15883 15887 15867
 
@@ -766,7 +767,7 @@ tried in `Unrolled_2_Full`. The loop body was too long, and the attempt failed m
 duplication count. I'll show only `Unrolled_1_2` here but the code for all four is available in the code repository:
 
 {% highlight java %}
-    static final class Dst_First_8_2 implements Demux
+    static final class Unrolled_1_2 implements Demux
     {
         public void demux (byte[] src, byte[][] dst)
         {
