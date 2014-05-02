@@ -9,7 +9,7 @@ I was looking for a simple example problem to demonstrate program optimisation, 
 He had written a routine for de-multiplexing one complex network protocol on high speed data links and found the performance insufficient - so he
 was optimising it. By the time I joined the process he had already improved the speed to be sufficient; I managed to make it a bit faster, too.
 I couldn't use his problem directly as an example, because it was too complex for that, but it reminded me of a much simpler problem that could
-demonstrate the same optimisation tricks: the de-multiplexing of E1 streams.
+demonstrate the same optimisation techniques: the de-multiplexing of E1 streams.
 
 It is a very simple problem indeed. It is very hard to produce a solution longer than twenty lines (I'll try, however). Yet it is a real-world problem
 rather than an academic exercise. And, although one may wonder if there is any space for optimisation at all, I'll show that there is. In short, the
@@ -58,7 +58,8 @@ To simplify the test framework, all the implementations will be designed as clas
 `Demux`.
 
 The code is very simple; it iterates over the entire input array and writes bytes, one at a time, to the destination arrays in round-robin fashion, closely
-following the logic of a hardware E1 decoder. Here is the code (see class `E1.Reference`):
+following the logic of a hardware E1 decoder. [Here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/4d07ccab09f50283631bbc8e2b1a255ea1363147)
+(see class `E1.Reference`):
 
 {% highlight java %}
 public final class E1
@@ -168,6 +169,8 @@ And the `main` method:
     }
 {% endhighlight %}
 
+(the entire test and measurement code can be seen [here](https://github.com/pzemtsov/article-E1-demux-Java/commit/ab2a4017828c4b4560901ff1e5834ae461d1db99)).
+
 The execution time is printed in milliseconds, because such is the resolution of the standard Java timer.
 I like it when execution time is between 500 ms and 10000 ms. It is long enough to allow sufficient measurement accuracy
 but short enough not to get bored. In our case this can be achieved by setting the `ITERATIONS` parameter to one
@@ -268,7 +271,8 @@ Let's recall the main loop of the `Reference` implementation:
 
 We can see that `dst_num` is initially set to 0 and is incremented in the loop until it reaches `NUM_TIMESLOTS-1`. Then it is set to zero and incremented
 again - just as if we were running an inner loop inside the main loop. Effectively, this is what we are doing, only the inner loop is written in an
-obscure way rather than directly using the loop statement. Let's try writing it directly:
+obscure way rather than directly using the loop statement.
+[Let's try writing it directly](https://github.com/pzemtsov/article-E1-demux-Java/commit/deaab8a9965cd8b2c270ffe0b0a15e85b358a7b9):
 
 {% highlight java %}
     static final class Src_First_1 implements Demux
@@ -313,7 +317,7 @@ However, I prefer to follow a convention that `for` loop contains a dedicated lo
 explicit initialisation step, increment step, and loop condition, all specified in the loop header. The variable
 mustn't be modified anywhere else. This convention doesn't forbid emergency loop termination using `break`, though.
 
-Here is the new code:
+[Here is the new code](https://github.com/pzemtsov/article-E1-demux-Java/commit/413af1583971d4d244125e5654dea66105acc96c):
 
 {% highlight java %}
     static final class Src_First_2 implements Demux
@@ -353,7 +357,7 @@ what happens:
 The code seems twice as efficient as `Src_First_1` - but we know now that it only does half the work, since it
 increments the loop variable twice in the loop!
 
-Let's fix the error and run the test again:
+[Let's fix the error](https://github.com/pzemtsov/article-E1-demux-Java/commit/57cfebd7b9b72a9a0bd2705865e8be042fb5c998) and run the test again:
 
 {% highlight java %}
     static final class Src_First_2 implements Demux
@@ -390,7 +394,8 @@ and, strangely, it improved the speed. Most likely, the HotSpot compiler perform
 better than we can do manually.
 
 Now we'll try a completely different approach in running the loops. For each index in the source array we can calculate
-where exactly the byte from that index must go. This way we only need one loop. Here is a new version:
+where exactly the byte from that index must go. This way we only need one loop.
+[Here is a new version](https://github.com/pzemtsov/article-E1-demux-Java/commit/c3620aeaa91cf53ea250c63721660126b7e69284):
 
 {% highlight java %}
     static final class Src_First_3 implements Demux
@@ -449,8 +454,8 @@ Out of the vast number of possible byte ordering, we've tried one (iterating alo
 other order to try is the destination-first ordering. We're going to take one output array, fill it up in its natural
 order, take the next one, etc.
 
-The `Src_First_2` class can be easily modified to iterate along destination arrays - all that's needed is to change
-the order of the loops: 
+[The `Src_First_2` class can be easily modified to iterate along destination arrays - all that's needed is to change
+the order of the loops](https://github.com/pzemtsov/article-E1-demux-Java/commit/472d121bd28cd2ece2fb29465cb4c534a781d6f9): 
 
 {% highlight java %}
     static final class Dst_First_1 implements Demux
@@ -485,6 +490,7 @@ of `dst [dst_num]`, the inner loop contains calculation `src.length / NUM_TIMESL
 does not depend on the loop variable and can be moved out of the loop. In addition, `dst_pos` is an induction variable,
 and its multiplication by `NUM_TIMESLOTS` can be replaced by addition. A good compiler will do all of that itself.
 But is our compiler good?
+[Let's test it: here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/2183d883aa6dca242a247a7497ee4bf6d92d5525):
 
 {% highlight java %}
     static final class Dst_First_2 implements Demux
@@ -519,7 +525,8 @@ Until now all the methods we've been testing were generic: they accepted inputs 
 size was a multiple of `NUM_TIMESLOTS`. But in reality we know this number. The input buffer has the size
 of 2048 (`SRC_SIZE`), and each of the output buffers has a size of 64 (`DST_SIZE`). Can we gain anything by
 hard-coding those values in the method? Let's take `Dst_First_1` and replace the loop upper limit with a
-constant (we'll replace the `assert` statement as well):
+constant (we'll replace the `assert` statement as well).
+[Here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/b2d647e778429d4a99445dc6c3292a919dc72d80):
 
 {% highlight java %}
     static final class Dst_First_3 implements Demux
@@ -567,8 +574,8 @@ In the previous chapter I mentioned an optimisation called [loop unrolling](http
 Most compilers can perform some level of
 unrolling, typically by factor of 2, less often by factor of 4. Small loops may be unrolled fully - replaced by the
 appropriate number of copies of the loop body. Compilers usually avoid complete unrolling of big loops, because there
-are valuable resources associated with the code size - namely, L1 code cache and [micro-operation cache]
-(http://en.wikipedia.org/wiki/CPU_cache#Micro-operation_.28uop.29_cache). Both caches
+are valuable resources associated with the code size - namely, L1 code cache and
+[micro-operation cache](http://en.wikipedia.org/wiki/CPU_cache#Micro-operation_.28uop.29_cache). Both caches
 keep executable machine code, the former in its source form (CPU instructions), and the latter as decoded
 micro-operations. When a tight loop of frequently executed routine doesn't fit into the cache, its code has to be read
 from higher-level cache or primary memory, and, possibly, decoded again, which slows down execution. The same will
@@ -583,8 +590,8 @@ buffer size and, accordingly, double the iteration count. All of that is very pa
 loop unrolling must be used as your last resort, when you really need the ultimate performance, and after you carefully
 took all the factors into account.
 
-All that said, I want to create a new family of implementations based on `Dst_First`: the `Unrolled`. At first, I'll
-unroll the inner loop fully:
+All that said, I want to create a new family of implementations based on `Dst_First`: the `Unrolled`. At first,
+[I'll unroll the inner loop fully](https://github.com/pzemtsov/article-E1-demux-Java/commit/ba6a1e72f9dea441e36cc1572e84fb68d6610844):
 
 {% highlight java %}
     static final class Unrolled_1 implements Demux
@@ -630,7 +637,8 @@ That was really worth the effort! The code runs 35% faster than before. Loop unr
 How about unrolling the outer loop as well? We can't expect improvement of the same magnitude. Each loop control 
 instruction from the inner loop executes 2048 times; similar instruction from the outer loop executes 32 times.
 The effect of removing of the outer instructions is 64 times less than the effect from the inner ones. This is a theory.
-Let's see if it is correct. Here is a program that unrolls both loops:
+Let's see if it is correct.
+[Here is a version that unrolls both loops](https://github.com/pzemtsov/article-E1-demux-Java/commit/81cf573ded354f8fe816134a522b27f3910504e4):
 
 {% highlight java %}
     static final class Unrolled_2_Full implements Demux
@@ -673,7 +681,7 @@ To check it, let's try running `Unrolled_2_Full` with `-Xint`:
 
 This proves the point that big methods are not compiled by HotSpot. But we can split big method into many small methods.
 The HotSpot will inline some of them, so hopefully not all the call instructions will be actually present in the code.
-The code, however, looks incredibly ugly:
+[The code, however, looks incredibly ugly](https://github.com/pzemtsov/article-E1-demux-Java/commit/93b8c56281fee894fd4d9e2c0042a47400ecd647):
 
 {% highlight java %}
     static final class Unrolled_3 implements Demux
@@ -721,7 +729,8 @@ We can try reducing code size. In `Unrolled_3` it is clearly visible that all `d
 They differ from each other only in indexing of the src array. We can make the offset into this array a method
 parameter. There will be one extra addition operation when indexing the array but I hope it will be absorbed by
 the addressing mode of memory access instruction, or maybe get removed completely by eliminating common sub-expression
-`&(src[0])+i` (I used C notation here, for Java has no pointer arithmetic). Here is the code:
+`&(src[0])+i` (I used C notation here, for Java has no pointer arithmetic).
+[Here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/ba43d3a285f616748f72c25cc047535445392cfc):
 
 {% highlight java %}
     static final class Unrolled_4 implements Demux
@@ -764,7 +773,8 @@ two each time. We'll have to duplicate the loop body, and process outputs `j` an
 If this is not enough, we can duplicate the body 4, 8 or 16 times. Duplicating it 32 times is what we've already
 tried in `Unrolled_2_Full`. The loop body was too long, and the attempt failed miserably. I've made four versions:
 `Unrolled_1_2`, `Unrolled_1_4`, `Unrolled_1_8` and `Unrolled_1_16`, the last number in a name indicating the
-duplication count. I'll show only `Unrolled_1_2` here but the code for all four is available in the code repository:
+duplication count. I'll show only `Unrolled_1_2` here but
+[the code for all four is available in the code repository](https://github.com/pzemtsov/article-E1-demux-Java/commit/660d73f8bbf246dd5642fbf6656496bd90f02139):
 
 {% highlight java %}
     static final class Unrolled_1_2 implements Demux
@@ -812,8 +822,8 @@ Possible further improvements
 -----------------------------
 
 In the `Dst_First` family of solutions we write consecutive bytes using byte-transfer operations. But the processor can
-transfer longer pieces of data: words of two bytes, double words of 4 bytes, quad words of 8 bytes. [SSE]
-(http://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) instructions can also manipulate 16 bytes at a time and
+transfer longer pieces of data: words of two bytes, double words of 4 bytes, quad words of 8 bytes. [SSE](http://en.wikipedia.org/wiki/Streaming_SIMD_Extensions)
+instructions can also manipulate 16 bytes at a time and
 [AVX](http://en.wikipedia.org/wiki/Advanced_Vector_Extensions) instructions can do 32. We could accumulate the
 appropriate number of bytes and then write them all at once. Unfortunately, Java does not allow it, except when
 direct byte buffers are used, and use of these buffers requires an interface change and a total rework of all
