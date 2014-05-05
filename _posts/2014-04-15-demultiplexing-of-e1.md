@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "De-multiplexing of E1 in Java"
+title:  "De-multiplexing of E1 streams in Java"
 date:   2014-04-15 00:00:00
 tags: optimisation performance de-multiplexing java
 ---
@@ -16,7 +16,7 @@ rather than an academic exercise. And, although one may wonder if there is any s
 problem seems ideal for a starting point of out optimisation journey. Besides, I'm curious: What is the de-multiplexing speed, in megabytes per second,
 that can be achieved on modern machines using typical programming tools?
 
-In this article I'll implement and optimise the E1 de-multiplexing in Java. Later I'll try C/C++ as well.
+In this article I'll implement and optimise the E1 de-multiplexing in **Java**. Later I'll try **C/C++** as well.
 
 A problem definition
 --------------------
@@ -35,16 +35,16 @@ speed of our de-multiplexer with the actual speed of the stream.
 
 Let's assume that our machine is equipped with an E1 card, which sends the source byte stream to our program, one buffer at a time. The card
 takes care of frame synchronisation, so we know that the data we receive starts and ends at valid frame boundaries, which makes the data size
-a multiple of 32. The input buffer will be modelled as a Java byte array. We need to decompose the input stream into 32 output buffers, which
+a multiple of 32. The input buffer will be modelled as a **Java** `byte` array. We need to decompose the input stream into 32 output buffers, which
 will also be represented as byte arrays of appropriate size. We'll ignore the buffer and pointer management, assuming that the output buffers
 will be processed immediately after de-multiplexing, and can be re-used straight away.
 
 I'll also assume that both input and output data are in the processor cache. This is a simplification, but it is appropriate for our little example.
 To achieve this, I'll use an input buffer small enough to fit into the cache completely. I've chosen a buffer size of 2048 bytes, or 64 bytes per timeslot. 
 
-It seems pretty obvious that we should be able to de-multiplex an E1 even in BASIC: as said earlier, the byte rate of an E1 stream is 256000 bytes/sec,
+It seems pretty obvious that we should be able to de-multiplex an E1 even in **BASIC**: as said earlier, the byte rate of an E1 stream is 256000 bytes/sec,
 or roughly 4 microseconds a byte. Assuming a typical clock speed of a modern processor to be 2.5GHz, this means that we have 10000 CPU cycles available
-to process each incoming byte. We expect much less cycles to be needed for that, so a program in Java must work faster than real time. This doesn't mean
+to process each incoming byte. We expect much less cycles to be needed for that, so a program in **Java** must work faster than real time. This doesn't mean
 that optimisation is useless: we can de-multiplex more than one E1 stream on one processor core. Let's see how many we can do.
 
 The reference implementation
@@ -101,7 +101,7 @@ highly optimised ones. You will see that other implementations can't be modified
 
 The method does not check the size of destination arrays but rather relies on a run-time exception being thrown if the arrays are too small.
 
-I especially like the line `for (byte b : src)` in this code. It uses the iterator syntax, which was added to Java relatively late (in version 1.5),
+I especially like the line `for (byte b : src)` in this code. It uses the iterator syntax, which was added to **Java** relatively late (in version 1.5),
 and which has great value in making programs look nicer. Here the loop written using such syntax immediately makes it clearly visible that the entire
 `src` array is iterated in the natural order of elements, and that its elements are only read and not written. It is very appropriate for a reference
 implementation.
@@ -171,24 +171,24 @@ And the `main` method:
 
 (the entire test and measurement code can be seen [here](https://github.com/pzemtsov/article-E1-demux-Java/commit/ab2a4017828c4b4560901ff1e5834ae461d1db99)).
 
-The execution time is printed in milliseconds, because such is the resolution of the standard Java timer.
+The execution time is printed in milliseconds, because such is the resolution of the standard **Java** timer.
 I like it when execution time is between 500 ms and 10000 ms. It is long enough to allow sufficient measurement accuracy
 but short enough not to get bored. In our case this can be achieved by setting the `ITERATIONS` parameter to one
 million.
 
 As is visible from the code, we don't just repeat the method execution one million times but also repeat the entire
 measurement five times (the value of `REPETITIONS`). This is done to handle the effect known as
-[HotSpot](http://en.wikipedia.org/wiki/HotSpot) warm-up. When the Java VM starts executing a program, the byte code
+[HotSpot](http://en.wikipedia.org/wiki/HotSpot) warm-up. When the **Java** VM starts executing a program, the byte code
 is interpreted directly. This is very, very slow. While this happens, the VM collects execution statistics and detects
-code sections where most processor time is spent (hot spots, which gave name to Java's [JIT compiler](http://en.wikipedia.org/wiki/Just-in-time_compilation)).
+code sections where most processor time is spent (hot spots, which gave name to **Java**'s [JIT compiler](http://en.wikipedia.org/wiki/Just-in-time_compilation)).
 These sections are then compiled into native code and optimised. The process of compiling also uses CPU time, so usually
-the performance of Java programs isn't great at start-up but improves later. We are interested in stable results on
+the performance of **Java** programs isn't great at start-up but improves later. We are interested in stable results on
 well warmed-up HotSpot, that's why we run several iterations.
 
 First results
 -------------
 
-After all the preparations, we are finally ready to run the program. I'm going to use the server VM of Java version 1.7_40 on Linux, running on a Dell
+After all the preparations, we are finally ready to run the program. I'm going to use the server VM of **Java** version 1.7_40 on Linux, running on a Dell
 blade with Intel(R) Xeon(R) CPU E5-2670 @ 2.60GHz.
 
     $ Java -server E1
@@ -204,7 +204,7 @@ The results, as measured after the warm-up, are still stable. We needn't bother 
 provided that the computer conditions are consistent between running different tests (clock frequency and memory
 configuration are the same, the same version of OS is running and no one else is running other tests at the same time).
 
-Just out of curiosity: how much does the HotSpot increase the speed of execution compared to interpreting of the byte code? Java has a special switch to
+Just out of curiosity: how much does the HotSpot increase the speed of execution compared to interpreting of the byte code? **Java** has a special switch to
 turn HotSpot off:
 
     $ java -Xint -server E1
@@ -312,7 +312,7 @@ variables, which are not independent. It is easy to see that these variables mai
 Why not try replacing `src_pos` with the expression on the right hand side? The outer loop then runs on `dst_pos`,
 and we mustn't forget to use the correct loop limit. Since the loop variable isn't modified inside the loop any more,
 we can replace the `while` loop with a `for` loop, which is my personal aesthetic preference. Strictly speaking,
-Java does not have a true `for` loop in the same sense as Pascal has - its `for` is just another syntax for `while`.
+**Java** does not have a true `for` loop in the same sense as Pascal has - its `for` is just another syntax for `while`.
 However, I prefer to follow a convention that `for` loop contains a dedicated loop variable (or variables) with
 explicit initialisation step, increment step, and loop condition, all specified in the loop header. The variable
 mustn't be modified anywhere else. This convention doesn't forbid emergency loop termination using `break`, though.
@@ -622,11 +622,11 @@ I won't include the generator program here because it is straightforward. All ot
 as well. I didn't include the code here fully: the `<skip>` mark indicates where there is more code. The file in the
 repository contains the full source.
 
-I left the multiplications, because Java does constant calculations at compile time, and this way the code looks
+I left the multiplications, because **Java** does constant calculations at compile time, and this way the code looks
 clearer. I've also renamed variable `dst_pos` as simply `j`, to make the text use less space on the screen (it doesn't
 affect execution speed or code size). Also please note two additional asserts: the code is generated for specific
-values of `NUM_TIMESLOTS` and `DST_SIZE` and won't work if they are changed. Unfortunately, Java doesn't have any
-macro-features. I can, of course, generate a Java class on the fly and load it, but this is too complex for our
+values of `NUM_TIMESLOTS` and `DST_SIZE` and won't work if they are changed. Unfortunately, **Java** doesn't have any
+macro-features. I can, of course, generate a **Java** class on the fly and load it, but this is too complex for our
 purposes. Some compile-time code generation similar to that of a macro assembler would really have helped here.
 Now let's run it:
 
@@ -729,7 +729,7 @@ We can try reducing code size. In `Unrolled_3` it is clearly visible that all `d
 They differ from each other only in indexing of the src array. We can make the offset into this array a method
 parameter. There will be one extra addition operation when indexing the array but I hope it will be absorbed by
 the addressing mode of memory access instruction, or maybe get removed completely by eliminating common sub-expression
-`&(src[0])+i` (I used C notation here, for Java has no pointer arithmetic).
+`&(src[0])+i` (I used **C** notation here, for **Java** has no pointer arithmetic).
 [Here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/ba43d3a285f616748f72c25cc047535445392cfc):
 
 {% highlight java %}
@@ -825,11 +825,11 @@ In the `Dst_First` family of solutions we write consecutive bytes using byte-tra
 transfer longer pieces of data: words of two bytes, double words of 4 bytes, quad words of 8 bytes. [SSE](http://en.wikipedia.org/wiki/Streaming_SIMD_Extensions)
 instructions can also manipulate 16 bytes at a time and
 [AVX](http://en.wikipedia.org/wiki/Advanced_Vector_Extensions) instructions can do 32. We could accumulate the
-appropriate number of bytes and then write them all at once. Unfortunately, Java does not allow it, except when
+appropriate number of bytes and then write them all at once. Unfortunately, **Java** does not allow it, except when
 direct byte buffers are used, and use of these buffers requires an interface change and a total rework of all
 the existing solutions. We can't afford it at this stage.
 
-However, this approach is easy to implement in other languages, such as C, and I was going to check the speed in C
+However, this approach is easy to implement in other languages, such as **C**, and I was going to check the speed in **C**
 anyway. Let's keep this option in mind. 
 
 Results
@@ -866,7 +866,7 @@ Here are the same results as a graph:
  
 The speeds we achieved are miles away from those we saw in the beginning. The byte decoding rate is very impressive:
 3.2 GBytes/sec, which theoretically allows de-multiplexing of 12500 E1 streams on one core. The clock speed of our
-processor is 2.6GHz, which means that the program uses 0.81 CPU cycles to move each byte. Not bad for Java.
+processor is 2.6GHz, which means that the program uses 0.81 CPU cycles to move each byte. Not bad for **Java**.
 
 What is my personal choice? This depends on the required performance. If the speed of `Reference` is good enough,
 I would use it and not bother with the rest. If we want it faster, I'd use `Dst_First_1`. Only if the performance
@@ -876,7 +876,7 @@ because I'm not a performance freak.
 Conclusions
 -----------
 
-This is where the Java part of the E1-demultiplexing story ends. Let's summarize what we learned along the way:
+This is where the **Java** part of the E1-demultiplexing story ends. Let's summarize what we learned along the way:
 
 -   There is something to optimise even for such a simple task
 
@@ -892,7 +892,7 @@ This is where the Java part of the E1-demultiplexing story ends. Let's summarize
 
 -   Any performance-orientated changes must be tested; theoretical assumptions about the speeds of different constructs may be wrong
 
--   Method inlining and loop unrolling help improve speed, but make the code very ugly, especially in Java where there aren't any meta-programming features. It is often worthwhile looking for some compromise solution, such as partial unrolling. Careful performance testing is needed
+-   Method inlining and loop unrolling help improve speed, but make the code very ugly, especially in **Java** where there aren't any meta-programming features. It is often worthwhile looking for some compromise solution, such as partial unrolling. Careful performance testing is needed
 
 -   Whatever you do to improve performance - test the correctness as well!
 
@@ -911,11 +911,11 @@ These are the items that fell out of the scope of this article but still require
 
 -   Will loop unrolling still be efficient if there is some other code used together with this code?
 
--   How will the performance be affected if we replace Java arrays with byte buffers?
+-   How will the performance be affected if we replace **Java** arrays with byte buffers?
 
 Coming soon
 -----------
 
-Will the program run faster if converted to C? Are there better ways to optimise, available in C only? What happens
-if write the code in C and call in from Java using JNI? Watch this space; these issues will be covered soon.
+Will the program run faster if converted to **C**? Are there better ways to optimise, available in **C** only? What happens
+if write the code in **C** and call in from **Java** using JNI? Watch this space; these issues will be covered soon.
 
