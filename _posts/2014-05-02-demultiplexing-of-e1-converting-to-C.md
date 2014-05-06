@@ -213,7 +213,7 @@ By the way, you can avoid writing down all 64 invocations of `MOVE_BYTE` by crea
 
 This way you have to write 12 invocations of some macros rather than 64. The same number will result from de-composition
 into six layers of two invocations each. A general formula for the minimal number of invocations for a given total
-number doesn't seem to be simple; perhaps some mathematically incluned reader can suggest one.
+number doesn't seem to be simple; perhaps some mathematically inclined reader can suggest one.
 
 The macros we've just created will be useful for other versions of our method, too. For instance, a four times unrolled version looks like this:
 
@@ -299,7 +299,7 @@ public:
 {% endhighlight %}
 
 I assume imaginary version of **C++** where percentage mark indicates code that runs at compile time. As you can see,
-the code looks very close to `Dst_First_1`. Unfortunately, such version does not exist, and we have to write ugly
+the code looks very close to `Dst_First_1`. Unfortunately, such a version does not exist, and we have to write ugly
 macro definitions. What a pity.
 
 More macro magic: parameter concatenation
@@ -501,7 +501,7 @@ Let's recall the results for **Java** version and put them together in the same 
 </table>
 
 Here comes our first sensation: **C++ is not always faster than Java**. Both `Dst_First_1` and `Dst_First_3` run
-quite a bit faster in **Java** than in **C++**. I'll come back to this fenomenon in later article. Let's look at
+quite a bit faster in **Java** than in **C++**. I'll come back to this fenomenon in a later article. Let's look at
 other expectations:
 
 - The compiler does not panic when compiling big methods; there are no cases when something ran unusually slow
