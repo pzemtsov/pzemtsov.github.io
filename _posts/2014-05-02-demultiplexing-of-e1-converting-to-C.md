@@ -24,11 +24,14 @@ As a result, today's discussion will be more about syntax of **C**/**C++** than 
 lots of macro definitions and invocations. If you are not interested in it or if you are already a **C** expert,
 you are welcome to jump straight to the "**Running it**" section.
 
+The entire project is available on [Github](http://github.com/) in a repository:
+[https://github.com/pzemtsov/article-E1-demux-C](https://github.com/pzemtsov/article-E1-demux-C)
+
 Conversion of non-unrolled versions
 -----------------------------------
 
 The syntax of **Java** is close enough to that of **C++** that we can almost convert one to another using
-find-and-replace. I will only give one example, the rest can be seen in the repository.
+find-and-replace. I will only give one example, [the rest can be seen in the repository](https://github.com/pzemtsov/article-E1-demux-C/commit/456c11dddc868b21a3282472010d63f1e1826a6b).
 
 **Java** code:
 
@@ -112,6 +115,7 @@ Conversion of unrolled versions: macro magic
 
 We could convert unrolled versions just as we did all the others, by find and replace. However, in **C**/**C++** we can do better,
 since **C**/**C++** have a rudimental meta-programming feature: macros.
+[See the full text in the repository](https://github.com/pzemtsov/article-E1-demux-C/commit/9c85cf30ef5268d56e421587ceab8775470fbb70).
 
 This is how Unrolled_1 can be written down using macros:
 
@@ -266,7 +270,10 @@ This is much smaller in source size than the version in **Java**.
 A sad comment on meta-programming
 ---------------------------------
 
-Meta-programming is when some part of a program is executed at compile-time, producing real program, which is then
+**Meta-programming** is an automatic generation of a program or some part of it. This is what I was doing in **Java**
+(all unrolled versions were generated). There are lots of external tools that perform some form of meta-programming
+(pre-processors, language converters, etc.), but the most convenient is when meta-programming is supported
+by the language itself. This means that some part of a program can be executed at compile-time, producing real program, which is then
 compiled into the executable code. As you could see in the previous section, it is very useful feature for
 high-performance programming, which involves lots of inlining and unrolling. Unfortunately, such a feature
 is a rare commodity in modern programming languages. **Java** does not have it (generics do not count and dynamic
@@ -407,7 +414,9 @@ as a by-product, a set of loops that don't start at zero but at some given numbe
 unrolled loop solutions. It has, however, one disadvantage. The indices in macro expansions appear as arithmetic
 expressions rather than as direct numbers; and this makes it impossible to use this macro with `CALL_DEMUX` above:
 the `'#'` concatenation operation does not evaluate expressions before concatenation. That's why we will use the
-partial solution.
+partial solution. Versions of code with both solutions are in the repository:
+[this is the solution we discard](https://github.com/pzemtsov/article-E1-demux-C/commit/f8f03136427227494847db0d52cc726fc0e629d8)
+[and this is the solution we'll use](https://github.com/pzemtsov/article-E1-demux-C/commit/1999ca98b6308ff9107e8ebf789e5615f822012e).
 
 Neither of these approaches works for `DEF_DEMUX`, because `DEF_DEMUX` does not allow semicolons between calls.
 
@@ -461,7 +470,7 @@ The **C++** standard does not require any particular format of a type name as re
 the class name prepended by the number of characters in it isn't the worst possible case.
 
 It is clearly visible that the results for two runs are quite stable. It means that running the test twice is unnesessary
-and we can remove appropriate code.
+and [we can remove appropriate code](https://github.com/pzemtsov/article-E1-demux-C/commit/b98c060e8f01ef58b5ae6bb382b3ae1213333d8c).
 
     9Reference: 1939
     11Src_First_1: 1885

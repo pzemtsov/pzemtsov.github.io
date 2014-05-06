@@ -18,6 +18,9 @@ that can be achieved on modern machines using typical programming tools?
 
 In this article I'll implement and optimise the E1 de-multiplexing in **Java**. Later I'll try **C/C++** as well.
 
+The entire project is available on [Github](http://github.com/) in a repository:
+[https://github.com/pzemtsov/article-E1-demux-Java](https://github.com/pzemtsov/article-E1-demux-Java)
+
 A problem definition
 --------------------
 
