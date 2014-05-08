@@ -44,7 +44,7 @@ This is the one we finally used in the project.
 {% endhighlight %}
 
 It is interesting to see what our macros expand to. Let's see what a simple invocation `MOVE_TIMESLOT (j)` produces
-using our current set of macros from `mymacros.h'. A `-E` key in `gcc` command line helps with that:
+using our current set of macros from `mymacros.h`. A `-E` key in `gcc` command line helps with that:
 
 Both versions are expanded into a piece of code of great elegance and beauty. See here:
 
