@@ -515,8 +515,8 @@ other expectations:
 
 - The compiler does not panic when compiling big methods; there are no cases when something ran unusually slow
 
-- In most cases **C++** is still a bit faster than **Java**, with typical the execution time being 70-80% of **Java** time,
-sometimes less (43% in `Src_First_3` and 68% in `Reference`). Some of this speed difference can be attributed to
+- In most cases **C++** is still a bit faster than **Java**, with typical execution time being 70-80% of the **Java** time,
+sometimes less (43% in `Src_First_3` and 68% in `Reference`). Some of the speed difference can be attributed to
 the abcense of index checking in **C++**.
 
 - All fully unrolled versions (`Unrolled_2_Full`, `Unrolled_3`, `Unrolled_4`) run at the same speed, so there is
@@ -530,7 +530,7 @@ produced very slow result (`Dst_First_2`), while in **C++** it even improved spe
 that optimiser in `gnu C++` isn't as good as one in HotSpot. `Src_First_3` didn't experience big slowdown
 either - could be due to array index checking.
 
-- The difference between Dst_First_3 and Dst_First_1 is that the input size is hard-coded in the former one,
+- The difference between `Dst_First_3` and `Dst_First_1` is that the input size is hard-coded in the former one,
 which should improve performance. However, the opposite has happened. This is something to investigate.
 
 Notes for myself
