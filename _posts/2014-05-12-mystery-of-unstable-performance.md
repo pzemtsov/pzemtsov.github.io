@@ -6,20 +6,22 @@ tags: C C++ GCC optimisation
 ---
 
 Most people love detective stories. It is a bit illogical. The situation where everyone is alive and well, and all
-the valuables are where they were left, for logically minded persons must be much more enjoyable than the case
+the valuables are where they were left, for logically minded person must be much more enjoyable than the case
 when they know exactly who killed half a dozen people and stole the money.
 
-Programming often allows us to feel inside the detective story, as either a victim or a detective. The same
-defeat of logic takes place: many programmers find it exciting to solve mysteries such as "Why something went
-wrong?". For many, like me, this is the biggest fun in programming - resolving mysteries, while, logically, the biggest
-fun should have been when everything just worked.
+Most programmers love resolving mysteries. For many, like me, this is the biggest fun in programming - to find
+out what went wrong and why. This is also illogical. Logically, the biggest fun should have been when everything just worked.
 
-The optimisation process adds another dimension to the story - in addition to the question "Why doesn't this program
-work?" we get another one - "Why is this program slow?". Both may require a full-scale investigation work, which
-has a lot in common with what detectives do in the books. They come up with the ideas and evaluate them - we do that too.
-They interview wintesses - we read logfiles. They take samples and run laboratory tests - so do we. There is even our equivalent of crowling
-in mud at the crime scene under moonlight looking for evidence - it is reading binary code in the middle of a
-faulty program, a very exciting activity indeed.
+Obviously, our problems are different. A typical problem is "Why doesn't this program work". Optimisation adds
+another one: "Why is this program slow?". Both require full-scale investigation work, and as a result
+a programmer feels inside the detective story, as either a victim, a criminal or a detective, depending on the
+outcome.
+
+Our investigations have a lot in common with what those clever detectives do in the books.
+They come up with the ideas and evaluate them - we do that too.
+They interview wintesses - we read logfiles. They take samples and run laboratory tests - so do we.
+There is even our equivalent of crowling in mud at the crime scene under moonlight looking for evidence - it
+is reading binary code in the middle of a faulty program, a very exciting activity indeed.
 
 Today I want to share one such investigation story, which was quite entertaining for me. I am going to tell the
 story as it unfolds, with the solution right in the end.
