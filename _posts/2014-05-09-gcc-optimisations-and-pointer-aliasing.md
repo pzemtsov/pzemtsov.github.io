@@ -121,7 +121,7 @@ _c:
 	ret
 {% endhighlight %}
 
-Both statements are present - the compiler assumed the worst case and followed the safest route. As in many other cases,
+Both statements are present -- the compiler assumed the worst case and followed the safest route. As in many other cases,
 safety contradicts performance: providing for the worst case (which may never occur), the compiler avoids performing
 some important optimisations. In our example it didn't perform 
 [common subexpression elimination](http://en.wikipedia.org/wiki/Common_subexpression_elimination). It is also
@@ -512,7 +512,7 @@ As you can see, the code is correct and performs exactly as intended.
 Most probably, the developers of GCC considered automatic non-aliasing of char pointers too high a risk. Programmers
 convert `int` pointers to `short` pointers  and vice versa relatively seldom. The same applies to `int` pointers 
 being converted to pointers to pointers. But converting pointers to various types to `char*` is very common. All sorts of
-memory dump, memory comparison, memory move routines are doing it. Converting in other direction is very common, too - 
+memory dump, memory comparison, memory move routines are doing it. Converting in other direction is very common, too -- 
 for example, when encoding and decoding protocol messages. Imagine a message, consisting of a tag (byte value),
 a port (two bytes), an IP address (four bytes), and possible other fields, and let this message be transmitted in
 a byte-packed form. A routine that packs that message into a byte buffer is very likely to look similar to this:

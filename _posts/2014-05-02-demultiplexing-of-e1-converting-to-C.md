@@ -165,23 +165,23 @@ public:
 
 Here I feel necessary to include some practical points on macro usage. Readers with good **C** experience can skip the next section:
 
-  - If a macro has limited lifetime, you should `#undef` it as soon as it becomes unnecessary; this can save you from
-    accidentally declaring macro with the same name later. This is especially applicable to temporary macros in
-    include files. In this example I didn't `#undef` the macros, because they will be used in other functions.
+- If a macro has limited lifetime, you should `#undef` it as soon as it becomes unnecessary; this can save you from
+  accidentally declaring macro with the same name later. This is especially applicable to temporary macros in
+  include files. In this example I didn't `#undef` the macros, because they will be used in other functions.
 
-  - If a macro is only used inside one function, it is a good idea to `#define` it right inside that function and
-    `#undef` it after the use.
+- If a macro is only used inside one function, it is a good idea to `#define` it right inside that function and
+  `#undef` it after the use.
 
-  - Don't forget that no white space is allowed between the macro name and open parenthesis. If there is any whitespace
-    there, the parenthesis together with the argument list will be considered part of a macro body.
+- Don't forget that no white space is allowed between the macro name and open parenthesis. If there is any whitespace
+  there, the parenthesis together with the argument list will be considered part of a macro body.
 
-  - The backslash (`'\'`) at the end of a line indicates that a macro is continued on the next line.
-    But for that it must really be at the end of the line, no white space is allowed after it
-    (although some compilers allow that).
+- The backslash (`'\'`) at the end of a line indicates that a macro is continued on the next line.
+  But for that it must really be at the end of the line, no white space is allowed after it
+  (although some compilers allow that).
 
-  - It is always a good idea to wrap the arguments into round brackets inside macro definition (see the `MOVE_BYTE`
-    definition). You never know what will come as parameters. Imagine the brackets were not there and the macro was
-    invoked like this:
+- It is always a good idea to wrap the arguments into round brackets inside macro definition (see the `MOVE_BYTE`
+  definition). You never know what will come as parameters. Imagine the brackets were not there and the macro was
+  invoked like this:
 
 {% highlight C++ %}
     MOVE_BYTE (x+1, y);
@@ -195,10 +195,10 @@ It would have been expanded as
 
 and this is not quite what was intended.
 
-  - For those who do not know the significance of a "do" statement in macro definitions, I'll explain it in one of the
-    following articles.
+- For those who do not know the significance of a "do" statement in macro definitions, I'll explain it in one of the
+  following articles.
 
-Here the usage of macros does not save you much typing - you must still invoke `MOVE_BYTE` manually 64 times.
+Here the usage of macros does not save you much typing -- you must still invoke `MOVE_BYTE` manually 64 times.
 But at least the actual code of `MOVE_BYTE` is in one place only, and can be modified easily.
 
 By the way, you can avoid writing down all 64 invocations of `MOVE_BYTE` by creating multi-layered macros:
@@ -369,7 +369,7 @@ Making things shorter: macros as macro parameters
 
 Our code contains manually written sequences of macro calls of size 64 (as a `MOVE_BYTES` definition), one each of size 2, 4, 8
 and 16 (various `Unrolled_1_x` versions) and four of size 32 (all fully unrolled versions).
-A code can be made a bit shorter by introducing a generic macro duplicator - a poor man's meta-programming loop.
+A code can be made a bit shorter by introducing a generic macro duplicator -- a poor man's meta-programming loop.
 Such a duplicator (also a macro) can take a macro as a parameter and call it given (constant) number of times.
 This is based on a very handy feature of macros: although a macro with parameters can't be invoked with different
 number of parameters, using its name without any parameters at all is allowed, the macro won't be expanded then.
@@ -383,7 +383,7 @@ There are three ways to write such a multiplier. The simplest (but the longest) 
 #define DUP_8(m)  do { m(0); m(1); m(2); m(3); m(4); m(5); m(6); m(7); } while (0)
 {% endhighlight %}
 
-And so on - definition of DUP_64 will contain 64 calls to m().
+And so on -- definition of DUP_64 will contain 64 calls to m().
 
 We can save a bit of typing by basing higher-order duplicator on lower-order one. A partial solution looks like this:
 
@@ -528,7 +528,7 @@ sometimes **C++** is.
 - Relative speeds of different solutions aren't the same as in **Java**. In **Java** manual optimisation of `Dst_First_1`
 produced very slow result (`Dst_First_2`), while in **C++** it even improved speed a bit, which causes suspicion
 that optimiser in `gnu C++` isn't as good as one in HotSpot. `Src_First_3` didn't experience big slowdown
-either - could be due to array index checking.
+either -- could be due to array index checking.
 
 - The difference between `Dst_First_3` and `Dst_First_1` is that the input size is hard-coded in the former one,
 which should improve performance. However, the opposite has happened. This is something to investigate.
@@ -548,5 +548,5 @@ Some points to investigate:
 Coming soon
 -----------
 
-Can C++ code be made faster without rewriting - perhaps there are some secret compiler keys? Can the speed be
+Can C++ code be made faster without rewriting -- perhaps there are some secret compiler keys? Can the speed be
 improved any more? Answers will follow soon.

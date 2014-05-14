@@ -9,7 +9,7 @@ Most people love detective stories. It is a bit illogical. The situation where e
 the valuables are where they were left, for logically minded person must be much more enjoyable than the case
 when they know exactly who killed half a dozen people and stole the money.
 
-Most programmers love resolving mysteries. For many, like me, this is the biggest fun in programming - to find
+Most programmers love resolving mysteries. For many, like me, this is the biggest fun in programming -- to find
 out what went wrong and why. This is also illogical. Logically, the biggest fun should have been when everything just worked.
 
 Obviously, our problems are different. A typical problem is "Why doesn't this program work". Optimisation adds
@@ -18,9 +18,9 @@ a programmer feels inside the detective story, as either a victim, a criminal or
 outcome.
 
 Our investigations have a lot in common with what those clever detectives do in the books.
-They come up with the ideas and evaluate them - we do that too.
-They interview wintesses - we read logfiles. They take samples and run laboratory tests - so do we.
-There is even our equivalent of crowling in mud at the crime scene under moonlight looking for evidence - it
+They come up with the ideas and evaluate them -- we do that too.
+They interview wintesses -- we read logfiles. They take samples and run laboratory tests -- so do we.
+There is even our equivalent of crowling in mud at the crime scene under moonlight looking for evidence -- it
 is reading binary code in the middle of a faulty program, a very exciting activity indeed.
 
 Today I want to share one such investigation story, which was quite entertaining for me. I am going to tell the
@@ -67,7 +67,7 @@ is nothing unusual here.
 
 But the performance of `Dst_First_3` is definitely unusual. I expected it to be as fast as `Dst_First_1`, or,
 even more likely, faster. And everyone would. This is common sense: programs don't become slower from replacing
-of variable loop limits with hard-coded constants - unless there is something wrong with a compiler. And here it
+of variable loop limits with hard-coded constants -- unless there is something wrong with a compiler. And here it
 is 20% slower. This is a mystery, and it requires an investigation. Without knowing the answer, we can't go
 forward. What's a point optimising a program by 5% or 10% if some unknown factor can suddenly make it lose 20%
 of speed?
@@ -128,7 +128,7 @@ are so unstable.
 
 Could it be that the compiler generates different code in different circumstances? Or perhaps the code is the same but
 some places in memory are better than the others? We'll look at it now. To do it, we don't need two functions any more,
-one is enough - the one that's unstable.
+one is enough -- the one that's unstable.
 
 Testing the unstable
 --------------------
@@ -184,7 +184,7 @@ What's the difference?
 ----------------------
 
 Analysing the assembly file helps  checking if the code produced for different versions differed. But this file does not
-show where these versions reside in memory. To see that, we need a universal programmer's tool - a debugger, in our
+show where these versions reside in memory. To see that, we need a universal programmer's tool -- a debugger, in our
 case `gdb`.
 
 However, we still need the assembly file: we need to know the mangled **C++** symbol names. It is easier to look
@@ -199,7 +199,7 @@ A quick look at the assembly output shows the symbol names:
     _ZNK11Dst_First_1ILi1EE5demuxEPKhjPPh
     _ZNK11Dst_First_1ILi0EE5demuxEPKhjPPh
 
-Clearly, the digit after the `"ILi"` indicates the value of the template parameter `N`. Note the order - the
+Clearly, the digit after the `"ILi"` indicates the value of the template parameter `N`. Note the order -- the
 methods are listed in the reverse order of their instantiation. This seems to be the general rule in GNU C:
 the code is generated last function first. This means that the code for a fast version comes first, followed
 by a slow version, followed by another fast and so on. Let's look at the first two, `Dst_First_1<5>` and
@@ -365,7 +365,7 @@ We can see that both pieces of code are aligned by 32. The second piece is short
 have to calculate the number of iterations of the loop and check if is is zero. The inner loops are almost identical,
 except the loop in the first code compares the loop variable (`%eax`) to another variable (`%edx`), while the
 second code compares it the constant `$0x40` (at `0x400fe6`). The `ja` (resp. `jne`) instructions that follows
-is the main loop instruction - it jumps to the beginning of the loop. The inner loop starts at 0x400f80 (0x20 offset
+is the main loop instruction -- it jumps to the beginning of the loop. The inner loop starts at 0x400f80 (0x20 offset
 from the start of the function) in the first case and at 0x400fd0 (0x10 offset from the start) in the second.
 These offsets look very round. Is it a coincidence? No, it is not. There are suspicious instructions just
 before the loops:
@@ -412,7 +412,7 @@ Other processors require alignment by 16. The recommendation is not "always alig
 target architecture". Unfortunately, the version of GCC I use does not seem to have a switch "compile for Sandy Bridge",
 that's why manual specification of important parameters is required.
 
-It is amazing how big a difference this makes - bigger than many real optimisations.
+It is amazing how big a difference this makes -- bigger than many real optimisations.
 
 Is there any cost?
 ------------------
@@ -471,7 +471,7 @@ Other types of alignment
 GNU C has two more switches controlling alignment:
 
 - `-falign-jumps` aligns jump targets, that is the locations in code that receive control by jumps only and never
-  by fall-through. The cost involved is relatively small - as with aligning functions, it is limited to the
+  by fall-through. The cost involved is relatively small -- as with aligning functions, it is limited to the
   problems associated with bigger code size. It might be a good idea to set this to 32 for Sandy Bridge (not for
   our program though, since it does not have such jumps)
 
@@ -582,12 +582,12 @@ Some observations:
 
 - `Dst_First_3` is still slightly slower than `Dst_First_1`. The difference, however, is small and can probably
   be attributed to some unlucky combination of instruction sizes of execution unit allocation.
-- This fact also shows that hard-coded loop sizes do not necessarily cause faster execution - at least, without
+- This fact also shows that hard-coded loop sizes do not necessarily cause faster execution -- at least, without
   extra optimisations such as loop unrolling
 
 - `Dst_First_2` was first written in **Java** as a hand-optimised version of `Dst_First_1`. In **Java** it was slower
   than the unoptimised version; in **C** it runs at the same speed. It indicates that, while manual optimisation
-  in **C** isn't as harmful as in **Java**, it isn't very helpful, either - or, at least, that additional effort
+  in **C** isn't as harmful as in **Java**, it isn't very helpful, either -- or, at least, that additional effort
   is required to make it helpful.
 
 Conclusions
