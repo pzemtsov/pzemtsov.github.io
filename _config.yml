@@ -1,3 +1,6 @@
 name: Notes on program optimisation
 markdown: redcarpet
 pygments: true
+
+redcarpet:
+ extensions: [smart]
