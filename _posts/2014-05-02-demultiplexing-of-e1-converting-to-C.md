@@ -491,7 +491,7 @@ and [we can remove appropriate code](https://github.com/pzemtsov/article-E1-demu
 Let's recall the results for **Java** version and put them together in the same table:
 
 <table>
-<tr><th>     Method               </th> <th>  Results in Java </th> <th> Results in C</th></tr>
+<tr><th>     Version              </th> <th>  Results in Java </th> <th> Results in C</th></tr>
 <tr><td><pre>Reference      </pre></td> <td><pre>  2860 </pre></td> <td><pre> 1939</pre></td></tr>
 <tr><td><pre>Src_First_1    </pre></td> <td><pre>  2481 </pre></td> <td><pre> 1885</pre></td></tr>
 <tr><td><pre>Src_First_2    </pre></td> <td><pre>  2284 </pre></td> <td><pre> 1924</pre></td></tr>

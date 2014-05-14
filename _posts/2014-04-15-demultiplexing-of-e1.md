@@ -841,7 +841,7 @@ Results
 Let's put all the results into one table. I'm using the last result of each test. The last column shows execution
 times as percentages of the time or the `Reference` solution.
 
-  Method         |          Comment                                                                    |    Time  | Rel.Ref
+  Version        |          Comment                                                                    |    Time  | Rel.Ref
 -----------------|-------------------------------------------------------------------------------------|---------:|--------:
 `Reference`      | Strictly follows hardware decoder                                                   |  ` 2860` | `100.0%`
 `Src_First_1`    | Refactored the inner loop of Reference                                              |  ` 2481` | ` 86.7%`

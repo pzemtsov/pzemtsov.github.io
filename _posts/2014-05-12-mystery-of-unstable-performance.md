@@ -556,7 +556,7 @@ I tried to do it then but faced exactly the same instability problem with `Dst_F
 Let's collect the old and the new results, together with the results from **Java**, in one table:
 
 <table>
-<tr><th>     Method               </th> <th>  Results in Java </th> <th> Old results in C</th><th> New results in C</th></tr>
+<tr><th>     Version              </th> <th>  Results in Java </th> <th> Old results in C</th><th> New results in C</th></tr>
 <tr><td><pre>Reference      </pre></td> <td><pre>  2860 </pre></td> <td><pre> 1939</pre></td> <td><pre> 1939</pre></td></tr>
 <tr><td><pre>Src_First_1    </pre></td> <td><pre>  2481 </pre></td> <td><pre> 1885</pre></td> <td><pre> 1488</pre></td></tr>
 <tr><td><pre>Src_First_2    </pre></td> <td><pre>  2284 </pre></td> <td><pre> 1924</pre></td> <td><pre> 1341</pre></td></tr>
