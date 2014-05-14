@@ -1,6 +1,7 @@
 name: Notes on program optimisation
 markdown: redcarpet
 pygments: true
+timezone: Africa/Johannesburg
 
 redcarpet:
  extensions: [smart, tables]
