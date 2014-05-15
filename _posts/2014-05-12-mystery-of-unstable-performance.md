@@ -113,7 +113,7 @@ public:
 };
 {% endhighlight %}
 
-The new code is in file [`e1-2.cpp`](https://github.com/pzemtsov/article-E1-demux-C/commit/01988e4f8bdff46fedf0573e54bc43332402a46b). Let's compile it and run:
+The new code is in file [`e1-2.cpp`]({{ site.REPO-E1-C }}/commit/01988e4f8bdff46fedf0573e54bc43332402a46b). Let's compile it and run:
 
     $ c++ -O3 -o e1-2 e1-2.cpp -lrt
     $ ./e1-2
@@ -135,7 +135,7 @@ Testing the unstable
 --------------------
 
 I'll remove `Dst_First_3` but instead create several copies of `Dst_First_1`. In **C++** it is easy to do using
-templates (see [`e1-3.cpp`](https://github.com/pzemtsov/article-E1-demux-C/commit/7a67fe72b9829caf5fcb9d6435e47094c166a29f)):
+templates (see [`e1-3.cpp`]({{ site.REPO-E1-C }}/commit/7a67fe72b9829caf5fcb9d6435e47094c166a29f)):
 
 {% highlight C++ %}
 template<int N> class Dst_First_1 : public Demux
@@ -535,7 +535,7 @@ Let's get back to our original `e1.cpp` and compile it with the alignment option
     10Unrolled_4: 653
 
 The results look much more stable than before.
-[Now we can remove `Unrolled_3` and `Unrolled4`](https://github.com/pzemtsov/article-E1-demux-C/commit/ed29557be68e178600e7f2139330bcbdd724fe9f),
+[Now we can remove `Unrolled_3` and `Unrolled4`]({{ site.REPO-E1-C }}/commit/ed29557be68e178600e7f2139330bcbdd724fe9f),
 which were found unnecessary in [this article]({{ page.ART-FROM-MACROS-TO-TEMPLATES }}).
 I tried to do it then but faced exactly the same instability problem with `Dst_First_1`.
 

@@ -13,7 +13,7 @@ Simple unrolled methods
 -----------------------
 
 Let's look at the first piece of unrolled code using macros, namely `Unrolled_1`
-([you can see it in a repository](https://github.com/pzemtsov/article-E1-demux-C/commit/b98c060e8f01ef58b5ae6bb382b3ae1213333d8c)):
+([you can see it in a repository]({{ site.REPO-E1-C }}/commit/b98c060e8f01ef58b5ae6bb382b3ae1213333d8c)):
 
 {% highlight C++ %}
 #define MOVE_BYTE(i,j) d[i] = src [(j)+(i)*32]
@@ -237,7 +237,7 @@ they can be removed from the macro-based code as well. The only reason they were
 in **Java** the compiler panicked at long functions.
 
 I've put the templated code into separate file, `e1-template.cpp`.
-[The code is available in the repository](https://github.com/pzemtsov/article-E1-demux-C/commit/561026d395eb57962a4a5167939ae2d39477e3a1).
+[The code is available in the repository]({{ site.REPO-E1-C }}/commit/561026d395eb57962a4a5167939ae2d39477e3a1).
 
 Running it
 ----------

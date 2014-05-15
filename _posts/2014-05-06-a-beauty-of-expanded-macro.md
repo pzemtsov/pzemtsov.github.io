@@ -19,7 +19,7 @@ This multiplier was used for writing unrolled loops. The main unrolled macro loo
     } while (0)
 {% endhighlight %}
 
-We had two versions of DUP2_64: [one that iterated indices manually](https://github.com/pzemtsov/article-E1-demux-C/blob/1999ca98b6308ff9107e8ebf789e5615f822012e/mymacros.h):
+We had two versions of DUP2_64: [one that iterated indices manually]({{ site.REPO-E1-C }}/blob/1999ca98b6308ff9107e8ebf789e5615f822012e/mymacros.h):
 
 {% highlight C++ %}
 #define DUP2_2(m,j)  do {               m(0,j); m(1,j); } while (0)
@@ -29,7 +29,7 @@ We had two versions of DUP2_64: [one that iterated indices manually](https://git
 {% endhighlight %}
 
 This is the one we finally used in the project.
-[Another version was relying on calling previously defined macros]((https://github.com/pzemtsov/article-E1-demux-C/blob/f8f03136427227494847db0d52cc726fc0e629d8/mymacros.h)):
+[Another version was relying on calling previously defined macros](({{ site.REPO-E1-C }}/blob/f8f03136427227494847db0d52cc726fc0e629d8/mymacros.h)):
 
 {% highlight C++ %}
 #define DUP2_2_(m, index, j)  do { m (index, j); m (index+1, j); } while (0)

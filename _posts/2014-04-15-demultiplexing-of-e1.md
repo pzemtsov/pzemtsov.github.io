@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "De-multiplexing of E1 streams in Java"
-
 date:   2014-04-15 00:00:00
 tags: optimisation performance de-multiplexing java
 ---
@@ -20,7 +19,7 @@ that can be achieved on modern machines using typical programming tools?
 In this article I'll implement and optimise the E1 de-multiplexing in **Java**. Later I'll try **C/C++** as well.
 
 The entire project is available on [Github](http://github.com/) in a repository:
-[https://github.com/pzemtsov/article-E1-demux-Java](https://github.com/pzemtsov/article-E1-demux-Java)
+[{{ site.REPO-E1 }}]({{ site.REPO-E1 }})
 
 A problem definition
 --------------------
@@ -62,7 +61,7 @@ To simplify the test framework, all the implementations will be designed as clas
 `Demux`.
 
 The code is very simple; it iterates over the entire input array and writes bytes, one at a time, to the destination arrays in round-robin fashion, closely
-following the logic of a hardware E1 decoder. [Here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/4d07ccab09f50283631bbc8e2b1a255ea1363147)
+following the logic of a hardware E1 decoder. [Here is the code]({{ site.REPO-E1 }}/commit/4d07ccab09f50283631bbc8e2b1a255ea1363147)
 (see class `E1.Reference`):
 
 {% highlight java %}
@@ -173,7 +172,7 @@ And the `main` method:
     }
 {% endhighlight %}
 
-(the entire test and measurement code can be seen [here](https://github.com/pzemtsov/article-E1-demux-Java/commit/ab2a4017828c4b4560901ff1e5834ae461d1db99)).
+(the entire test and measurement code can be seen [here]({{ site.REPO-E1 }}/commit/ab2a4017828c4b4560901ff1e5834ae461d1db99)).
 
 The execution time is printed in milliseconds, because such is the resolution of the standard **Java** timer.
 I like it when execution time is between 500 ms and 10000 ms. It is long enough to allow sufficient measurement accuracy
@@ -276,7 +275,7 @@ Let's recall the main loop of the `Reference` implementation:
 We can see that `dst_num` is initially set to 0 and is incremented in the loop until it reaches `NUM_TIMESLOTS-1`. Then it is set to zero and incremented
 again -- just as if we were running an inner loop inside the main loop. Effectively, this is what we are doing, only the inner loop is written in an
 obscure way rather than directly using the loop statement.
-[Let's try writing it directly](https://github.com/pzemtsov/article-E1-demux-Java/commit/deaab8a9965cd8b2c270ffe0b0a15e85b358a7b9):
+[Let's try writing it directly]({{ site.REPO-E1 }}/commit/deaab8a9965cd8b2c270ffe0b0a15e85b358a7b9):
 
 {% highlight java %}
     static final class Src_First_1 implements Demux
@@ -321,7 +320,7 @@ However, I prefer to follow a convention that `for` loop contains a dedicated lo
 explicit initialisation step, increment step, and loop condition, all specified in the loop header. The variable
 mustn't be modified anywhere else. This convention doesn't forbid emergency loop termination using `break`, though.
 
-[Here is the new code](https://github.com/pzemtsov/article-E1-demux-Java/commit/413af1583971d4d244125e5654dea66105acc96c):
+[Here is the new code]({{ site.REPO-E1 }}/commit/413af1583971d4d244125e5654dea66105acc96c):
 
 {% highlight java %}
     static final class Src_First_2 implements Demux
@@ -361,7 +360,7 @@ what happens:
 The code seems twice as efficient as `Src_First_1` -- but we know now that it only does half the work, since it
 increments the loop variable twice in the loop!
 
-[Let's fix the error](https://github.com/pzemtsov/article-E1-demux-Java/commit/57cfebd7b9b72a9a0bd2705865e8be042fb5c998) and run the test again:
+[Let's fix the error]({{ site.REPO-E1 }}/commit/57cfebd7b9b72a9a0bd2705865e8be042fb5c998) and run the test again:
 
 {% highlight java %}
     static final class Src_First_2 implements Demux
@@ -399,7 +398,7 @@ better than we can do manually.
 
 Now we'll try a completely different approach in running the loops. For each index in the source array we can calculate
 where exactly the byte from that index must go. This way we only need one loop.
-[Here is a new version](https://github.com/pzemtsov/article-E1-demux-Java/commit/c3620aeaa91cf53ea250c63721660126b7e69284):
+[Here is a new version]({{ site.REPO-E1 }}/commit/c3620aeaa91cf53ea250c63721660126b7e69284):
 
 {% highlight java %}
     static final class Src_First_3 implements Demux
@@ -459,7 +458,7 @@ other order to try is the destination-first ordering. We're going to take one ou
 order, take the next one, etc.
 
 [The `Src_First_2` class can be easily modified to iterate along destination arrays -- all that's needed is to change
-the order of the loops](https://github.com/pzemtsov/article-E1-demux-Java/commit/472d121bd28cd2ece2fb29465cb4c534a781d6f9): 
+the order of the loops]({{ site.REPO-E1 }}/commit/472d121bd28cd2ece2fb29465cb4c534a781d6f9): 
 
 {% highlight java %}
     static final class Dst_First_1 implements Demux
@@ -494,7 +493,7 @@ of `dst [dst_num]`, the inner loop contains calculation `src.length / NUM_TIMESL
 does not depend on the loop variable and can be moved out of the loop. In addition, `dst_pos` is an induction variable,
 and its multiplication by `NUM_TIMESLOTS` can be replaced by addition. A good compiler will do all of that itself.
 But is our compiler good?
-[Let's test it: here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/2183d883aa6dca242a247a7497ee4bf6d92d5525):
+[Let's test it: here is the code]({{ site.REPO-E1 }}/commit/2183d883aa6dca242a247a7497ee4bf6d92d5525):
 
 {% highlight java %}
     static final class Dst_First_2 implements Demux
@@ -530,7 +529,7 @@ size was a multiple of `NUM_TIMESLOTS`. But in reality we know this number. The 
 of 2048 (`SRC_SIZE`), and each of the output buffers has a size of 64 (`DST_SIZE`). Can we gain anything by
 hard-coding those values in the method? Let's take `Dst_First_1` and replace the loop upper limit with a
 constant (we'll replace the `assert` statement as well).
-[Here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/b2d647e778429d4a99445dc6c3292a919dc72d80):
+[Here is the code]({{ site.REPO-E1 }}/commit/b2d647e778429d4a99445dc6c3292a919dc72d80):
 
 {% highlight java %}
     static final class Dst_First_3 implements Demux
@@ -595,7 +594,7 @@ loop unrolling must be used as your last resort, when you really need the ultima
 took all the factors into account.
 
 All that said, I want to create a new family of implementations based on `Dst_First`: the `Unrolled`. At first,
-[I'll unroll the inner loop fully](https://github.com/pzemtsov/article-E1-demux-Java/commit/ba6a1e72f9dea441e36cc1572e84fb68d6610844):
+[I'll unroll the inner loop fully]({{ site.REPO-E1 }}/commit/ba6a1e72f9dea441e36cc1572e84fb68d6610844):
 
 {% highlight java %}
     static final class Unrolled_1 implements Demux
@@ -642,7 +641,7 @@ How about unrolling the outer loop as well? We can't expect improvement of the s
 instruction from the inner loop executes 2048 times; similar instruction from the outer loop executes 32 times.
 The effect of removing of the outer instructions is 64 times less than the effect from the inner ones. This is a theory.
 Let's see if it is correct.
-[Here is a version that unrolls both loops](https://github.com/pzemtsov/article-E1-demux-Java/commit/81cf573ded354f8fe816134a522b27f3910504e4):
+[Here is a version that unrolls both loops]({{ site.REPO-E1 }}/commit/81cf573ded354f8fe816134a522b27f3910504e4):
 
 {% highlight java %}
     static final class Unrolled_2_Full implements Demux
@@ -685,7 +684,7 @@ To check it, let's try running `Unrolled_2_Full` with `-Xint`:
 
 This proves the point that big methods are not compiled by HotSpot. But we can split big method into many small methods.
 The HotSpot will inline some of them, so hopefully not all the call instructions will be actually present in the code.
-[The code, however, looks incredibly ugly](https://github.com/pzemtsov/article-E1-demux-Java/commit/93b8c56281fee894fd4d9e2c0042a47400ecd647):
+[The code, however, looks incredibly ugly]({{ site.REPO-E1 }}/commit/93b8c56281fee894fd4d9e2c0042a47400ecd647):
 
 {% highlight java %}
     static final class Unrolled_3 implements Demux
@@ -734,7 +733,7 @@ They differ from each other only in indexing of the src array. We can make the o
 parameter. There will be one extra addition operation when indexing the array but I hope it will be absorbed by
 the addressing mode of memory access instruction, or maybe get removed completely by eliminating common sub-expression
 `&(src[0])+i` (I used **C** notation here, for **Java** has no pointer arithmetic).
-[Here is the code](https://github.com/pzemtsov/article-E1-demux-Java/commit/ba43d3a285f616748f72c25cc047535445392cfc):
+[Here is the code]({{ site.REPO-E1 }}/commit/ba43d3a285f616748f72c25cc047535445392cfc):
 
 {% highlight java %}
     static final class Unrolled_4 implements Demux
@@ -778,7 +777,7 @@ If this is not enough, we can duplicate the body 4, 8 or 16 times. Duplicating i
 tried in `Unrolled_2_Full`. The loop body was too long, and the attempt failed miserably. I've made four versions:
 `Unrolled_1_2`, `Unrolled_1_4`, `Unrolled_1_8` and `Unrolled_1_16`, the last number in a name indicating the
 duplication count. I'll show only `Unrolled_1_2` here but
-[the code for all four is available in the code repository](https://github.com/pzemtsov/article-E1-demux-Java/commit/660d73f8bbf246dd5642fbf6656496bd90f02139):
+[the code for all four is available in the code repository]({{ site.REPO-E1 }}/commit/660d73f8bbf246dd5642fbf6656496bd90f02139):
 
 {% highlight java %}
     static final class Unrolled_1_2 implements Demux

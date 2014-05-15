@@ -10,14 +10,14 @@ the first part, not so many know the second (I didn't until recently), so hopefu
 who find this information useful. 
 
 All the code snippets can be copied directly from the text and compiled, but for convenience I've also placed
-them in one single file in a [GIT repository](https://github.com/pzemtsov/article-GCC-pointer-aliasing), together with produced assembly code.
+them in one single file in a [GIT repository]({{ site.REPO-ALIASING }}), together with produced assembly code.
 
 A little quiz
 -------------
 
 Here is a little quiz (true GCC experts will know the answer straight away).
 
-Consider the following program (let's call it [`a.c`](https://github.com/pzemtsov/article-GCC-pointer-aliasing/blob/master/a.c))):
+Consider the following program (let's call it [`a.c`]({{ site.REPO-ALIASING }}/blob/master/a.c))):
 
 {% highlight C++ %}
 void a (int ** p)
@@ -38,7 +38,7 @@ in 64-bit mode but 32-bit code is a bit easier to read and I'm not going to run 
 
     > gcc -O3 -S a.c
 
-We get the following (in file [`a.s`](https://github.com/pzemtsov/article-GCC-pointer-aliasing/blob/master/a.s)), I only left relevant parts:
+We get the following (in file [`a.s`]({{ site.REPO-ALIASING }}/blob/master/a.s)), I only left relevant parts:
 
 {% highlight text %}
 _a:
@@ -334,7 +334,7 @@ The code looks as if there were `__restrict__` keywords used. What happened, why
 made such a difference?
 
 Let's compile the program with a special switch: `-fno-strict-aliasing`. The full assembly can be found in
-the repository, file [a-nostrict.s](https://github.com/pzemtsov/article-GCC-pointer-aliasing/blob/master/a-nostrict.s).
+the repository, file [a-nostrict.s]({{ site.REPO-ALIASING }}/blob/master/a-nostrict.s).
 
 {% highlight text %}
 _c_short:
