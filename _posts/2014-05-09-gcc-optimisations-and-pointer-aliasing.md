@@ -736,6 +736,6 @@ Conclusions
 Coming soon
 -----------
 
-How is all of this applicable to our [de-multiplexing of E1 streams in C](http://pzemtsov.github.io/2014/05/01/demultiplexing-of-e1-converting-to-C.html)
+How is all of this applicable to our [de-multiplexing of E1 streams in C]({{ site.ART-E1-C }})
 example? Stay tuned, this will be covered soon.
 .

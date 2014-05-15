@@ -5,7 +5,7 @@ date:   2014-05-07 00:00:00
 tags: C C++ meta-programming templates
 ---
 
-In [one of the previous articles](http://pzemtsov.github.io/2014/05/01/demultiplexing-of-e1-converting-to-C.html)
+In [one of the previous articles]({{ site.ART-E1-C }})
 I was using **C** macros to implement deep loop unrolling. I also mentioned **C++** templates and stated that it
 was possible to use those for the same purpose, but that the code would look complex and ugly. Now I want to test this statement.
 

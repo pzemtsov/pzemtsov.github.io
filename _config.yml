@@ -3,5 +3,11 @@ markdown: redcarpet
 pygments: true
 timezone: Africa/Johannesburg
 
+ART-E1:   /2014/04/15/demultiplexing-of-e1.html
+ART-E1-C: /2014/05/02/demultiplexing-of-e1-converting-to-C.html
+
+TITLE-E1:   "De-multiplexing of E1 streams in Java"
+TITLE-E1-C: "De-multiplexing of E1 stream: converting to C"
+
 redcarpet:
  extensions: [smart, tables]

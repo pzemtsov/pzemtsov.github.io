@@ -5,7 +5,7 @@ date:   2014-05-06 00:00:00
 tags: C C++ macro meta-programming
 ---
 
-In [one of the previous articles]({% post_url 2014-05-02-demultiplexing-of-e1-converting-to-C %})
+In [one of the previous articles]({{ site.ART-E1-C }})
 we've made a macro multiplier, which is a macro that calls another macro given number of times.
 This multiplier was used for writing unrolled loops. The main unrolled macro looked like this:
 

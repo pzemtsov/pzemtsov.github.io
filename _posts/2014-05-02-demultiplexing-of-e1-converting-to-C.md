@@ -5,7 +5,7 @@ date:   2014-05-02 00:00:00
 tags: optimisation performance de-multiplexing C C++ macro meta-programming
 ---
 
-In the [previous article](http://pzemtsov.github.io/2014/04/14/demultiplexing-of-e1.html)
+In the [previous article]({{ site.ART-E1 }})
 we were de-multiplexing the **[E1 stream](http://en.wikipedia.org/wiki/E-carrier#E1_frame_structure)** in **Java**.
 Now I want to try **C**/**C++**. General expectation is that it will be faster
 than in **Java**, possibly much faster; we'll check if this is true.

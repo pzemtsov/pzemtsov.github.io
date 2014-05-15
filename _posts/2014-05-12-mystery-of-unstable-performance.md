@@ -3,6 +3,7 @@ layout: post
 title:  The mystery of an unstable performance
 date:   2014-05-12 12:00:00
 tags: C C++ GCC optimisation
+ART-FROM-MACROS-TO-TEMPLATES: /2014/05/07/from-macros-to-templates.html
 ---
 
 Most people love detective stories. It is a bit illogical. The situation where everyone is alive and well, and all
@@ -29,7 +30,7 @@ story as it unfolds, with the solution right in the end.
 The mystery
 -----------
 
-As you might remember, in the article ["De-multiplexing of E1 stream: converting to C"](http://pzemtsov.github.io/2014/05/01/demultiplexing-of-e1-converting-to-C.html)
+As you might remember, in the article ["{{ site.TITLE-E1-C }}"]({{ site.ART-E1-C }})
 we converted the **Java** code into **C++** and ran it on a Sandy Bridge processor. These were the results we got:
 
     9Reference: 1939
@@ -535,7 +536,7 @@ Let's get back to our original `e1.cpp` and compile it with the alignment option
 
 The results look much more stable than before.
 [Now we can remove `Unrolled_3` and `Unrolled4`](https://github.com/pzemtsov/article-E1-demux-C/commit/ed29557be68e178600e7f2139330bcbdd724fe9f),
-which were found unnecessary in [this article](http://pzemtsov.github.io/2014/05/06/from-macros-to-templates.html).
+which were found unnecessary in [this article]({{ page.ART-FROM-MACROS-TO-TEMPLATES }}).
 I tried to do it then but faced exactly the same instability problem with `Dst_First_1`.
 
     $ c++ -O3  -falign-functions=32 -falign-loops=32 -o e1 e1.cpp -lrt
