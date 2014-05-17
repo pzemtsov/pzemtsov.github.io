@@ -859,7 +859,7 @@ times as percentages of the time or the `Reference` solution.
 `Unrolled_3`     | Both loops unrolled; each iteration of an outer loop made into separate method      |  `  790` | ` 27.6%`
 `Unrolled_4`     | Both loops unrolled; all methods from `Unrolled_3` merged into one using parameters |  `  711` | ` 24.9%`
 
-Here are the same results as a graph:
+Here are the same results as a graph (I removed the worst performers to improve the resolution of the rest):
 
 <img src="{{ site.url }}/images/demultiplexing-of-e1-graph.png" width="709" height="501">
  

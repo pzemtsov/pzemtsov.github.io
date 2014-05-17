@@ -15,11 +15,11 @@ we came across the example of the opposite.
 These are the versions in question and the performance data, as published at the end of
 [the last article]({{ page.ART-UNSTABLE }}):
 
-<table>
+<table style="width:100%">
 <tr><th>     Method               </th> <th>  Results in Java </th> <th>  Results in C  </th></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td><pre>  1155 </pre></td> <td><pre> 1457</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td><pre>  2093 </pre></td> <td><pre> 1454</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td><pre>  1022 </pre></td> <td><pre> 1464</pre></td></tr>
+<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1457</pre></td></tr>
+<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre> 1454</pre></td></tr>
+<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1464</pre></td></tr>
 </table>
 
 We can see that `Dst_First_1` and `Dst_First_3` are faster in **Java** than in **C**. There are other irregularities
@@ -338,23 +338,23 @@ Let's try `-funroll-loops`:
 Let's put all the results into one table. The old results are taken from
 [The mystery of an unstable performance]({{ page.ART-UNSTABLE }}).
 
-<table>
+<table style="width:100%">
 <tr><th>     Version              </th> <th>  Results in Java </th> <th> Old results in C</th><th> New results in C</th></tr>
-<tr><td><pre>Reference      </pre></td> <td><pre>  2860 </pre></td> <td><pre> 1939</pre></td> <td><pre> 1604</pre></td></tr>
-<tr><td><pre>Src_First_1    </pre></td> <td><pre>  2481 </pre></td> <td><pre> 1888</pre></td> <td><pre> 1119</pre></td></tr>
-<tr><td><pre>Src_First_2    </pre></td> <td><pre>  2284 </pre></td> <td><pre> 1341</pre></td> <td><pre> 1101</pre></td></tr>
-<tr><td><pre>Src_First_3    </pre></td> <td><pre>  4360 </pre></td> <td><pre> 1891</pre></td> <td><pre> 1458</pre></td></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td><pre>  1155 </pre></td> <td><pre> 1457</pre></td> <td><pre> 1079</pre></td></tr>
-<tr><td><pre>Dst_First_1a   </pre></td> <td><pre>       </pre></td> <td><pre>     </pre></td> <td><pre>  882</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td><pre>  2093 </pre></td> <td><pre> 1454</pre></td> <td><pre>  880</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td><pre>  1022 </pre></td> <td><pre> 1464</pre></td> <td><pre> 1009</pre></td></tr>
-<tr><td><pre>Dst_First_3a   </pre></td> <td><pre>       </pre></td> <td><pre>     </pre></td> <td><pre>  727</pre></td></tr>
-<tr><td><pre>Unrolled_1     </pre></td> <td><pre>   659 </pre></td> <td><pre>  636</pre></td> <td><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_1_2   </pre></td> <td><pre>   654 </pre></td> <td><pre>  634</pre></td> <td><pre>  633</pre></td></tr>
-<tr><td><pre>Unrolled_1_4   </pre></td> <td><pre>   636 </pre></td> <td><pre>  655</pre></td> <td><pre>  651</pre></td></tr>
-<tr><td><pre>Unrolled_1_8   </pre></td> <td><pre>   637 </pre></td> <td><pre>  650</pre></td> <td><pre>  648</pre></td></tr>
-<tr><td><pre>Unrolled_1_16  </pre></td> <td><pre> 25904 </pre></td> <td><pre>  635</pre></td> <td><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_2_Full</pre></td> <td><pre> 15630 </pre></td> <td><pre>  635</pre></td> <td><pre>  635</pre></td></tr>
+<tr><td><pre>Reference      </pre></td> <td align="right"><pre>  2860 </pre></td> <td align="right"><pre> 1939</pre></td> <td align="right"><pre> 1604</pre></td></tr>
+<tr><td><pre>Src_First_1    </pre></td> <td align="right"><pre>  2481 </pre></td> <td align="right"><pre> 1888</pre></td> <td align="right"><pre> 1119</pre></td></tr>
+<tr><td><pre>Src_First_2    </pre></td> <td align="right"><pre>  2284 </pre></td> <td align="right"><pre> 1341</pre></td> <td align="right"><pre> 1101</pre></td></tr>
+<tr><td><pre>Src_First_3    </pre></td> <td align="right"><pre>  4360 </pre></td> <td align="right"><pre> 1891</pre></td> <td align="right"><pre> 1458</pre></td></tr>
+<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1457</pre></td> <td align="right"><pre> 1079</pre></td></tr>
+<tr><td><pre>Dst_First_1a   </pre></td> <td align="right"><pre>       </pre></td> <td align="right"><pre>     </pre></td> <td align="right"><pre>  882</pre></td></tr>
+<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre> 1454</pre></td> <td align="right"><pre>  880</pre></td></tr>
+<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1464</pre></td> <td align="right"><pre> 1009</pre></td></tr>
+<tr><td><pre>Dst_First_3a   </pre></td> <td align="right"><pre>       </pre></td> <td align="right"><pre>     </pre></td> <td align="right"><pre>  727</pre></td></tr>
+<tr><td><pre>Unrolled_1     </pre></td> <td align="right"><pre>   659 </pre></td> <td align="right"><pre>  636</pre></td> <td align="right"><pre>  635</pre></td></tr>
+<tr><td><pre>Unrolled_1_2   </pre></td> <td align="right"><pre>   654 </pre></td> <td align="right"><pre>  634</pre></td> <td align="right"><pre>  633</pre></td></tr>
+<tr><td><pre>Unrolled_1_4   </pre></td> <td align="right"><pre>   636 </pre></td> <td align="right"><pre>  655</pre></td> <td align="right"><pre>  651</pre></td></tr>
+<tr><td><pre>Unrolled_1_8   </pre></td> <td align="right"><pre>   637 </pre></td> <td align="right"><pre>  650</pre></td> <td align="right"><pre>  648</pre></td></tr>
+<tr><td><pre>Unrolled_1_16  </pre></td> <td align="right"><pre> 25904 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
+<tr><td><pre>Unrolled_2_Full</pre></td> <td align="right"><pre> 15630 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
 </table>
 
 

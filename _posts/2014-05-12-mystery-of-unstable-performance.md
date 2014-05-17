@@ -557,21 +557,21 @@ I tried to do it then but faced exactly the same instability problem with `Dst_F
 
 Let's collect the old and the new results, together with the results from **Java**, in one table:
 
-<table>
+<table style="width:100%">
 <tr><th>     Version              </th> <th>  Results in Java </th> <th> Old results in C</th><th> New results in C</th></tr>
-<tr><td><pre>Reference      </pre></td> <td><pre>  2860 </pre></td> <td><pre> 1939</pre></td> <td><pre> 1939</pre></td></tr>
-<tr><td><pre>Src_First_1    </pre></td> <td><pre>  2481 </pre></td> <td><pre> 1885</pre></td> <td><pre> 1488</pre></td></tr>
-<tr><td><pre>Src_First_2    </pre></td> <td><pre>  2284 </pre></td> <td><pre> 1924</pre></td> <td><pre> 1341</pre></td></tr>
-<tr><td><pre>Src_First_3    </pre></td> <td><pre>  4360 </pre></td> <td><pre> 1892</pre></td> <td><pre> 1891</pre></td></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td><pre>  1155 </pre></td> <td><pre> 1467</pre></td> <td><pre> 1457</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td><pre>  2093 </pre></td> <td><pre> 1445</pre></td> <td><pre> 1454</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td><pre>  1022 </pre></td> <td><pre> 1761</pre></td> <td><pre> 1464</pre></td></tr>
-<tr><td><pre>Unrolled_1     </pre></td> <td><pre>   659 </pre></td> <td><pre>  633</pre></td> <td><pre>  636</pre></td></tr>
-<tr><td><pre>Unrolled_1_2   </pre></td> <td><pre>   654 </pre></td> <td><pre>  634</pre></td> <td><pre>  634</pre></td></tr>
-<tr><td><pre>Unrolled_1_4   </pre></td> <td><pre>   636 </pre></td> <td><pre>  654</pre></td> <td><pre>  655</pre></td></tr>
-<tr><td><pre>Unrolled_1_8   </pre></td> <td><pre>   637 </pre></td> <td><pre>  650</pre></td> <td><pre>  650</pre></td></tr>
-<tr><td><pre>Unrolled_1_16  </pre></td> <td><pre> 25904 </pre></td> <td><pre>  635</pre></td> <td><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_2_Full</pre></td> <td><pre> 15630 </pre></td> <td><pre>  635</pre></td> <td><pre>  635</pre></td></tr>
+<tr><td><pre>Reference      </pre></td> <td align="right"><pre>  2860 </pre></td> <td align="right"><pre> 1939</pre></td> <td align="right"><pre> 1939</pre></td></tr>
+<tr><td><pre>Src_First_1    </pre></td> <td align="right"><pre>  2481 </pre></td> <td align="right"><pre> 1885</pre></td> <td align="right"><pre> 1488</pre></td></tr>
+<tr><td><pre>Src_First_2    </pre></td> <td align="right"><pre>  2284 </pre></td> <td align="right"><pre> 1924</pre></td> <td align="right"><pre> 1341</pre></td></tr>
+<tr><td><pre>Src_First_3    </pre></td> <td align="right"><pre>  4360 </pre></td> <td align="right"><pre> 1892</pre></td> <td align="right"><pre> 1891</pre></td></tr>
+<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1467</pre></td> <td align="right"><pre> 1457</pre></td></tr>
+<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre> 1445</pre></td> <td align="right"><pre> 1454</pre></td></tr>
+<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1761</pre></td> <td align="right"><pre> 1464</pre></td></tr>
+<tr><td><pre>Unrolled_1     </pre></td> <td align="right"><pre>   659 </pre></td> <td align="right"><pre>  633</pre></td> <td align="right"><pre>  636</pre></td></tr>
+<tr><td><pre>Unrolled_1_2   </pre></td> <td align="right"><pre>   654 </pre></td> <td align="right"><pre>  634</pre></td> <td align="right"><pre>  634</pre></td></tr>
+<tr><td><pre>Unrolled_1_4   </pre></td> <td align="right"><pre>   636 </pre></td> <td align="right"><pre>  654</pre></td> <td align="right"><pre>  655</pre></td></tr>
+<tr><td><pre>Unrolled_1_8   </pre></td> <td align="right"><pre>   637 </pre></td> <td align="right"><pre>  650</pre></td> <td align="right"><pre>  650</pre></td></tr>
+<tr><td><pre>Unrolled_1_16  </pre></td> <td align="right"><pre> 25904 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
+<tr><td><pre>Unrolled_2_Full</pre></td> <td align="right"><pre> 15630 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
 </table>
 
 Some observations:

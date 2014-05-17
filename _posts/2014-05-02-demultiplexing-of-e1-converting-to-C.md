@@ -490,23 +490,23 @@ and [we can remove appropriate code]({{ site.REPO-E1-C }}/article-E1-demux-C/com
 
 Let's recall the results for **Java** version and put them together in the same table:
 
-<table>
+<table style="width:100%">
 <tr><th>     Version              </th> <th>  Results in Java </th> <th> Results in C</th></tr>
-<tr><td><pre>Reference      </pre></td> <td><pre>  2860 </pre></td> <td><pre> 1939</pre></td></tr>
-<tr><td><pre>Src_First_1    </pre></td> <td><pre>  2481 </pre></td> <td><pre> 1885</pre></td></tr>
-<tr><td><pre>Src_First_2    </pre></td> <td><pre>  2284 </pre></td> <td><pre> 1924</pre></td></tr>
-<tr><td><pre>Src_First_3    </pre></td> <td><pre>  4360 </pre></td> <td><pre> 1892</pre></td></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td><pre>  1155 </pre></td> <td><pre> 1467</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td><pre>  2093 </pre></td> <td><pre> 1445</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td><pre>  1022 </pre></td> <td><pre> 1761</pre></td></tr>
-<tr><td><pre>Unrolled_1     </pre></td> <td><pre>   659 </pre></td> <td><pre>  633</pre></td></tr>
-<tr><td><pre>Unrolled_1_2   </pre></td> <td><pre>   654 </pre></td> <td><pre>  634</pre></td></tr>
-<tr><td><pre>Unrolled_1_4   </pre></td> <td><pre>   636 </pre></td> <td><pre>  654</pre></td></tr>
-<tr><td><pre>Unrolled_1_8   </pre></td> <td><pre>   637 </pre></td> <td><pre>  650</pre></td></tr>
-<tr><td><pre>Unrolled_1_16  </pre></td> <td><pre> 25904 </pre></td> <td><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_2_Full</pre></td> <td><pre> 15630 </pre></td> <td><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_3     </pre></td> <td><pre>   790 </pre></td> <td><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_4     </pre></td> <td><pre>   711 </pre></td> <td><pre>  655</pre></td></tr>
+<tr><td><pre>Reference      </pre></td> <td align="right"><pre>  2860 </pre></td> <td align="right"><pre> 1939</pre></td></tr>
+<tr><td><pre>Src_First_1    </pre></td> <td align="right"><pre>  2481 </pre></td> <td align="right"><pre> 1885</pre></td></tr>
+<tr><td><pre>Src_First_2    </pre></td> <td align="right"><pre>  2284 </pre></td> <td align="right"><pre> 1924</pre></td></tr>
+<tr><td><pre>Src_First_3    </pre></td> <td align="right"><pre>  4360 </pre></td> <td align="right"><pre> 1892</pre></td></tr>
+<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1467</pre></td></tr>
+<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre> 1445</pre></td></tr>
+<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1761</pre></td></tr>
+<tr><td><pre>Unrolled_1     </pre></td> <td align="right"><pre>   659 </pre></td> <td align="right"><pre>  633</pre></td></tr>
+<tr><td><pre>Unrolled_1_2   </pre></td> <td align="right"><pre>   654 </pre></td> <td align="right"><pre>  634</pre></td></tr>
+<tr><td><pre>Unrolled_1_4   </pre></td> <td align="right"><pre>   636 </pre></td> <td align="right"><pre>  654</pre></td></tr>
+<tr><td><pre>Unrolled_1_8   </pre></td> <td align="right"><pre>   637 </pre></td> <td align="right"><pre>  650</pre></td></tr>
+<tr><td><pre>Unrolled_1_16  </pre></td> <td align="right"><pre> 25904 </pre></td> <td align="right"><pre>  635</pre></td></tr>
+<tr><td><pre>Unrolled_2_Full</pre></td> <td align="right"><pre> 15630 </pre></td> <td align="right"><pre>  635</pre></td></tr>
+<tr><td><pre>Unrolled_3     </pre></td> <td align="right"><pre>   790 </pre></td> <td align="right"><pre>  635</pre></td></tr>
+<tr><td><pre>Unrolled_4     </pre></td> <td align="right"><pre>   711 </pre></td> <td align="right"><pre>  655</pre></td></tr>
 </table>
 
 Here comes our first sensation: **C++ is not always faster than Java**. Both `Dst_First_1` and `Dst_First_3` run
