@@ -3,7 +3,6 @@ layout: post
 title:  How to make C run as fast as Java
 date:   2014-05-15 12:00:00
 tags: C C++ Java GCC optimisation
-REPO-E1: "{{ site.repo }}/rtyu"
 ART-UNSTABLE: /2014/05/12/mystery-of-unstable-performance.html
 ART-ALIASING: /2014/05/08/gcc-optimisations-and-pointer-aliasing.html
 ---
@@ -151,7 +150,7 @@ A quick look at the inner loop (the code between `.L52` and `.L50`) reveals that
 {% endhighlight %}
 
 There are three memory access instructions here. The first one reads a byte from the address `%rsi` at the offset `%r8`,
-where `%r8` is a copy of a loop variable (`%edi`), which is incremented by 32 each loop iteration. Clearly, this is
+where `%r8` is a copy of a loop variable (`%edi`), which is incremented by 32 for each loop iteration. Clearly, this is
 
     src [dst_pos * NUM_TIMESLOTS + dst_num]
 
@@ -253,14 +252,14 @@ This loop is executed 32 * 64 * 1000000 times in 1454 ms, or 0.71 ns per loop. T
 finish in less than two cycles, a lot of parallel execution must be going on, and an extra instruction could be squeezed
 in somewhere as well.
 
-The code for `Dst_First_2` looks exectly like `Dst_First_1a` (except for one insignificant instruction swap),
+The code for `Dst_First_2` looks exactly like `Dst_First_1a` (except for one insignificant instruction swap),
 which proves that GNU C is good enough in performing operation strength reduction, and there is no point helping it
 to do it. We should rather try writing more easily readable code, and I believe that `Dst_First_1a` is easier
 to read than `Dst_First_2`.
 
 The code for `Dst_First_3a` looks the best of all, you can see it in [`e1.asm`]({{ site.REPO-E1-C }}/blob/c976a9f9d44345859ac6b4c4b81dc20527842575/e1.asm) in the repository.
 
-But the code still runs slowly. The optimisation did not help -- at least, on its own.
+But the code still runs slowly. The optimisation did not help -- at least, not on its own.
 
 Looking at the code again: loop unrolling
 -----------------------------------------
@@ -275,11 +274,11 @@ We performed manual loop unrolling, sometimes taking it to extremes. But we know
 of performing some level of loop unrolling automatically. The only way to explain why **Java** executes this
 code in 1022 ms while **C**-compiled code runs for 1443 ms is that **Java** performs loop unrolling while **C++** does not.
 
-Why does not GNU C do it? Could it be that it is just a bad compiler? No. Unrolling all the loops in the program
+Why does GNU C not do it? Could it be that it is just a bad compiler? No. Unrolling all the loops in the program
 is probably as bad an idea as not unrolling anything at all, if not worse. Loop unrolling increases code size
 big time, and bigger code often runs slower. In addition, when the exact loop iteration count is unknown, some
 extra code is required at loop entry or exit to compensate for possible "leftovers". In short, loop unrolling
-must be performed where it definitely benefits the program, and **C** compiler does not know whete this is, unless
+must be performed where it definitely benefits the program, and the **C** compiler does not know where this is, unless
 it has access to profiling data. **Java** has access to profiling data by design, that's why it can perform
 such optimisations more efficiently.
 
@@ -317,7 +316,7 @@ The option `-funroll-all-loops` is looking dangerous, it can easily make the pro
 
 Let's try `-funroll-loops`:
 
-    c++ -O3 -falign-functions=32 -falign-loops=32 -funroll-loops -o e1 e1.cpp
+    c++ -O3 -falign-functions=32 -falign-loops=32 -funroll-loops -o e1 e1.cpp -lrt
     ./e1
 
     9Reference: 1604
@@ -573,7 +572,7 @@ Observations:
   number of iterations modulo 7. If it is zero, the code jumps to the loop entry, if it is one, the code processes
   one byte and then jumps to the loop entry, and so on.
 
-- The code for `Dst_First_3a` does not need these tests and looks much neeter
+- The code for `Dst_First_3a` does not need these tests and looks much neater
 
 - The code still does not look optimal: `leal` instruction could have been merged with the memory load operation. Perhaps,
   it has something to do with the operand size: the `leal` is a 32-bit instructions. This is something to
@@ -592,7 +591,7 @@ Conclusions
 
 - GCC can do strength reduction; there is no need to perform it manually
 
-- Finally, **C**-compiled program **does** run faster than the one in **Java**
+- Finally, the **C**-compiled program **does** run faster than the one in **Java**
 
 - There is still something wrong with the code
 

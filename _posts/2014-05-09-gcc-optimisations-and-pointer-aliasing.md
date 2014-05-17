@@ -368,7 +368,7 @@ types are almost the same. For example, an unsigned int can alias an int, but no
 </td></tr></table>
 
 This is why `c_short()` was optimised, while `int` version (`c()`) was not: the compiler assumed that two
-`int` pointers can point to the same memory while and `int` pointer and `short` pointer can not. The text in bold
+`int` pointers can point to the same memory while an `int` pointer and a `short` pointer can not. The text in bold
 suggests that if we replace `short` with `char`, it again won't optimise. And this is indeed the case:
 
 {% highlight C++ %}
@@ -573,10 +573,10 @@ void b_2 (char * __restrict__ * __restrict__ p)
 {% endhighlight %}
 
 This does not help either. I couldn't find any way to tell a compiler that there is no aliasing in this case,
-Maybe some of the readers now the way?
+Maybe some of the readers know the way?
 
 How about the `const` specifier in **C++**? Doesn't declaring a `const` pointer indicate that the memory pointed
-by it won't change? No, id doesn't: it only means that the memory won't be changed via this pointer, and says
+by it won't change? No, it doesn't: it only means that the memory won't be changed via this pointer, and says
 nothing about other pointers. It is just an extra safety feature, additional syntax check (you can't pass `const`
 pointer where non-`const` is expected), and not a performance improvement mechanism.
 
