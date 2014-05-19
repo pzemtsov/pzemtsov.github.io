@@ -142,10 +142,10 @@ overflow and produce some small number as a result; this result would in fact be
 (where no overflow occurs, and the result is big) would be incorrect. This means we can't embed this addition into the addressing mode
 of a load instructions, because address calculations are always 64 bits on this processor.
 
-We know that in this loop `dst_pos` is actually small, it stays within interval `[0..DST_SIZE-1]`, and, since we
-know the value of `DST_SIZE`, we could figure out that the overflow would never happen. This would allow to
-perform all calculations in the most efficient operand size, which is 64 bit in this case. But it
-seems that the compiler does not perform this optimisation.
+We know that in this loop `dst_pos` is actually small, it stays within interval `[0..DST_SIZE-1]`. If the compiler
+established this fact (and there are techniques of an interval analysis that make it possible), it could use the
+most efficient operand size instead of the declared size. The results would not differ because no overflow would
+ever happen. Unfortunately, it seems that the compiler does not perform this optimisation.
 
 Why are `int` and `unsigned` 32 bits?
 -------------------------------------
@@ -157,7 +157,7 @@ standard, and for a long time the most common size of `int` has been 32 bits. Th
 changing it to 64 bits.
 
 I can think of two reasons why this hasn't happened in GNU C. One is the legacy code. There is a huge amount of **C** code
-around, it it everywhere. Not all of it is well-written. Some of the code may contain dependencies on type
+around, it is everywhere. Not all of it is well-written. Some of the code may contain dependencies on type
 sizes, and it is very difficult to find these dependencied in the code.
 
 The other reason is that 64-bit isn't always better. Unofficially **C/C++** declares that `int` is the most natural
@@ -172,7 +172,7 @@ working with traditional registers (`eax`, `edx`, etc.):
 
 this means that the 32-bit code is shorter. However, this is only applicable to small functions that can be fully
 compiled using only traditional registers. As soon as the new registers (`r8` .. `r15`) are used, the instructions
-immediately become as long as in 64-bit case:
+immediately become as long as in the 64-bit case:
 
      49 01 C2        addq %rax, %r10
      41 01 C2        addl %eax, %r10d
@@ -231,10 +231,10 @@ And here is one for `sum64`:
 The fragments look almost identical, except for one important difference: `paddd` instruction in the first case
 and `paddq` in the second. These are the [**SSE-2**](http://en.wikipedia.org/wiki/SSE2) instructions.
 Both operate on 128-bit `xmm` registers, but `paddd`
-considers these registers consisting of four 32-bit words, whilr `paddq` of two 64-bit words.
+considers these registers consisting of four 32-bit words, while `paddq` of two 64-bit words.
 The operations are performed simultaneously on all the components.
 
-The code is really amazing. The GNU C has a built-in vectoriser, which tries to use SSE wherever possible.
+The code is really amazing. The GNU C compiler has a built-in vectoriser, which tries to use SSE wherever possible.
 In this case it has split a source vector into sub-vectors of sizes four or two, added those sub-vectors componentwise,
 and then calculated the sum of the result.
 
@@ -277,16 +277,16 @@ And the previous result we got (as published in ["{{ page.TITLE-CFAST }}"]({{ pa
 
 We've got very significant improvement. It looks attractive to modify all the code in the same way.
 
-Goint portable
+Going portable
 --------------
 
 Replacing `unsigned` with `unsigned long` throughout the program seems a bit unsafe. What if it is bad for some
 other platform? If some 32-bit platform defines `unsigned long` as 64-bit, such a modification will cause
-a disaster. What we need is a speciat type for variables used as indices. Fortunately for us, such a type
+a disaster. What we need is a special type for variables used as indices. Fortunately for us, such a type
 exists, it is the `size_t`.
 
 Strictly speaking, the `size_t` isn't designed for indices, it is there for sizes. A `sizeof` operator returns
-result of this type. Many library functions have parameters of this type: `malloc()`, `calloc()`,
+results of this type. Many library functions have parameters of this type: `malloc()`, `calloc()`,
 `memcpy()`, `qsort()` and others. In addition to byte counts, it is used for element counts. It looks
 very reasonable to use this type for indexing, as long as a programmer is happy to use an unsigned type. There
 is a signed analog of the `size_t`, too -- it is called `ptrdiff_t`.
@@ -301,7 +301,7 @@ Remember, when first talking about the type to use, in the article ["{{ site.TIT
 I mentioned `size_t`. I said then that I
 was using `unsigned`, because `size_t` was also unsigned. I didn't, however, use `size_t` itself, because I
 considered it an unnecessary complication. Now it turned out that it was actually a performance feature.
-This is how writing articles can help learn something new.
+This is how writing articles can help you learn something new.
 
 This is what happens when we make everything `size_t`
 ([see the code in repository]({{ site.REPO-E1-C }}/commit/067109ef4d03529be893ca2fd6205d42edc58c86)):
