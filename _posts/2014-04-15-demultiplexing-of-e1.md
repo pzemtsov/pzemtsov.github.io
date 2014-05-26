@@ -100,7 +100,7 @@ The method checks that the input is a multiple of `NUM_TIMESLOTS`, because it do
 that all the outputs receive the same number of bytes, and that isn't true for arbitrary input sizes. And secondly, the implementation assumes that the
 first byte in each input buffer belongs to output zero (it sets `dst_num` to 0). Both of these assumptions can be removed by appropriate modifications of
 the interface and implementation (I'll skip the demonstration). This is typical for reference implementations: they are usually more flexible than the
-highly optimised ones. You will see that other implementations can't be modified that easily.
+highly optimised ones. You will see that other implementations can't be modified so easily.
 
 The method does not check the size of destination arrays but rather relies on a run-time exception being thrown if the arrays are too small.
 
@@ -114,7 +114,7 @@ This method is 13 lines long, well within the 20 line budget that I mentioned ea
 Test framework
 --------------
 
-We are not ready to run the test implementation yet. We need to create a test framework first.
+We are still not ready to run the test implementation. We need to create a test framework first.
 
 We need methods to create the test input data and to allocate the test outputs:
 
@@ -526,7 +526,7 @@ and maybe I'll return to it later.
 
 Until now all the methods we've been testing were generic: they accepted inputs of any size as long as that
 size was a multiple of `NUM_TIMESLOTS`. But in reality we know this number. The input buffer has the size
-of 2048 (`SRC_SIZE`), and each of the output buffers has a size of 64 (`DST_SIZE`). Can we gain anything by
+of 2048 (`SRC_SIZE`), and each of the output buffers has the size of 64 (`DST_SIZE`). Can we gain anything by
 hard-coding those values in the method? Let's take `Dst_First_1` and replace the loop upper limit with a
 constant (we'll replace the `assert` statement as well).
 [Here is the code]({{ site.REPO-E1 }}/commit/b2d647e778429d4a99445dc6c3292a919dc72d80):
@@ -567,7 +567,7 @@ In short, constant sizes of loops help improving performance, but at a cost of l
 It's a choice that the programmer must make.
 
 We've looked at three versions of the code written in destination-first fashion. The very first implementation already
-demonstrated great improvements over the fastest source-first solution: 49.4%. Attempt to help the compiler with petty
+demonstrated great improvements over the fastest source-first solution: 49.4%. The attempt to help the compiler with petty
 optimisations (`Dst_First_2`) failed, while hard-coding the buffer size gained additional 11.5%.
 
 Going unrolled
@@ -621,11 +621,11 @@ All that said, I want to create a new family of implementations based on `Dst_Fi
 
 
 The inner loop here is fully unrolled. I wrote a program to generate the code -- I was too lazy to type it manually.
-I won't include the generator program here because it is straightforward. All other unrolled versions are generated
+I don't include the generator program here because it is straightforward. All other unrolled versions are generated
 as well. I didn't include the code here fully: the `<skip>` mark indicates where there is more code. The file in the
 repository contains the full source.
 
-I left the multiplications, because **Java** does constant calculations at compile time, and this way the code looks
+I left the multiplications, because **Java** performs constant calculations at compile time, and this way the code looks
 clearer. I've also renamed variable `dst_pos` as simply `j`, to make the text use less space on the screen (it doesn't
 affect execution speed or code size). Also please note two additional asserts: the code is generated for specific
 values of `NUM_TIMESLOTS` and `DST_SIZE` and won't work if they are changed. Unfortunately, **Java** doesn't have any
@@ -668,7 +668,7 @@ Let's see if it is correct.
 {% endhighlight %}
 
 
-Again, I didn't show the whole method, as it is 553 lines long -- too long for this article (lines are wider in the
+Again, I don't show the whole method, as it is 553 lines long -- too long for this article (lines are wider in the
 repository, otherwise it would be even longer). This proves that it is really possible to write a very long program
 for a simple task if you try hard enough. How fast does this version run?
 
@@ -682,7 +682,7 @@ To check it, let's try running `Unrolled_2_Full` with `-Xint`:
     $ java -Xint -server E1
     E1.Unrolled_2_Full: 16586 16548 16557 16551 16553
 
-This proves the point that big methods are not compiled by HotSpot. But we can split big method into many small methods.
+This proves the point that big methods are not compiled by HotSpot. But we can split a big method into many small methods.
 The HotSpot will inline some of them, so hopefully not all the call instructions will be actually present in the code.
 [The code, however, looks incredibly ugly]({{ site.REPO-E1 }}/commit/93b8c56281fee894fd4d9e2c0042a47400ecd647):
 
@@ -767,7 +767,7 @@ And the result is:
     E1.Unrolled_4: 773 710 710 711 711
 
 This is faster than the previous one (790) but still slower than `Unrolled_1` (659). This means that we mustn't fully
-discard this approach, and in some cases it can be productive. It can even happen to be faster on some other processors.
+discard this approach, and in some cases it may be productive. It may even be faster on some other processors.
 However, in our specific case on our processor a simple loop unrolling gave the best results so far.
 
 Another approach to loop unrolling is partial unrolling. The outer loop in `Unrolled_1` runs for 32 iterations,
@@ -838,7 +838,7 @@ anyway. Let's keep this option in mind.
 Results
 -------
 
-Let's put all the results into one table. I'm using the last result of each test. The last column shows execution
+Let's put all the results into one table. I've used the last result of each test. The last column shows execution
 times as percentages of the time or the `Reference` solution.
 
   Version        |          Comment                                                                    |    Time  | Rel.Ref
@@ -863,7 +863,7 @@ Here are the same results as a graph (I removed the worst performers to improve 
 
 <img src="{{ site.url }}/images/demultiplexing-of-e1-graph.png" width="709" height="501">
  
-The speeds we achieved are miles away from those we saw in the beginning. The byte decoding rate is very impressive:
+The speeds we have achieved are miles away from those we saw in the beginning. The byte decoding rate is very impressive:
 3.2 GBytes/sec, which theoretically allows de-multiplexing of 12500 E1 streams on one core. The clock speed of our
 processor is 2.6GHz, which means that the program uses 0.81 CPU cycles to move each byte. Not bad for **Java**.
 
@@ -898,7 +898,7 @@ This is where the **Java** part of the E1-demultiplexing story ends. Let's summa
 Notes for myself
 ----------------
 
-These are the items that fell out of the scope of this article but still require attention. I've left them for the future:
+These are the items that fell out of the scope of this article but still require some attention. I've left them for the future:
 
 -   Why is the speed difference between `Dst_First_1` and `Dst_First_2` so big?
 

@@ -31,12 +31,12 @@ Looking at the code: pointer aliasing
 
 Let's recall what these three versions of E1 de-multiplexors are:
 
-- `Dst_First_1`: a simplest, unoptimised version;
+- `Dst_First_1`: the simplest, unoptimised version;
 
-- `Dst_First_2`: a result of manual optimisation of the `Dst_First_1`. Specifically, loop invariant code motion
+- `Dst_First_2`: the result of manual optimisation of the `Dst_First_1`. Specifically, loop invariant code motion
    and operation strength reduction were performed.
 
-- `Dst_First_3`: a version of `Dst_First_1` with a hard-coded size of input and output buffers.
+- `Dst_First_3`: the version of `Dst_First_1` with a hard-coded size of input and output buffers.
 
 [Here is the code for all three versions]({{ site.REPO-E1-C }}/commit/ed29557be68e178600e7f2139330bcbdd724fe9f):
 
@@ -174,7 +174,7 @@ void b (char ** p)
 }
 {% endhighlight %}
 
-In that example the problem was that the compiler assumed aliasing of `p[0]` and `p`, and did not optimise the second
+In that case the compiler assumed aliasing of `p[0]` and `p`, and did not optimise the second
 `p[0]`. In our case, the compiler assumes that `dst + dst_num` (a `char**`) can be aliased with `dst[dst_num] + dst_pos`
 (a `char*`), and does not optimise repetitive access to `dst[dst_num]`.
 
@@ -244,13 +244,13 @@ The code for `Dst_First_1a` looks better (I'll only show the inner loop, the res
         ja      .L37
 {% endhighlight %}
 
-It is difficult to say why this code isn't faster than the original code. Perhaps an extra instruction got
+It is difficult to say why this code isn't faster than the original one. Perhaps an extra instruction got
 absorbed between the latencies of some other instructions, and the extra dependency that it creates was eliminated
 by dynamic instruction reordering. It is interesting to check how many CPU cycles it takes to perform the loop.
 This loop is executed 32 * 64 * 1000000 times in 1454 ms, or 0.71 ns per loop. The CPU runs at 2.6 GHz, or at
-0.38 ns per cycle. This means that these 7 instructions take 1.87 CPU cycles to execute. For seven instructions to
-finish in less than two cycles, a lot of parallel execution must be going on, and an extra instruction could be squeezed
-in somewhere as well.
+0.38 ns per cycle. This means that these 7 instructions take 1.87 CPU cycles to execute. For this to happen,
+a lot of parallel execution must be going on, and who knows what the limit is? Perhaps, an extra instruction can be
+squeezed in somewhere as well.
 
 The code for `Dst_First_2` looks exactly like `Dst_First_1a` (except for one insignificant instruction swap),
 which proves that GNU C is good enough in performing operation strength reduction, and there is no point helping it
@@ -259,13 +259,13 @@ to read than `Dst_First_2`.
 
 The code for `Dst_First_3a` looks the best of all, you can see it in [`e1.asm`]({{ site.REPO-E1-C }}/blob/c976a9f9d44345859ac6b4c4b81dc20527842575/e1.asm) in the repository.
 
-But the code still runs slowly. The optimisation did not help -- at least, not on its own.
+But the code still runs slowly. The optimisation has not helped -- at least, not on its own.
 
 Looking at the code again: loop unrolling
 -----------------------------------------
 
 The code for both `Dst_First_1a` and `Dst_First_3a` seems almost ideal. I can't rewrite the assembly version
-to be much faster; most likely, I can't make it faster at all.
+manually and make it much faster; most likely, I can't make it faster at all.
 
 Unless I unroll the loops.
 
@@ -312,7 +312,7 @@ and so on. We won't use them, relying on the default values.
 As you can see, `-loop-optimize` is capable of performing some unrolling, and it is invoked with `-O3` option.
 But it didn't unroll our loops.
 
-The option `-funroll-all-loops` is looking dangerous, it can easily make the program run slower.
+The option `-funroll-all-loops` looks dangerous, it can easily make the program run slower.
 
 Let's try `-funroll-loops`:
 
@@ -366,7 +366,7 @@ Observations:
 
 - `Dst_First` versions now run faster than `Src_First`, it was not so in **C** initially.
 
-- While resolving the pointer aliasing and optimising the loop did not help on its own, it helped a lot.
+- While resolving the pointer aliasing and optimising the loop did not help on its own, it helped a lot
   in combination with the loop unrolling. This is visible by comparing `Dst_First_1` with `Dst_First_1a` and
   `Dst_First_3` with `Dst_First_3a`.
 
