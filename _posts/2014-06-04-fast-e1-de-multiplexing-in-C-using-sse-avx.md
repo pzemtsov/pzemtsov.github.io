@@ -374,7 +374,7 @@ And the last thing to remember before we start programming SSE is data alignment
 complex, the requirements differ on different processors and in different modes of compilation. The penalties for
 not aligning the data also differ. The most universal advice is to align data on 16 bytes for SSE and on
 32 bytes for AVX. The `new` operator in GNU C aligns pointers by 16; however, some other compiler won't necessarily
-do it, so it is preferable to align pointers by 16 explicitly. SSE utility set has special function for it,
+do it, so it is preferable to align pointers by 16 explicitly. SSE utility set has a special function for it,
 `_mm_malloc`, where you can specify alignment, and corresponding `_mm_free`. We'll definitely need to use these functions in
 AVX case to align buffers by 32.
 
@@ -411,8 +411,8 @@ inline __m128i transpose_4x4 (__m128i m)
 }
 {% endhighlight %}
 
-One may ask: Why are we using `_mm_setr_epi8` rather than `_mm_set_epi8`? This is because I use different
-byte order in my diagrams than Intel does in its documentation. They draw SSE register the highest byte first; for
+One may ask: Why are we using `_mm_setr_epi8` rather than `_mm_set_epi8`? This is because I use a different
+byte order in my diagrams than Intel does in its documentation. They draw the SSE register with the highest byte first; for
 my purpose the memory layout order (the lowest address first) is more appropriate. Intel calls this order "reverse",
 and `_mm_setr_epi8` loads byte in this reverse order.
 
@@ -1350,7 +1350,7 @@ Conclusions
 - On an AVX machine it makes sense to compile SSE code with AVX instruction set enabled; it improves performance;
 
 - The ultra-fast programs with SSE/AVX look slightly less readable; they are more prone to errors and impose
-  additional alignment requirements on the data. One must really think twice if making program run four times
+  additional alignment requirements on the data. One must really think twice if making the program run four times
   faster is worth it.
 
 Coming soon
