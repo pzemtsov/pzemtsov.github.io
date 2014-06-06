@@ -322,7 +322,7 @@ The performance looks like this:
     12Read4_Write4: 685
     19Read4_Write4_Unroll: 638
 
-which is very disappointing. The unrolling helped a bit; however, in general our wonderful plan has failed.
+The performance is still bad. The unrolling helped a bit; however, in general our wonderful plan has failed.
 We could try more sophisticated versions, such as reading 4 bytes and writing 8, or even reading 8 and writing 8,
 but there is little chance it will help. It looks like the numerous shifts and bitwise ORs eat up all the performance gain
 we get from optimising the memory access. It may seem that this is the end of our story, and there is
@@ -344,7 +344,7 @@ is writing in assembly language. Sometimes this is the only way; however, for mo
 to do without it, because Intel was very kind to provide intrinsic functions for all the instructions, as well as
 for many combinations. This made it possible to program SSE while staying in **C**. Most **C** compilers in the Intel world
 understand these intrinsics. Both GNU C and MSVC do. Moreover, they are capable of performing optimisations on the
-SSE code, so the code written in **C** may end up being better than a hand-written assembly code. Here is the
+SSE code so the code written in **C** may end up being better than a hand-written assembly code. Here is the
 [Intel&reg; guide for intrinsic functions](https://software.intel.com/sites/default/files/managed/68/8b/319433-019.pdf).
 
 One important thing to remember about SSE is that it makes our code even less portable. Until now our code could run
@@ -364,7 +364,8 @@ is the AVX. When I get hold of a machine that supports AVX2, I'll have to update
 
 If the target architecture is unknown, it makes sense developing several versions and choose between them dynamically.
 Our object-based design makes it easy. This approach is followed by Intel in their [IPP](https://software.intel.com/en-us/intel-ipp)
-library, which is implemented in multiple versions, and the best one is selected at run time.
+library. Every function there comes in several versions, optimised for different processors. The most suitable
+version is chosen at run time.
 
 In order to use the SSE intrinsics, one must include several header files. I've placed all such code in a special file,
 `sse.h`. I also use this file as a collection of various handy utility functions and macros that will be created as
@@ -412,9 +413,12 @@ inline __m128i transpose_4x4 (__m128i m)
 {% endhighlight %}
 
 One may ask: Why are we using `_mm_setr_epi8` rather than `_mm_set_epi8`? This is because I use a different
-byte order in my diagrams than Intel does in its documentation. They draw the SSE register with the highest byte first; for
-my purpose the memory layout order (the lowest address first) is more appropriate. Intel calls this order "reverse",
-and `_mm_setr_epi8` loads byte in this reverse order.
+byte order in my diagrams than Intel does in its documentation. They draw the SSE register with the highest byte first
+(on the left side); for my purpose the memory layout order (the lowest address first) is more appropriate.
+Intel calls this order "reverse", and `_mm_setr_epi8` loads byte in this reverse order. This difference only
+applies to the presentation order and to the order of arguments of the "set" functions. It does not cause any
+difference in the results of the operations. For instance, the zero index for the byte shuffle instruction points to
+the lowest byte, which is the first byte in memory.
 
 We still need to combine the original four double-words into a single XMM register and then extract resulting
 double-words. Intel provides useful function `_mm_setr_epi32()` to do the first part (it is compiled into a sequence
@@ -1334,7 +1338,7 @@ And here is the graph with today's results:
 Conclusions
 -----------
 
-- **Java** is fast but **C++** is faster
+- **Java** is fast but **C++** is faster. Well, sometimes.
 
 - Our current speed is 6 times higher than the fastest version in **C** until now, and 26 times faster than where
   we started in **Java**
