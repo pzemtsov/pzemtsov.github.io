@@ -20,8 +20,8 @@ outcome.
 
 Our investigations have a lot in common with what those clever detectives do in the books.
 They come up with the ideas and evaluate them -- we do that too.
-They interview wintesses -- we read logfiles. They take samples and run laboratory tests -- so do we.
-There is even our equivalent of crowling in mud at the crime scene under moonlight looking for evidence -- it
+They interview witnesses -- we read logfiles. They take samples and run laboratory tests -- so do we.
+There is even our equivalent of crawling in mud at the crime scene under moonlight looking for evidence -- it
 is reading binary code in the middle of a faulty program, a very exciting activity indeed.
 
 Today I want to share one such investigation story, which was quite entertaining for me. I am going to tell the
@@ -203,7 +203,7 @@ A quick look at the assembly output shows the symbol names:
 Clearly, the digit after the `"ILi"` indicates the value of the template parameter `N`. Note the order -- the
 methods are listed in the reverse order of their instantiation. This seems to be the general rule in GNU C:
 the code is generated last function first. This means that the code for a fast version comes first, followed
-by a slow version, followed by another fast and so on. Let's look at the first two, `Dst_First_1<5>` and
+by a slow version, followed by another fast one and so on. Let's look at the first two, `Dst_First_1<5>` and
 `Dst_First_1<4>`. For that let's run `gdb`:
 
     $ gdb ./e1-3
@@ -401,7 +401,7 @@ This looks much better. In this case we don't need `-falign-functions` any more,
 can't align the loops by 32 if the functions aren't aligned by 32. However, if we want to align functions without loops
 (such as our fully inlined version), we still need this switch. So let's use both.
 
-Why is the alignment so importent? Apparently, a processor, after executing the jump instruction, starts fetching and
+Why is the alignment so important? Apparently, a processor, after executing the jump instruction, starts fetching and
 decoding instructions at the new location (actually, it does it *before* executing the jump instruction; this is
 why branch prediction is so important). The instructions are fetched into a prefetch buffer and then decoded
 (more than one at a time). This buffer is always aligned by 16 or 32 bytes, depending on the exact processor model.
@@ -421,11 +421,11 @@ Is there any cost?
 
 Aligning of functions is almost free. I say "almost", because there are some second-order effects. Any increase in the
 code size makes caching less efficient. If less code fits into a memory page, more pages are required, which affects
-the initial page loading and slows down program startup. It also affects [TLB](http://en.wikipedia.org/wiki/Translation_lookaside_buffer)
-preformance. But these are all minor effects. What's important is that the alignment is achieved by inserting
+the initial page loading and slows down program start-up. It also affects [TLB](http://en.wikipedia.org/wiki/Translation_lookaside_buffer)
+performance. But these are all minor effects. What's important is that the alignment is achieved by inserting
 bytes that are not executed. The start of a function is just moved to the next aligned location.
 
-Aligning of loops isn't for free. Most loops are entered in a "fall through" way, The control naturally arives to the start of
+Aligning of loops isn't for free. Most loops are entered in a "fall through" way -- the control naturally arrives to the start of
 the loop from the top, all preceding code being executed. Let's have a look what this code looks like in our case (`Dst_First_3`).
 In e1-2:
 

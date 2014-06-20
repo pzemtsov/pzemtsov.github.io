@@ -360,7 +360,7 @@ Let's put all the results into one table. The old results are taken from
 
 Observations:
 
-- All the versions (exluding manually unrolled) became faster.
+- All the versions (excluding manually unrolled) became faster.
 
 - All the versions now run faster than in **Java**.
 
@@ -562,7 +562,7 @@ Observations:
 
 - The entire `Dst_First_3a` was 123 bytes long; became 246 byte
 
-- The loop unrolling killed the loop alignment in `Dst_First_1a`: the loop starts at `0x410c2f`.
+- The loop unrolling killed the loop alignment in `Dst_First_1a`: the loop starts at `0x410c2f`,
   still explicitly aligned. A possible reason is that the loop entry is also a target for a normal branch.
   I think this is wrong, possibly a deficiency of GNU C.
 

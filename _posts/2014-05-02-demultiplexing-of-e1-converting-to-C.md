@@ -104,7 +104,7 @@ are dealing with bytes of general nature.
 We also need a timer (replacement for **Java**'s `System.currentTimeMillis ()`). I've moved it to separate header file
 `"timer.h"`. We'll copy the measurement and correctness test code from **Java** with only minor changes.
 We don't need to run test five times, since **C++** doesn't have any warm-up effect. We'll still run it twice,
-just to be safe. Another change is triggered by abcense of a garbage collection in **C++**. All the memory we allocate
+just to be safe. Another change is triggered by absence of a garbage collection in **C++**. All the memory we allocate
 must be freed. Finally, we'll run all out versions at once, so to improve stability of results, we'll run them in
 the same memory, re-using the buffers.
 
@@ -361,7 +361,7 @@ private:
 };
 {% endhighlight %}
 
-You can see how using `'#'` helps create necessary method names. Note abcense of semicolons between calls to `DEF_DEMUX`:
+You can see how using `'#'` helps create necessary method names. Note absence of semicolons between calls to `DEF_DEMUX`:
 in **C**/**C++** function definitions do not end with semicolons (but class definitions do!)
 
 Making things shorter: macros as macro parameters
@@ -510,14 +510,14 @@ Let's recall the results for **Java** version and put them together in the same 
 </table>
 
 Here comes our first sensation: **C++ is not always faster than Java**. Both `Dst_First_1` and `Dst_First_3` run
-quite a bit faster in **Java** than in **C++**. I'll come back to this fenomenon in a later article. Let's look at
+quite a bit faster in **Java** than in **C++**. I'll come back to this phenomenon in a later article. Let's look at
 other expectations:
 
 - The compiler does not panic when compiling big methods; there are no cases when something ran unusually slow
 
 - In most cases **C++** is still a bit faster than **Java**, with typical execution time being 70-80% of the **Java** time,
 sometimes less (43% in `Src_First_3` and 68% in `Reference`). Some of the speed difference can be attributed to
-the abcense of index checking in **C++**.
+the absence of index checking in **C++**.
 
 - All fully unrolled versions (`Unrolled_2_Full`, `Unrolled_3`, `Unrolled_4`) run at the same speed, so there is
 no need to create complex solutions such as `Unrolled_3`

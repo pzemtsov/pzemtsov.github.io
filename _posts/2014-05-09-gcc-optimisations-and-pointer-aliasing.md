@@ -64,7 +64,7 @@ Looking at the code
 
 If you don't know how to read this assembler, don't worry: I didn't know either. I grew up with MASM, which looks
 different from GNU assembler. It does not use `'%'` for registers and '`$`' for constants; besides, it specifies
-the destinaton before the source and the operation size on the operand rather than in the instruction code. GNU
+the destination before the source and the operation size on the operand rather than in the instruction code. GNU
 assembler does other way around. For instance, the instruction from the above listing:
 
 {% highlight text %}
@@ -183,11 +183,11 @@ Helping the compiler: `__restrict__`
 ----------------------------------
 
 As we saw, the compiler on its own can't determine that there is no aliasing. It needs help from a human.
-In GCC thare are two ways to provide such help: `__restrict__` keyword and `-fstrict-aliasing` switch.
+In GCC there are two ways to provide such help: `__restrict__` keyword and `-fstrict-aliasing` switch.
 
 The [**\_\_restrict\_\_**](http://en.wikipedia.org/wiki/Restrict) keyword is a type qualifier, which, applied to a pointer,
 indicates that for the lifetime of this pointer its target can only be accessed via this pointer or the derived one.
-By derived pointer we mean one produced by a direct assignment or pointer arithmetics (such as `p + 1`).
+By derived pointer we mean one produced by a direct assignment or pointer arithmetic (such as `p + 1`).
 
 Or at least this is how it is defined. The reality is somewhat different.
 
@@ -352,7 +352,7 @@ _c_short:
 The effect is gone: the code looks very close to the old `int` version.
 
 All the `-fno-strict-aliasing` key does is that it switches off previous `-fstrict-aliasing`. We didn't invoke
-`-fstrict-aliasing`, but it was switched on automatically as part of `-O3` optimisatin pack (in fact, it is
+`-fstrict-aliasing`, but it was switched on automatically as part of `-O3` optimisation pack (in fact, it is
 switched on by `-O2`, and `-O3` is a superset of `-O2`).
 
 This is what GCC documentation says about the meaning of `-fstrict-aliasing`:
@@ -455,7 +455,7 @@ This is very important and justifies a bold statement:
 **Any C/C++ program compiled with option `-O2` or `-O3` is potentially unsafe and incorrect!**
 
 It is common practice to compile everything with `-O3`. Everybody wants speed, and everybody knows `-O3` means speed.
-This way unfamilliar, old and well forgotten, or third-party code  may end up being compiled like this, and who
+This way unfamiliar, old and well forgotten, or third-party code  may end up being compiled like this, and who
 knows what is inside? An author may have specifically relied on aliasing. One very common way of deliberate aliasing
 is when we cast pointers to different types in order to access the same memory differently. Consider following
 artificial example: we want to check how the value changes if we fill its first bytes with zeroes (for instance,
@@ -548,7 +548,7 @@ void b (char ** p)
 {% endhighlight %}
 
 Let's assume we know there is no aliasing here, because we work with a regular pointer structure, where `p` is a pointer to
-an array of pointers to arrays of `char` (a usual way to implement two-dimentions arrays), and we know no one
+an array of pointers to arrays of `char` (a usual way to implement two-dimensions arrays), and we know no one
 is using unsafe casts. We want to tell this fact to the compiler. Maybe `__restrict__` will help?
 
 No, applying this qualifier to `p` does not help, this code
@@ -572,7 +572,7 @@ void b_2 (char * __restrict__ * __restrict__ p)
 }
 {% endhighlight %}
 
-This does not help either. I couldn't find any way to tell a compiler that there is no aliasing in this case,
+This does not help either. I couldn't find any way to tell a compiler that there is no aliasing in this case.
 Maybe some of the readers know the way?
 
 How about the `const` specifier in **C++**? Doesn't declaring a `const` pointer indicate that the memory pointed
@@ -638,7 +638,7 @@ This will improve overall safety of our compiled program.
 Other languages
 ---------------
 
-**Java** claims it does not have pointers, but this is not completely true. It does not have pointer arithmetics
+**Java** claims it does not have pointers, but this is not completely true. It does not have pointer arithmetic
 or unsafe pointer casting (unless you use `java.misc.Unsafe`), but its object references are in fact pointers
 and as such are subject to pointer aliasing problem. Our `c()` example could be re-written in **Java** using either classes or arrays:
 
@@ -662,7 +662,7 @@ static void c_array (int [] p, int [] q)
 
 Here we have the same pointer aliasing problem as in **C**.
 
-Hovever, absence of pointer arithmetics and unsafe casts helps reduce the scope of the problem. For instance,
+However, absence of pointer arithmetic and unsafe casts helps reduce the scope of the problem. For instance,
 non-aliasing of pointers to different types (achieved in GCC by `-fstrict-aliasing`) in **Java** is built into the
 language. Two references of incompatible types or two arrays with different types of elements never alias,
 and this allows **Java** compiler (HotSpot) to perform optimisations that **C** compiler does not do.
@@ -738,4 +738,3 @@ Coming soon
 
 How is all of this applicable to our [de-multiplexing of E1 streams in C]({{ site.ART-E1-C }})
 example? Stay tuned, this will be covered soon.
-.

@@ -235,7 +235,7 @@ considers these registers consisting of four 32-bit words, while `paddq` of two 
 The operations are performed simultaneously on all the components.
 
 The code is really amazing. The GNU C compiler has a built-in vectoriser, which tries to use SSE wherever possible.
-In this case it has split a source vector into sub-vectors of sizes four or two, added those sub-vectors componentwise,
+In this case it has split a source vector into sub-vectors of sizes four or two, added those sub-vectors component-wise,
 and then calculated the sum of the result.
 
 Obviously, the second code requires twice as many iterations, as a result it runs longer.
@@ -289,7 +289,7 @@ Strictly speaking, the `size_t` isn't designed for indices, it is there for size
 results of this type. Many library functions have parameters of this type: `malloc()`, `calloc()`,
 `memcpy()`, `qsort()` and others. In addition to byte counts, it is used for element counts. It looks
 very reasonable to use this type for indexing, as long as a programmer is happy to use an unsigned type. There
-is a signed analog of the `size_t`, too -- it is called `ptrdiff_t`.
+is a signed version of the `size_t`, too -- it is called `ptrdiff_t`.
 
 Our index variables are unsigned already, so we can make all of them `size_t`.
 It makes sense to modify our interface and make `src_length` of type `size_t` as well. Besides making the code
@@ -424,7 +424,7 @@ Conclusions
 -----------
 - The size of the data types used does matter.
 
-- The type `size_t` is there for a purpose; this purpose isn't just for programs to look stylish and comform
+- The type `size_t` is there for a purpose; this purpose isn't just for programs to look stylish and conform
   to the conventions -- the programs really run faster if they use this type
 
 - We have exhausted conventional ways of achieving high performance in **C**; further improvements require

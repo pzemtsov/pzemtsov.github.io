@@ -85,7 +85,7 @@ Some comments on this:
 - There is no need for separate `MOVE_BYTE` function or macro any more: its code can be easily placed inside `move_bytes<N>`.
 
 - Hopefully the functions will be inlined into each other (I asked for that by using the `inline` keyword, but the
-  compiler can do some ilininng even without such a request), and in the end we'll get an unrolled loop.
+  compiler can do some inlining even without such a request), and in the end we'll get an unrolled loop.
 
 - Macros can access any variables from the context they are invoked; functions can't. That's why the entire
   context these functions operate one must be passed to them as parameters
@@ -100,7 +100,7 @@ Some comments on this:
 - The functional languages enthusiasts will probably find it exciting. I still prefer the macro solution as the
   more straightforward one.
 
-- However I must agree that it does not look as ugly as I though it would, so my original statement is probably not
+- However I must agree that it does not look as ugly as I thought it would, so my original statement is probably not
   correct.
 
 Deeper unrolling
@@ -147,7 +147,7 @@ public:
 {% endhighlight %}
 
 Parameter `j` defines the first timeslot to be moved. It's been added to make `move_timeslots<N>()` suitable for
-partialy unrolled versions, too:
+partially unrolled versions, too:
 
 {% highlight C++ %}
 class Unrolled_1_4 : public Demux
@@ -193,7 +193,7 @@ Other versions
 The remaining two versions (`Unrolled_3` and `Unrolled_4`) both involve repeatitive calling of functions from
 `demux()`. The difference was that in `Unrolled_4` it was the same function called 32 times, while in `Unrolled_3` there were
 32 different specialised functions. Using templates, we can do both: we can create service templated functions
-to implement loops, and we can create 32 instantiations of templated function. We can make all the servce templates
+to implement loops, and we can create 32 instantiations of templated function. We can make all the service templates
 private members of a class, so there won't be any need to `#undef` them after use. But it is easy to show that in
 our specific case all of that is unnecessary.
 
