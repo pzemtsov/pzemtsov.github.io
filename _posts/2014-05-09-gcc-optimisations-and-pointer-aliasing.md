@@ -3,7 +3,11 @@ layout: post
 title:  GCC, optimisations and pointer aliasing
 date:   2014-05-09 00:00:00
 tags: C C++ aliasing optimisation
+ART-STD-ALIASING: /2014/07/23/gcc-c-standard-and-pointer-aliasing.html
 ---
+
+_[Note: some of the statements made in this article turned out to be incorrect. They have been corrected
+later [here]({{ page.ART-STD-ALIASING }}). End of note]_
 
 Today I'm going to talk about **pointer aliasing** and the way it is controlled in GCC. While most people know
 the first part, not so many know the second (I didn't until recently), so hopefully there will be readers

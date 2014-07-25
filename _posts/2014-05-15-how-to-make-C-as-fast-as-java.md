@@ -4,7 +4,7 @@ title:  How to make C run as fast as Java
 date:   2014-05-15 12:00:00
 tags: C C++ Java GCC optimisation
 ART-UNSTABLE: /2014/05/12/mystery-of-unstable-performance.html
-ART-ALIASING: /2014/05/08/gcc-optimisations-and-pointer-aliasing.html
+ART-ALIASING: /2014/05/09/gcc-optimisations-and-pointer-aliasing.html
 ---
 
 No, there isn't a mistake in the title. Everyone expects that **C** programs always run faster than **Java**
