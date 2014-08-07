@@ -215,7 +215,7 @@ by values of restricted set of types, the new effective types are limited. Objec
 
 There are some points in this definition that are unclear to me. One is the use of character arrays. I've made the
 example involving copying bytes in a loop, but I'm not sure myself it is correct. The standard talks about
-value "copied as an array of character type", as something other that using `memcpy` or `memmove`, 
+value "copied as an array of character type", as something other than using `memcpy` or `memmove`, 
 but it isn't clear if it means a loop like mine.
 
 The other point is what happens if we modify a single byte of a value of non-character type. Consider the pointer `p`
@@ -349,7 +349,7 @@ This definition really looks impressive; it is a masterpiece of a standard-speak
 makes it worth reading the entire Standard. It takes a while to read the
 whole page full of bold latin-alphabet symbols, but when you finish, you will probably see that the meaning of this definition
 is exactly the same as that of the single line above. I don't say "probably" because I doubt your ability to
-understand the above text -- I say it because doubt my own ability to understand it.
+understand the above text -- I say it because I doubt my own ability to understand it.
 
 The definition allows specifying one pointer to be `restrict`. This guarantees that no one can access its destination,
 except for its derived pointers, so the compiler knows exactly what can and what cannot alias its destination.
@@ -391,11 +391,11 @@ meaningful place for it is right at the end:
 - `int ** restrict p;` -- meaning that `p` can point to an array of pointers to arrays to `int`, and inside current block
   nothing else can point to the same array.
 
-We can't define `int * restrict * p;` (a pointer to an array of restricted pointers). Probably, it wasn't easy
+We can't define `int * restrict * p;` (a pointer to an array of restricted pointers). It probably wasn't easy
 to define the behaviour of such pointers.
 
-This means that, unfortunately, the `restrict` qualifier has not been added in a consistent way. The way it is added
-its power is limited. However, this qualifier is still useful in the case of ordinary identifiers.
+This means that, unfortunately, the `restrict` qualifier has not been added in a consistent way. As a result, it has
+limited power. However, this qualifier is still useful in the case of ordinary identifiers.
 
 By the way, [The Rationale](http://www.open-std.org/JTC1/SC22/WG14/www/C99RationaleV5.10.pdf) 
 says that `struct` fields can be declared as `restrict`. This is strange, for `struct` fields are not ordinary identifiers,
@@ -403,7 +403,7 @@ and the definition shown above is not applicable. The way Rationale interprets s
 `struct` declaration contains two `restrict` pointers, these pointers taken from the same instance of the `struct`
 do not alias each other. The pointers from different instances, however, can alias.
 
-Here is a demonstration of limited power of `restrict` qualifier. No matter what we do, there is no way to use
+Here is a demonstration of the limited power of the `restrict` qualifier. No matter what we do, there is no way to use
 `restrict` to optimise the following function:
 
 {% highlight C++ %}
@@ -442,8 +442,8 @@ Conclusions
   are disabled; the semantics of the program is, however, well defined. This is the safest option.
 
 - The **C** standard (starting from C99) provides `restrict` keyword, but **C++** standard does not. GCC provides
-  `__restrict__` in both (as a language extension in case of **C++**). The semantics is the same as in the C99
-  standard. For unknown reason, to indicate that two pointers do not alias, both must be declared `restrict`. In general,
+  `__restrict__` in both (as a language extension in the case of **C++**). The semantics is the same as in the C99
+  standard. For an unknown reason, to indicate that two pointers do not alias, both must be declared `restrict`. In general,
   the power of this declaration is limited -- it does not help for complex pointer structures.
 
 - The strict aliasing rules put restrictions on programs (often too strict), but allow the compiler to do some
