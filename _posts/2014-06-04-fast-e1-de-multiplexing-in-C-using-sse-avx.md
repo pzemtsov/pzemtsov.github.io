@@ -633,7 +633,7 @@ inline void transpose_4x4_dwords (__m128i &w0, __m128i &w1, __m128i &w2, __m128i
 }
 {% endhighlight %}
 
-We have used four shuffle instructions where previously we were using twelve. Hopefully, this will make a difference.
+We have used eight shuffle instructions where previously we were using twelve. Hopefully, this will make a difference.
 [Let's modify the `Read4_Write16_SSE`]({{ site.REPO-E1-C }}/commit/19edc241cbce6779c2bb636bee36bbb756cea102):
 
 {% highlight C++ %}
