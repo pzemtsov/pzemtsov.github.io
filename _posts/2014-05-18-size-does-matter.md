@@ -90,42 +90,71 @@ _ZNK12Dst_First_3a5demuxEPKhjPPh:
         ret
 {% endhighlight %}
 
-Let's look at the inner loop (the code between `.L29` and `jne .L29`. This loop has been unrolled 8 times,
-this is why the same piece of code is repeated 8 times:
+Let's look at the inner loop (the code between `.L29` and `jne .L29`). This loop has been unrolled 8 times,
+which corresponds to the following transformation of the original code:
 
-{% highlight text %}
-        leal    64(%rdx), %r11d
-        movb    %r8b, 1(%rdi,%rax)
-        movzbl  (%rsi,%r11), %r10d
+{% highlight C++ %}
+        for (unsigned dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+            byte * d = dst [dst_num];
+            unsigned dst_pos_x_32 = 0;
+            for (unsigned dst_pos = 0; dst_pos < DST_SIZE; dst_pos += 8) {
+                d [dst_pos + 0] = src [dst_pos_x_32 +   0 + dst_num];
+                d [dst_pos + 1] = src [dst_pos_x_32 +  32 + dst_num];
+                d [dst_pos + 2] = src [dst_pos_x_32 +  64 + dst_num];
+                d [dst_pos + 3] = src [dst_pos_x_32 +  96 + dst_num];
+                d [dst_pos + 4] = src [dst_pos_x_32 + 128 + dst_num];
+                d [dst_pos + 5] = src [dst_pos_x_32 + 160 + dst_num];
+                d [dst_pos + 6] = src [dst_pos_x_32 + 192 + dst_num];
+                d [dst_pos + 7] = src [dst_pos_x_32 + 224 + dst_num];
+                dst_pos_x_32 += 256;
+            }
+        }
 {% endhighlight %}
 
-(the offsets in `leal` and `movb` vary).
+You can see that operation strength reduction has also happened: `dst_pos * 32` became a separate variable,
+updated once in the inner loop.
 
-Here `%rdx` is a pointer to the source memory, where the input bytes reside at the offsets 0, 32, 64 and so on;
-these bytes are loaded and written to the memory at the offsets 0, 1, 2, etc, from `(%rdi + %rax)`.
-The `%rdi` is `d` and `%rax` is `dst_pos`.
+It is easy to see how registers are allocated:
 
-Why is there the `leal` instruction? All it does is that it adds 64 to `%rdx` and writes result into `%r11d` (the
-`%r11d` is the lowest 32 bits of the 64-bit register `%r11`; when something is written to these lower 32
-bits, the higher 32 bits are zeroed). The result of this addition is later used in `movzbl`, where another
-register is added to it - `%rsi` (`src`).  But wait, in Intel architecture an addressing mode can consist of
-two registers (one possibly scaled) and an offset; why is this `64` offset not placed right there, like this?
+- `%rsi` is `src`
+- `%rdi` is `dst`
+- `%r9`  is `dst_num`
+- `%rax` is `dst_pos`
+- `%edx` is `dst_pos_x_32`
+
+Here is the code for one assignment from the inner loop (after sorting out some instruction re-ordering):
 
 {% highlight text %}
+        leal    32(%rdx), %r10d
+        movzbl  (%rsi,%r10), %r8d
         movb    %r8b, 1(%rdi,%rax)
-        movzbl  64(%rsi,%rdx), %r10d
+{% endhighlight %}
+
+Why is there the `leal` instruction? All it does is that it adds 32 to `%rdx` and writes the result into `%r10d`.
+The result of this addition is later used in the effective address of the `movzbl`, where another
+register is added to it -- `%rsi` (`src`).  But wait, in Intel architecture an addressing mode can consist of
+two registers (one possibly scaled) and an offset; why is this `32` offset not placed right there, like this?
+
+{% highlight text %}
+        movzbl  32(%rsi,%rdx), %r8d
+        movb    %r8b, 1(%rdi,%rax)
 {% endhighlight %}
 
 The hint comes from the name of the instruction (`leal`, rather than `leaq`), as well as the name of the result
-(`%r11d`): this is a 32-bit instruction. Why is the compiler computing the sum in 32 bits, but uses the 64-bit
-version of the result in the addressing mode?
+(`%r10d`, rather than `%r10`): this is a 32-bit instruction. The `%rdx` is specified as an argument, but in actual
+fact it only uses its lower 32 bits (`%edx`). Only the lower 32 bits of the result are used; they are written
+into into `%r10d`, which is the low part of the 64-bit register `%r10`. The higher 32 bits are zeroed.
+In short, the operation performs unsigned 32-bit addition (with possible wrapping in case of an overflow) and
+converts the result to 64 bits. The `leal` here has nothing to do with "load effective address", which is what its name stands for;
+it is used as a replacement for the addition instruction (`addl`), for the only reason that it allows the result to be in
+different register than the source, which saves a move instruction in our case. There is no way to combine this operation with a regular 64-bit addition in an
+addressing mode.
 
-The reason is simple: `dst_pos` is declared as `unsigned`, and `unsigned`, as well as `int`, is 32 bits in GCC.
-The `leal` here has nothing to do with "load effective address", which is what its name stands for; it is used as an
-addition instruction, and the only reason it is used instead of `addl` is that it allows the result to be in
-different register from the source, which saves a move instruction in our case.
+Why is the compiler computing the sum in 32 bits?
 
-In the source code `dst_pos` is multiplied by `NUM_TIMESLOTS`, and this is a 32-bit multiplication. Even if the
+The reason is simple: `dst_pos` is declared as `unsigned`, and `unsigned`, as well as `int`, is 32 bits long in GCC.
+The `%edx` register corresponds to the `dst_pos_x_32` variable from the pseudo-code, which equals to the
+`dst_pos` multiplied by `NUM_TIMESLOTS` (32), and this is a 32-bit multiplication. Even if the
 result is converted to a 64-bit value later, the **C++** requires the multiplication to be performed in 32-bit
 mode, and the high part of a result to be discarded. Check this:
 
@@ -136,16 +165,25 @@ unsigned long y = x * x;                 // result is 3567587328, which is
 unsigned long z = (unsigned long) x * x; // result is 1000000000000
 {% endhighlight %}
 
-In our example multiplication was replaced by addition (as a result of the strength reduction), but that addition was still performed
-in 32 bits for numeric safety. If current value of `%edx` is close to `0xFFFFFFFF`, adding 64 to it can cause
+In our example the multiplication was replaced with the addition (as a result of the strength reduction), but that addition was still performed
+in 32 bits for numeric safety:
+
+{% highlight text %}
+        addl    $256, %edx
+{% endhighlight %}
+
+The same applies to adding of the offsets (32, 64, etc) to `%edx`: these must also be done in 32 bits.
+If current value of `%edx` is close to `0xFFFFFFFF`, adding 32 to it can cause
 overflow and produce some small number as a result; this result would in fact be correct, while 64-bit result
 (where no overflow occurs, and the result is big) would be incorrect. This means we can't embed this addition into the addressing mode
 of a load instructions, because address calculations are always 64 bits on this processor.
 
-We know that in this loop `dst_pos` is actually small, it stays within interval `[0..DST_SIZE-1]`. If the compiler
-established this fact (and there are techniques of an interval analysis that make it possible), it could use the
-most efficient operand size instead of the declared size. The results would not differ because no overflow would
-ever happen. Unfortunately, it seems that the compiler does not perform this optimisation.
+We know that in this loop `dst_pos` is actually small, and so does the compiler; that's why it uses 64-bit register
+(`%rax`) for this variable. It knows that no overflow can happen while adding 8 to it. However, it doesn't seem to
+be clever enough to figure out that no overflow happens while multiplying it by 32. That's why it keeps `dst_pos_x_32`
+in a 32-bit variable `%edx` and performs all the calculations with it in a 32-bit way, which is unsuitable for
+effective address expressions.
+
 
 Why are `int` and `unsigned` 32 bits?
 -------------------------------------
@@ -186,9 +224,9 @@ Multiplication seems to run at the same speed.
 reduce speed due to memory bandwith limitations.
 
 32-bit numbers often allow better low-level optimisations than 64-bit numbers. Here is a simple example --
-a routine that adds two vectors of of 256 numbers each. We'll make two versions: for 32-bit numbers and for 64-bit:
+a routine that adds two vectors of 256 numbers each. We'll make two versions: for 32-bit numbers and for 64-bit:
 
-{% highlight C %}
+{% highlight C++ %}
 
 void sum32 (unsigned *a, unsigned * b, unsigned * c)
 {
@@ -240,14 +278,14 @@ and then calculated the sum of the result.
 
 Obviously, the second code requires twice as many iterations, as a result it runs longer.
 
-As you can see, there isn't a simple answer to the question which integer type is the most natural on the Intel 64
+As you can see, there isn't a simple answer to the question which integer type is the most natural on the Intel 64-bit
 architecture, and there are valid arguments both ways. However, it seems that 64 bits is the best size for values
 used to index arrays.
 
 Going 64 bits
 -------------
 
-Let's take `Dst_First_3a` and declare `dst_pos` a 64-bit variable. On 64-bit GCC we can use `unsigned long`:
+Let's take `Dst_First_3a` and declare `dst_pos` a 64-bit variable. On the 64-bit GCC we can use `unsigned long`:
 
 {% highlight C++ %}
 class Dst_First_3a : public Demux
@@ -401,9 +439,45 @@ _ZNK12Dst_First_3a5demuxEPKhmPPh:
         ret
 {% endhighlight %}
 
-The code looks much better than before (the previous version was published in the
-[previous article]({{ page.ART-CFAST }})). In fact,
-it looks close to ideal, To improve the speed even more, something extraordinary must be done.
+The code looks much better than before. Each line of the inner loop produces two instructions instead of three now:
+
+{% highlight text %}
+        movzbl  32(%rdx), %r8d
+        movb    %r8b, 1(%rdi,%rax)
+{% endhighlight %}
+
+Previously there were these three lines:
+
+{% highlight text %}
+        leal    32(%rdx), %r10d
+        movzbl  (%rsi,%r10), %r8d
+        movb    %r8b, 1(%rdi,%rax)
+{% endhighlight %}
+
+In fact, the code looks close to ideal, To improve the speed even more, something extraordinary must be done.
+
+By the way, the compiler chose different route from what I suggested before (adding an address, an index and an offset
+in the effective address calculation). It employed different transformation of the source program:
+
+{% highlight C++ %}
+        for (unsigned dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+            byte * d = dst [dst_num];
+            byte * s = src + dst_num;
+            for (unsigned dst_pos = 0; dst_pos < DST_SIZE; dst_pos += 8) {
+                d [dst_pos + 0] = s [  0];
+                d [dst_pos + 1] = s [ 32];
+                d [dst_pos + 2] = s [ 64];
+                d [dst_pos + 3] = s [ 96];
+                d [dst_pos + 4] = s [128];
+                d [dst_pos + 5] = s [160];
+                d [dst_pos + 6] = s [192];
+                d [dst_pos + 7] = s [224];
+                s += 256;
+            }
+        }
+{% endhighlight %}
+
+I don't think this new way is any faster (after all, address modes are free), but it looks neater.
 
 Retrospective
 -------------

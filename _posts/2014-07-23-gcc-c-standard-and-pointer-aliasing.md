@@ -12,7 +12,7 @@ After [this]({{ page.ART-ALIASING }}) article had been published, I received a v
 
 I'm very grateful to Kenton for pointing it out. His first statement is indeed correct. The last time I read
 a **C** standard must have been more than twenty years ago, enough time for the information to go out of active memory,
-or, simply speaking, be forgot.
+or, simply speaking, be forgotten.
 
 This is a good opportunity to look back and check what various standards have to say on the issue. So today instead
 of sharing a programming experience, I'm going to share a learning experience, which is also good.
@@ -61,7 +61,7 @@ We can see that the Standard definition talks about the same things as GNU C des
 
 First of all, what is an optimisation option in GNU C, is a language rule in the Standard. And a very strict one, too.
 It contains the word "**shall**", which, earlier in the Standard (3.16), is defined as a requirement whose violation
-is punishable by an undefined behaviour. And of four unusual types of behaviour that **C** defines (undefined behaviour,
+is punishable by an undefined behaviour. And of the four unusual types of behaviour that **C** defines (undefined behaviour,
 unspecified behaviour, implementation-defined behaviour, and locale-specific behaviour) the undefined behaviour is
 the worst:
 
@@ -267,13 +267,13 @@ following the Standard strictly, we should rather try to satisfy the limitations
 In this case our target compiler is GNU C, and it allows reading and writing from aliased memory without any problems
 (except for some performance penalties because you have to switch off certain optimisations).
 
-It looks odd, but it seems that the Standard is much more tolerant towards writing big objects to character
+It looks odd, but it seems that the Standard is much more tolerant to writing big objects to character
 arrays than to reading. When we are reading an `int` from a `char` array, we're violating the standard. But if we are
 writing an `int` to a freshly allocated `char` array, we are not violating it -- we a creating a new object, of type `int`.
 As a result, our output array, being declared as `char *`, in reality consists of objects of type `int` (`long`, or `__m128i`),
 which is perfectly legal.
 
-If the customer of our demodulation function wants later to read output arrays byte by byte, he is free to do so,
+If the customer of our demodulation function wants to read the output arrays byte by byte, he is free to do so,
 since the Standard allows reading complex objects byte by byte. He is also free to read the data using the same types
 we used to fill the arrays. But if he tries reading the data using other types, he'll be violating the Standard. 
 
