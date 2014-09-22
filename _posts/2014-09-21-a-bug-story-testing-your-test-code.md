@@ -621,6 +621,11 @@ least likely to resemble the correct output.
   attention to this unrealistic improvement. You can't rely on this much luck -- rather try to improve your
   test procesures.
 
+- The bug would not have been made if instead of writing down the inlined code manually I used some repetition
+  instruction having number of repetitions as a parameter. It seems that traditional macros are incapable of that
+  (or, at least, I don't know such a way), but templates can help here. Using templates for variable repetitions
+  was described in this article: ["{{ site.TITLE-TEMPLATE }}"]({{ site.ART-TEMPLATE }}).
+
 Coming soon
 -----------
 
