@@ -324,7 +324,7 @@ The performance looks like this:
 
 The performance is still bad. The unrolling helped a bit; however, in general our wonderful plan has failed.
 We could try more sophisticated versions, such as reading 4 bytes and writing 8, or even reading 8 and writing 8,
-but there is little chance it will help. It looks like the numerous shifts and bitwise ORs eat up all the performance gain
+but there is little chance it will help. It looks like numerous shifts and bitwise ORs eat up all the performance gain
 we get from optimising the memory access. It may seem that this is the end of our story, and there is
 no way to make it faster, but we still have one more resource: the SSE.
 
@@ -333,7 +333,7 @@ Some words about the SSE
 
 This article wasn't conceived as an SSE tutorial. If you are unfamiliar with SSE, there are numerous resources
 where you can find something about it. The [Wikipedia article](http://en.wikipedia.org/wiki/Streaming_SIMD_Extensions)
-can help for the initial reading; it explains different versions of SSE and their availabilities on various processors.
+can help for the initial reading; it explains different versions of SSE and their availability on various processors.
 As the ultimate reading, nothing can beat the Intel documentation, such as
 ["Intel&reg; 64 and IA-32 Architectures Software Developer Manuals"](http://www.intel.com/content/www/us/en/processors/architectures-software-developer-manuals.html])
 and ["Intel&reg; Architecture Instruction Set Extensions Programming Reference"](https://software.intel.com/sites/default/files/managed/68/8b/319433-019.pdf),
