@@ -486,7 +486,9 @@ This is the output:
 
 This looks interesting. The destination memory, freshly allocated in both cases, is filled with zeroes before the first
 run and is not before the second one. This is normal, because, unlike in **Java**, **C++**'s `new` operator does not clear
-allocated memory. Most users fill allocated objects and arrays with something useful; clearing it would have been a
+allocated memory (or, rather, does not have such obligation -- MSVC seems to clear it).
+Most users fill allocated objects and arrays with something useful (which is the point of allocating them in the first place);
+clearing them would have been a
 waste of CPU cycles. **Java**'s way is safer, but less efficient (if the word "safer" is appropriate here is a matter of
 opinion; after all, programs that use uninitialised data are usually incorrect; "safety" makes them behave consistently
 incorrect rather than demonstrate some variety).
