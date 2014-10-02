@@ -841,23 +841,26 @@ Results
 Let's put all the results into one table. I've used the last result of each test. The last column shows execution
 times as percentages of the time or the `Reference` solution.
 
-  Version        |          Comment                                                                    |    Time  | Rel.Ref
------------------|-------------------------------------------------------------------------------------|---------:|--------:
-`Reference`      | Strictly follows hardware decoder                                                   |  ` 2860` | `100.0%`
-`Src_First_1`    | Refactored the inner loop of Reference                                              |  ` 2481` | ` 86.7%`
-`Src_First_2`    | Nested loops with multiplication                                                    |  ` 2284` | ` 79.9%`
-`Src_First_3`    | Loop along source with division and modulo                                          |  ` 4360` | `152.4%`
-`Dst_First_1`    | Nested loops with multiplication                                                    |  ` 1155` | ` 40.4%`
-`Dst_First_2`    | `Dst_First_1` optimised manually                                                    |  ` 2093` | ` 73.2%`
-`Dst_First_3`    | `Dst_First_1` with hard coded input size                                            |  ` 1022` | ` 35.8%`
-`Unrolled_1`     | Inner loop unrolled fully                                                           |  `  659` | ` 23.0%`
-`Unrolled_1_2`   | Outer loop unrolled by 2                                                            |  `  654` | ` 22.9%`
-`Unrolled_1_4`   | Outer loop unrolled by 4                                                            |  `  636` | ` 22.2%`
-`Unrolled_1_8`   | Outer loop unrolled by 8                                                            |  `  637` | ` 22.3%`
-`Unrolled_1_16`  | Outer loop unrolled by 16                                                           |  `25904` | `905.7%`
-`Unrolled_2_Full`| Both loops unrolled in one huge method                                              |  `15630` | `546.5%`
-`Unrolled_3`     | Both loops unrolled; each iteration of an outer loop made into separate method      |  `  790` | ` 27.6%`
-`Unrolled_4`     | Both loops unrolled; all methods from `Unrolled_3` merged into one using parameters |  `  711` | ` 24.9%`
+<table class="numeric">
+<tr><th> Version </th><th> Comment </th> <th> Time </th> <th> Rel.Ref </th>
+<tr><td class="label">Reference      </td><td class="ttext">Strictly follows hardware decoder            </td><td> 2860 </td><td> 100.0% </td></tr>
+<tr><td class="label">Src_First_1    </td><td class="ttext">Refactored the inner loop of Reference       </td><td> 2481 </td><td>  86.7% </td></tr>
+<tr><td class="label">Src_First_2    </td><td class="ttext">Nested loops with multiplication             </td><td> 2284 </td><td>  79.9% </td></tr>
+<tr><td class="label">Src_First_3    </td><td class="ttext">Loop along source with division and modulo   </td><td> 4360 </td><td> 152.4% </td></tr>
+<tr><td class="label">Dst_First_1    </td><td class="ttext">Nested loops with multiplication             </td><td> 1155 </td><td>  40.4% </td></tr>
+<tr><td class="label">Dst_First_2    </td><td class="ttext"><code>Dst_First_1</code> optimised manually             </td><td> 2093 </td><td>  73.2% </td></tr>
+<tr><td class="label">Dst_First_3    </td><td class="ttext"><code>Dst_First_1</code> with hard coded input size     </td><td> 1022 </td><td>  35.8% </td></tr>
+<tr><td class="label">Unrolled_1     </td><td class="ttext">Inner loop unrolled fully                    </td><td>  659 </td><td>  23.0% </td></tr>
+<tr><td class="label">Unrolled_1_2   </td><td class="ttext">Outer loop unrolled by 2                     </td><td>  654 </td><td>  22.9% </td></tr>
+<tr><td class="label">Unrolled_1_4   </td><td class="ttext">Outer loop unrolled by 4                     </td><td>  636 </td><td>  22.2% </td></tr>
+<tr><td class="label">Unrolled_1_8   </td><td class="ttext">Outer loop unrolled by 8                     </td><td>  637 </td><td>  22.3% </td></tr>
+<tr><td class="label">Unrolled_1_16  </td><td class="ttext">Outer loop unrolled by 16                    </td><td>25904 </td><td> 905.7% </td></tr>
+<tr><td class="label">Unrolled_2_Full</td><td class="ttext">Both loops unrolled in one huge method       </td><td>15630 </td><td> 546.5% </td></tr>
+<tr><td class="label">Unrolled_3     </td><td class="ttext">Both loops unrolled; each iteration of
+                                                             an outer loop made into separate method      </td><td> 790 </td><td>  27.6% </td></tr>
+<tr><td class="label">Unrolled_4     </td><td class="ttext">Both loops unrolled; all methods from
+                                                            <code>Unrolled_3</code> merged into one using parameters </td><td> 711 </td><td>  24.9% </td></tr>
+</table>
 
 Here are the same results as a graph (I removed the worst performers to improve the resolution of the rest):
 

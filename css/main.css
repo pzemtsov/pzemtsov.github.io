@@ -208,3 +208,9 @@ table.numeric td.label {
   font-family: "Courier New", monospace;
   font-weight: bold;
 }
+
+table.numeric td.ttext {
+  font-weight: normal;
+  text-align: left;
+  font-family: Georgia, Times, serif;
+}
