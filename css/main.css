@@ -13,9 +13,10 @@
 html, body { height: 100%; }
 
 body {
-  background-color: #FFF;
-  font: 13.34px Georgia, Times, serif;
-  font-size: small;
+  background-color: #EEE;
+  color: #444;
+  font: 20px Georgia, Times, serif;
+/*  font-size: large; */
   text-align: center;
 }
 
@@ -58,9 +59,9 @@ a:visited { color: #a0a; }
 /*****************************************************************************/
 
 .site {
-  font-size: 115%;
-  text-align: justify;
-  width: 42em;
+/*  font-size: 115%; */
+  text-align: left;
+  width: 35em;
   margin: 3em auto 2em;
   line-height: 1.5em;
 }
@@ -131,12 +132,20 @@ a:visited { color: #a0a; }
 
 /* standard */
 .post pre {
-  font-size: 90%;
+  font-size: 75%;
   line-height: 115%;
   border: 1px solid #ddd;
-  background-color: #eef;
-  padding: 0 .4em;
+/*  background-color: #eef;*/
+  font-weight: bold;
+
 }
+
+.highlight {
+  background-color: #eef;
+  margin: 0 -6em 0 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}  
 
 .post ul, .post ol {
   margin-left: 1.35em;
@@ -145,7 +154,6 @@ a:visited { color: #a0a; }
 .post code {
   border: 1px solid #ddd;
   background-color: #eef;
-  padding: 0 .2m;
   font-weight: bold;
 }
 
