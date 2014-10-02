@@ -15,7 +15,7 @@ html, body { height: 100%; }
 body {
   background-color: #EEE;
   color: #444;
-  font: 20px Georgia, Times, serif;
+  font: 19px Georgia, Times, serif;
 /*  font-size: large; */
   text-align: center;
 }
@@ -48,7 +48,7 @@ a:visited { color: #a0a; }
 
 .posts span {
   color: #aaa;
-  font-family: Monaco, "Courier New", monospace;
+/*  font-family: Monaco, "Courier New", monospace;*/
   font-size: 80%;
 }
 
@@ -141,7 +141,8 @@ a:visited { color: #a0a; }
 
 .highlight {
   background-color: #eef;
-  margin: 0 -6em 1em 0;
+/*  margin: 0 -6em 1em 0;*/
+  margin: 0 0 1em 0;
   overflow-x: auto;
   overflow-y: hidden;
 }  
@@ -154,10 +155,19 @@ a:visited { color: #a0a; }
   border: 1px solid #ddd;
   background-color: #eef;
   font-weight: bold;
+  font-family: Consolas, "Courier New", monospace;
+}
+
+code.text {
+ background-color: black;
+ color: #D0D0D0;
+ padding: 5px;
+ border-radius: 5px;
 }
 
 .post pre code {
   border: none;
+  display: block;
 }
 
 /* terminal */
