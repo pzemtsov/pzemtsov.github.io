@@ -134,26 +134,28 @@ a:visited { color: #a0a; }
 .post pre {
   font-size: 75%;
   line-height: 115%;
-  border: 1px solid #ddd;
-/*  background-color: #eef;*/
+/*  border: 1px solid #ddd; */
   font-weight: bold;
 }
 
 .highlight {
   background-color: #eef;
-/*  margin: 0 -6em 1em 0;*/
   margin: 0 0 1em 0;
   overflow-x: auto;
   overflow-y: hidden;
 }  
+
+.highlight pre code {
+  border: 1px solid #666;
+}
 
 .post ul, .post ol {
   margin-left: 1.35em;
 }
 
 .post code {
-  border: 1px solid #ddd;
-  background-color: #eef;
+  border: 1px solid #c0c0c0;
+  background-color: #e0e0ff; /*yellow; *//* #eef; */
   font-weight: bold;
   font-family: Consolas, "Courier New", monospace;
 }
@@ -166,7 +168,6 @@ code.language-text {
 }
 
 .post pre code {
-  border: none;
   display: block;
 }
 
