@@ -159,7 +159,7 @@ public:
 };
 {% endhighlight %}
 
-The entire code can be found [here](({{ site.REPO-BUG-TEST }}/commit/1235970a0dcca2910a52f58b7c20f506051d6bd0) (I made an extract of the original file with only the relevant code and called it
+The entire code can be found [here]({{ site.REPO-BUG-TEST }}/commit/1235970a0dcca2910a52f58b7c20f506051d6bd0) (I made an extract of the original file with only the relevant code and called it
 `e1-bug1.cpp`). The code looks a bit complicated at first, but it is easy to see the main idea: we iterate over both input and output
 with step 4, effectively dividing our entire matrix into the grid of 4x4 blocks. Each block is read into four
 32-bit variables (hopefully, residing in registers), transposed in registers by means of shifts, and then written
