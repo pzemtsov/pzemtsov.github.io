@@ -184,5 +184,27 @@ code.language-text {
 
 .post table td {
   border: 1px solid black;
+  padding: 1px 5px; 1px; 5px;
+}
+
+.post table {
+  width:100%
+}
+
+.post th {
+  border: 2px solid black;
   padding: 5px;
+  background-color: #C0C0C0;
+}
+
+table.numeric td {
+  text-align: right;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+}
+
+table.numeric td.label {
+  text-align: left;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
 }

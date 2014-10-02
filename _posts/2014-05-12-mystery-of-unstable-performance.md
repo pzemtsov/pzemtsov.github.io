@@ -557,21 +557,21 @@ I tried to do it then but faced exactly the same instability problem with `Dst_F
 
 Let's collect the old and the new results, together with the results from **Java**, in one table:
 
-<table style="width:100%">
-<tr><th>     Version              </th> <th>  Results in Java </th> <th> Old results in C</th><th> New results in C</th></tr>
-<tr><td><pre>Reference      </pre></td> <td align="right"><pre>  2860 </pre></td> <td align="right"><pre> 1939</pre></td> <td align="right"><pre> 1939</pre></td></tr>
-<tr><td><pre>Src_First_1    </pre></td> <td align="right"><pre>  2481 </pre></td> <td align="right"><pre> 1885</pre></td> <td align="right"><pre> 1488</pre></td></tr>
-<tr><td><pre>Src_First_2    </pre></td> <td align="right"><pre>  2284 </pre></td> <td align="right"><pre> 1924</pre></td> <td align="right"><pre> 1341</pre></td></tr>
-<tr><td><pre>Src_First_3    </pre></td> <td align="right"><pre>  4360 </pre></td> <td align="right"><pre> 1892</pre></td> <td align="right"><pre> 1891</pre></td></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1467</pre></td> <td align="right"><pre> 1457</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre> 1445</pre></td> <td align="right"><pre> 1454</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1761</pre></td> <td align="right"><pre> 1464</pre></td></tr>
-<tr><td><pre>Unrolled_1     </pre></td> <td align="right"><pre>   659 </pre></td> <td align="right"><pre>  633</pre></td> <td align="right"><pre>  636</pre></td></tr>
-<tr><td><pre>Unrolled_1_2   </pre></td> <td align="right"><pre>   654 </pre></td> <td align="right"><pre>  634</pre></td> <td align="right"><pre>  634</pre></td></tr>
-<tr><td><pre>Unrolled_1_4   </pre></td> <td align="right"><pre>   636 </pre></td> <td align="right"><pre>  654</pre></td> <td align="right"><pre>  655</pre></td></tr>
-<tr><td><pre>Unrolled_1_8   </pre></td> <td align="right"><pre>   637 </pre></td> <td align="right"><pre>  650</pre></td> <td align="right"><pre>  650</pre></td></tr>
-<tr><td><pre>Unrolled_1_16  </pre></td> <td align="right"><pre> 25904 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_2_Full</pre></td> <td align="right"><pre> 15630 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
+<table class="numeric">
+<tr><th>     Version      </th><th>  Time in Java </th><th> Old time in C</th><th> New time in C</th></tr>
+<tr><td class="label">Reference      </td><td>  2860</td><td> 1939</td><td> 1939</td></tr>
+<tr><td class="label">Src_First_1    </td><td>  2481</td><td> 1885</td><td> 1488</td></tr>
+<tr><td class="label">Src_First_2    </td><td>  2284</td><td> 1924</td><td> 1341</td></tr>
+<tr><td class="label">Src_First_3    </td><td>  4360</td><td> 1892</td><td> 1891</td></tr>
+<tr><td class="label">Dst_First_1    </td><td>  1155</td><td> 1467</td><td> 1457</td></tr>
+<tr><td class="label">Dst_First_2    </td><td>  2093</td><td> 1445</td><td> 1454</td></tr>
+<tr><td class="label">Dst_First_3    </td><td>  1022</td><td> 1761</td><td> 1464</td></tr>
+<tr><td class="label">Unrolled_1     </td><td>   659</td><td>  633</td><td>  636</td></tr>
+<tr><td class="label">Unrolled_1_2   </td><td>   654</td><td>  634</td><td>  634</td></tr>
+<tr><td class="label">Unrolled_1_4   </td><td>   636</td><td>  654</td><td>  655</td></tr>
+<tr><td class="label">Unrolled_1_8   </td><td>   637</td><td>  650</td><td>  650</td></tr>
+<tr><td class="label">Unrolled_1_16  </td><td> 25904</td><td>  635</td><td>  635</td></tr>
+<tr><td class="label">Unrolled_2_Full</td><td> 15630</td><td>  635</td><td>  635</td></tr>
 </table>
 
 Some observations:

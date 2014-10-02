@@ -490,28 +490,28 @@ and [we can remove appropriate code]({{ site.REPO-E1-C }}/commit/b98c060e8f01ef5
 
 Let's recall the results for **Java** version and put them together in the same table:
 
-<table style="width:100%">
-<tr><th>     Version              </th> <th>  Results in Java </th> <th> Results in C</th></tr>
-<tr><td><pre>Reference      </pre></td> <td align="right"><pre>  2860 </pre></td> <td align="right"><pre> 1939</pre></td></tr>
-<tr><td><pre>Src_First_1    </pre></td> <td align="right"><pre>  2481 </pre></td> <td align="right"><pre> 1885</pre></td></tr>
-<tr><td><pre>Src_First_2    </pre></td> <td align="right"><pre>  2284 </pre></td> <td align="right"><pre> 1924</pre></td></tr>
-<tr><td><pre>Src_First_3    </pre></td> <td align="right"><pre>  4360 </pre></td> <td align="right"><pre> 1892</pre></td></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1467</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre> 1445</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1761</pre></td></tr>
-<tr><td><pre>Unrolled_1     </pre></td> <td align="right"><pre>   659 </pre></td> <td align="right"><pre>  633</pre></td></tr>
-<tr><td><pre>Unrolled_1_2   </pre></td> <td align="right"><pre>   654 </pre></td> <td align="right"><pre>  634</pre></td></tr>
-<tr><td><pre>Unrolled_1_4   </pre></td> <td align="right"><pre>   636 </pre></td> <td align="right"><pre>  654</pre></td></tr>
-<tr><td><pre>Unrolled_1_8   </pre></td> <td align="right"><pre>   637 </pre></td> <td align="right"><pre>  650</pre></td></tr>
-<tr><td><pre>Unrolled_1_16  </pre></td> <td align="right"><pre> 25904 </pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_2_Full</pre></td> <td align="right"><pre> 15630 </pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_3     </pre></td> <td align="right"><pre>   790 </pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_4     </pre></td> <td align="right"><pre>   711 </pre></td> <td align="right"><pre>  655</pre></td></tr>
+<table class="numeric">
+<tr><th>     Version              </th> <th>  Time in Java </th> <th> Time in C</th></tr>
+<tr><td class="label">Reference      </td> <td>  2860 </td> <td> 1939</td></tr>
+<tr><td class="label">Src_First_1    </td> <td>  2481 </td> <td> 1885</td></tr>
+<tr><td class="label">Src_First_2    </td> <td>  2284 </td> <td> 1924</td></tr>
+<tr><td class="label">Src_First_3    </td> <td>  4360 </td> <td> 1892</td></tr>
+<tr><td class="label">Dst_First_1    </td> <td>  1155 </td> <td> 1467</td></tr>
+<tr><td class="label">Dst_First_2    </td> <td>  2093 </td> <td> 1445</td></tr>
+<tr><td class="label">Dst_First_3    </td> <td>  1022 </td> <td> 1761</td></tr>
+<tr><td class="label">Unrolled_1     </td> <td>   659 </td> <td>  633</td></tr>
+<tr><td class="label">Unrolled_1_2   </td> <td>   654 </td> <td>  634</td></tr>
+<tr><td class="label">Unrolled_1_4   </td> <td>   636 </td> <td>  654</td></tr>
+<tr><td class="label">Unrolled_1_8   </td> <td>   637 </td> <td>  650</td></tr>
+<tr><td class="label">Unrolled_1_16  </td> <td> 25904 </td> <td>  635</td></tr>
+<tr><td class="label">Unrolled_2_Full</td> <td> 15630 </td> <td>  635</td></tr>
+<tr><td class="label">Unrolled_3     </td> <td>   790 </td> <td>  635</td></tr>
+<tr><td class="label">Unrolled_4     </td> <td>   711 </td> <td>  655</td></tr>
 </table>
 
 Here comes our first sensation: **C++ is not always faster than Java**. Both `Dst_First_1` and `Dst_First_3` run
 quite a bit faster in **Java** than in **C++**. I'll come back to this phenomenon in a later article. Let's look at
-other expectations:
+other observations:
 
 - The compiler does not panic when compiling big methods; there are no cases when something ran unusually slow
 
@@ -548,5 +548,5 @@ Some points to investigate:
 Coming soon
 -----------
 
-Can C++ code be made faster without rewriting -- perhaps there are some secret compiler keys? Can the speed be
+Can **C++** code be made faster without rewriting -- perhaps there are some secret compiler keys? Can the speed be
 improved any more? Answers will follow soon.

@@ -365,23 +365,23 @@ This is what happens when we make everything `size_t`
 The results look really impressive. Let's put them into the table. The old results come from the
 [previous article]({{ page.ART-CFAST }}):
 
-<table style="width:100%">
-<tr><th>     Version              </th> <th>  Results in Java </th>               <th> Old results in C</th>              <th> New results in C</th></tr>
-<tr><td><pre>Reference      </pre></td> <td align="right"><pre>  2860 </pre></td> <td align="right"><pre> 1604</pre></td> <td align="right"><pre> 1367</pre></td></tr>
-<tr><td><pre>Src_First_1    </pre></td> <td align="right"><pre>  2481 </pre></td> <td align="right"><pre> 1119</pre></td> <td align="right"><pre>  987</pre></td></tr>
-<tr><td><pre>Src_First_2    </pre></td> <td align="right"><pre>  2284 </pre></td> <td align="right"><pre> 1101</pre></td> <td align="right"><pre>  986</pre></td></tr>
-<tr><td><pre>Src_First_3    </pre></td> <td align="right"><pre>  4360 </pre></td> <td align="right"><pre> 1458</pre></td> <td align="right"><pre> 1359</pre></td></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1079</pre></td> <td align="right"><pre>  991</pre></td></tr>
-<tr><td><pre>Dst_First_1a   </pre></td> <td align="right"><pre>       </pre></td> <td align="right"><pre>  882</pre></td> <td align="right"><pre>  763</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre>  880</pre></td> <td align="right"><pre>  766</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1009</pre></td> <td align="right"><pre>  982</pre></td></tr>
-<tr><td><pre>Dst_First_3a   </pre></td> <td align="right"><pre>       </pre></td> <td align="right"><pre>  727</pre></td> <td align="right"><pre>  652</pre></td></tr>
-<tr><td><pre>Unrolled_1     </pre></td> <td align="right"><pre>   659 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  636</pre></td></tr>
-<tr><td><pre>Unrolled_1_2   </pre></td> <td align="right"><pre>   654 </pre></td> <td align="right"><pre>  633</pre></td> <td align="right"><pre>  632</pre></td></tr>
-<tr><td><pre>Unrolled_1_4   </pre></td> <td align="right"><pre>   636 </pre></td> <td align="right"><pre>  651</pre></td> <td align="right"><pre>  636</pre></td></tr>
-<tr><td><pre>Unrolled_1_8   </pre></td> <td align="right"><pre>   637 </pre></td> <td align="right"><pre>  648</pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_1_16  </pre></td> <td align="right"><pre> 25904 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_2_Full</pre></td> <td align="right"><pre> 15630 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
+<table class="numeric">
+<tr><th>     Version              </th> <th>  Time in Java </th> <th> Old time in C</th><th> New time in C</th></tr>
+<tr><td class="label">Reference      </td><td>  2860 </td><td> 1604</td><td> 1367</td></tr>
+<tr><td class="label">Src_First_1    </td><td>  2481 </td><td> 1119</td><td>  987</td></tr>
+<tr><td class="label">Src_First_2    </td><td>  2284 </td><td> 1101</td><td>  986</td></tr>
+<tr><td class="label">Src_First_3    </td><td>  4360 </td><td> 1458</td><td> 1359</td></tr>
+<tr><td class="label">Dst_First_1    </td><td>  1155 </td><td> 1079</td><td>  991</td></tr>
+<tr><td class="label">Dst_First_1a   </td><td>       </td><td>  882</td><td>  763</td></tr>
+<tr><td class="label">Dst_First_2    </td><td>  2093 </td><td>  880</td><td>  766</td></tr>
+<tr><td class="label">Dst_First_3    </td><td>  1022 </td><td> 1009</td><td>  982</td></tr>
+<tr><td class="label">Dst_First_3a   </td><td>       </td><td>  727</td><td>  652</td></tr>
+<tr><td class="label">Unrolled_1     </td><td>   659 </td><td>  635</td><td>  636</td></tr>
+<tr><td class="label">Unrolled_1_2   </td><td>   654 </td><td>  633</td><td>  632</td></tr>
+<tr><td class="label">Unrolled_1_4   </td><td>   636 </td><td>  651</td><td>  636</td></tr>
+<tr><td class="label">Unrolled_1_8   </td><td>   637 </td><td>  648</td><td>  635</td></tr>
+<tr><td class="label">Unrolled_1_16  </td><td> 25904 </td><td>  635</td><td>  635</td></tr>
+<tr><td class="label">Unrolled_2_Full</td><td> 15630 </td><td>  635</td><td>  635</td></tr>
 </table>
 
 Observations:

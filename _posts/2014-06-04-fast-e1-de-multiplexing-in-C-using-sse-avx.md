@@ -1304,31 +1304,31 @@ Results summary
 
 Here are all the results we've got in **C**, in a table:
 
-<table style="width:100%">
-<tr><th>     Version                </th> <th> Time</th></tr>
-<tr><td><pre>Reference         </pre></td> <td align="right"><pre> 1367</pre></td></tr>
-<tr><td><pre>Src_First_1       </pre></td> <td align="right"><pre>  987</pre></td></tr>
-<tr><td><pre>Src_First_2       </pre></td> <td align="right"><pre>  986</pre></td></tr>
-<tr><td><pre>Src_First_3       </pre></td> <td align="right"><pre> 1359</pre></td></tr>
-<tr><td><pre>Dst_First_1       </pre></td> <td align="right"><pre>  991</pre></td></tr>
-<tr><td><pre>Dst_First_1a      </pre></td> <td align="right"><pre>  763</pre></td></tr>
-<tr><td><pre>Dst_First_2       </pre></td> <td align="right"><pre>  766</pre></td></tr>
-<tr><td><pre>Dst_First_3       </pre></td> <td align="right"><pre>  982</pre></td></tr>
-<tr><td><pre>Dst_First_3a      </pre></td> <td align="right"><pre>  652</pre></td></tr>
-<tr><td><pre>Unrolled_1        </pre></td> <td align="right"><pre>  636</pre></td></tr>
-<tr><td><pre>Unrolled_1_2      </pre></td> <td align="right"><pre>  632</pre></td></tr>
-<tr><td><pre>Unrolled_1_4      </pre></td> <td align="right"><pre>  636</pre></td></tr>
-<tr><td><pre>Unrolled_1_8      </pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_1_16     </pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Write_4           </pre></td> <td align="right"><pre>  491</pre></td></tr>
-<tr><td><pre>Write_8           </pre></td> <td align="right"><pre>  508</pre></td></tr>
-<tr><td><pre>Read4_Write4      </pre></td> <td align="right"><pre>  638</pre></td></tr>
-<tr><td><pre>Read4_Write4_SSE  </pre></td> <td align="right"><pre>  232</pre></td></tr>
-<tr><td><pre>Read4_Write16_SSE </pre></td> <td align="right"><pre>  141</pre></td></tr>
-<tr><td><pre>Read8_Write16_SSE </pre></td> <td align="right"><pre>  120</pre></td></tr>
-<tr><td><pre>Read16_Write16_SSE</pre></td> <td align="right"><pre>  163</pre></td></tr>
-<tr><td><pre>Read4_Write32_AVX </pre></td> <td align="right"><pre>  138</pre></td></tr>
-<tr><td><pre>Read8_Write32_AVX </pre></td> <td align="right"><pre>  109</pre></td></tr>
+<table class="numeric">
+<tr><th>     Version                </th><th> Time</th></tr>
+<tr><td class="label">Reference         </td><td> 1367</td></tr>
+<tr><td class="label">Src_First_1       </td><td>  987</td></tr>
+<tr><td class="label">Src_First_2       </td><td>  986</td></tr>
+<tr><td class="label">Src_First_3       </td><td> 1359</td></tr>
+<tr><td class="label">Dst_First_1       </td><td>  991</td></tr>
+<tr><td class="label">Dst_First_1a      </td><td>  763</td></tr>
+<tr><td class="label">Dst_First_2       </td><td>  766</td></tr>
+<tr><td class="label">Dst_First_3       </td><td>  982</td></tr>
+<tr><td class="label">Dst_First_3a      </td><td>  652</td></tr>
+<tr><td class="label">Unrolled_1        </td><td>  636</td></tr>
+<tr><td class="label">Unrolled_1_2      </td><td>  632</td></tr>
+<tr><td class="label">Unrolled_1_4      </td><td>  636</td></tr>
+<tr><td class="label">Unrolled_1_8      </td><td>  635</td></tr>
+<tr><td class="label">Unrolled_1_16     </td><td>  635</td></tr>
+<tr><td class="label">Write_4           </td><td>  491</td></tr>
+<tr><td class="label">Write_8           </td><td>  508</td></tr>
+<tr><td class="label">Read4_Write4      </td><td>  638</td></tr>
+<tr><td class="label">Read4_Write4_SSE  </td><td>  232</td></tr>
+<tr><td class="label">Read4_Write16_SSE </td><td>  141</td></tr>
+<tr><td class="label">Read8_Write16_SSE </td><td>  120</td></tr>
+<tr><td class="label">Read16_Write16_SSE</td><td>  163</td></tr>
+<tr><td class="label">Read4_Write32_AVX </td><td>  138</td></tr>
+<tr><td class="label">Read8_Write32_AVX </td><td>  109</td></tr>
 </table>
 
 And here is the graph with today's results:

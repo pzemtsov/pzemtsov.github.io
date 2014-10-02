@@ -15,11 +15,11 @@ we came across the example of the opposite.
 These are the versions in question and the performance data, as published at the end of
 [the last article]({{ page.ART-UNSTABLE }}):
 
-<table style="width:100%">
+<table class="numeric">
 <tr><th>     Method               </th> <th>  Results in Java </th> <th>  Results in C  </th></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1457</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre> 1454</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1464</pre></td></tr>
+<tr><td class="label">Dst_First_1 </td> <td> 1155 </td><td> 1457></td></tr>
+<tr><td class="label">Dst_First_2 </td> <td> 2093 </td><td> 1454></td></tr>
+<tr><td class="label">Dst_First_3 </td> <td> 1022 </td><td> 1464></td></tr>
 </table>
 
 We can see that `Dst_First_1` and `Dst_First_3` are faster in **Java** than in **C**. There are other irregularities
@@ -338,23 +338,23 @@ Let's try `-funroll-loops`:
 Let's put all the results into one table. The old results are taken from
 [The mystery of an unstable performance]({{ page.ART-UNSTABLE }}).
 
-<table style="width:100%">
-<tr><th>     Version              </th> <th>  Results in Java </th> <th> Old results in C</th><th> New results in C</th></tr>
-<tr><td><pre>Reference      </pre></td> <td align="right"><pre>  2860 </pre></td> <td align="right"><pre> 1939</pre></td> <td align="right"><pre> 1604</pre></td></tr>
-<tr><td><pre>Src_First_1    </pre></td> <td align="right"><pre>  2481 </pre></td> <td align="right"><pre> 1888</pre></td> <td align="right"><pre> 1119</pre></td></tr>
-<tr><td><pre>Src_First_2    </pre></td> <td align="right"><pre>  2284 </pre></td> <td align="right"><pre> 1341</pre></td> <td align="right"><pre> 1101</pre></td></tr>
-<tr><td><pre>Src_First_3    </pre></td> <td align="right"><pre>  4360 </pre></td> <td align="right"><pre> 1891</pre></td> <td align="right"><pre> 1458</pre></td></tr>
-<tr><td><pre>Dst_First_1    </pre></td> <td align="right"><pre>  1155 </pre></td> <td align="right"><pre> 1457</pre></td> <td align="right"><pre> 1079</pre></td></tr>
-<tr><td><pre>Dst_First_1a   </pre></td> <td align="right"><pre>       </pre></td> <td align="right"><pre>     </pre></td> <td align="right"><pre>  882</pre></td></tr>
-<tr><td><pre>Dst_First_2    </pre></td> <td align="right"><pre>  2093 </pre></td> <td align="right"><pre> 1454</pre></td> <td align="right"><pre>  880</pre></td></tr>
-<tr><td><pre>Dst_First_3    </pre></td> <td align="right"><pre>  1022 </pre></td> <td align="right"><pre> 1464</pre></td> <td align="right"><pre> 1009</pre></td></tr>
-<tr><td><pre>Dst_First_3a   </pre></td> <td align="right"><pre>       </pre></td> <td align="right"><pre>     </pre></td> <td align="right"><pre>  727</pre></td></tr>
-<tr><td><pre>Unrolled_1     </pre></td> <td align="right"><pre>   659 </pre></td> <td align="right"><pre>  636</pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_1_2   </pre></td> <td align="right"><pre>   654 </pre></td> <td align="right"><pre>  634</pre></td> <td align="right"><pre>  633</pre></td></tr>
-<tr><td><pre>Unrolled_1_4   </pre></td> <td align="right"><pre>   636 </pre></td> <td align="right"><pre>  655</pre></td> <td align="right"><pre>  651</pre></td></tr>
-<tr><td><pre>Unrolled_1_8   </pre></td> <td align="right"><pre>   637 </pre></td> <td align="right"><pre>  650</pre></td> <td align="right"><pre>  648</pre></td></tr>
-<tr><td><pre>Unrolled_1_16  </pre></td> <td align="right"><pre> 25904 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
-<tr><td><pre>Unrolled_2_Full</pre></td> <td align="right"><pre> 15630 </pre></td> <td align="right"><pre>  635</pre></td> <td align="right"><pre>  635</pre></td></tr>
+<table class="numeric">
+<tr><th>     Version              </th> <th>  Time in Java </th> <th> Old time in C</th><th> New time in C</th></tr>
+<tr><td class="label">Reference      </td><td >  2860 </td><td > 1939</td><td > 1604</td></tr>
+<tr><td class="label">Src_First_1    </td><td >  2481 </td><td > 1888</td><td > 1119</td></tr>
+<tr><td class="label">Src_First_2    </td><td >  2284 </td><td > 1341</td><td > 1101</td></tr>
+<tr><td class="label">Src_First_3    </td><td >  4360 </td><td > 1891</td><td > 1458</td></tr>
+<tr><td class="label">Dst_First_1    </td><td >  1155 </td><td > 1457</td><td > 1079</td></tr>
+<tr><td class="label">Dst_First_1a   </td><td >       </td><td >     </td><td >  882</td></tr>
+<tr><td class="label">Dst_First_2    </td><td >  2093 </td><td > 1454</td><td >  880</td></tr>
+<tr><td class="label">Dst_First_3    </td><td >  1022 </td><td > 1464</td><td > 1009</td></tr>
+<tr><td class="label">Dst_First_3a   </td><td >       </td><td >     </td><td >  727</td></tr>
+<tr><td class="label">Unrolled_1     </td><td >   659 </td><td >  636</td><td >  635</td></tr>
+<tr><td class="label">Unrolled_1_2   </td><td >   654 </td><td >  634</td><td >  633</td></tr>
+<tr><td class="label">Unrolled_1_4   </td><td >   636 </td><td >  655</td><td >  651</td></tr>
+<tr><td class="label">Unrolled_1_8   </td><td >   637 </td><td >  650</td><td >  648</td></tr>
+<tr><td class="label">Unrolled_1_16  </td><td > 25904 </td><td >  635</td><td >  635</td></tr>
+<tr><td class="label">Unrolled_2_Full</td><td > 15630 </td><td >  635</td><td >  635</td></tr>
 </table>
 
 
