@@ -5,8 +5,8 @@ date:   2014-09-21 12:00:00
 tags:   C C++ bug
 ---
 
-The background
---------------
+Background
+----------
 
 This story happened when I was preparing the article ["{{ site.TITLE-E1-C-SSE }}"]({{ site.ART-E1-C-SSE }})". For those who are out of context, here is a brief
 introduction. We were de-multiplexing the E1 stream, first [in **Java**]({{ site.ART-E1 }}), then
@@ -613,7 +613,7 @@ Conclusions
 - Uninitialised memory is good for performance but bad for testing; fill your output memory with the values that are the
 least likely to resemble the correct output.
 
-- Test code is also a code; it can contain bugs or drawbacks. It requires the same attention as the production code.
+- Test code is also code; it can contain bugs or drawbacks. It requires the same attention as the production code.
   Possibly, even more, since there are usually no tests for the test code.
 
 - This time I was extremely lucky twice. First, the bug I made caused a big speed improvement; were it smaller,

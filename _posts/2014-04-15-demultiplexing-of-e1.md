@@ -119,18 +119,18 @@ We are still not ready to run the test implementation. We need to create a test 
 We need methods to create the test input data and to allocate the test outputs:
 
 {% highlight java %}
-    static byte[] generate ()
-    {
-        byte [] buf = new byte [SRC_SIZE];
-        Random r = new Random (0);
-        r.nextBytes (buf);
-        return buf;
-    }
+static byte[] generate ()
+{
+    byte [] buf = new byte [SRC_SIZE];
+    Random r = new Random (0);
+    r.nextBytes (buf);
+    return buf;
+}
     
-    static byte[][] allocate_dst ()
-    {
-        return new byte [NUM_TIMESLOTS][DST_SIZE];
-    }
+static byte[][] allocate_dst ()
+{
+    return new byte [NUM_TIMESLOTS][DST_SIZE];
+}
 {% endhighlight %}
 
 
@@ -141,35 +141,35 @@ in other cases, where the speed may depend on the input data (a classic example 
 Next, we need a performance measuring code:
 
 {% highlight java %}
-    public static final int ITERATIONS = 1000000;
-    public static final int REPETITIONS = 5;
+public static final int ITERATIONS = 1000000;
+public static final int REPETITIONS = 5;
 
-    static void measure (Demux demux)
-    {
-        byte[] src = generate ();
-        byte[][] dst = allocate_dst ();
+static void measure (Demux demux)
+{
+    byte[] src = generate ();
+    byte[][] dst = allocate_dst ();
 
-        System.out.print (demux.getClass ().getCanonicalName () + ":");
+    System.out.print (demux.getClass ().getCanonicalName () + ":");
      
-        for (int loop = 0; loop < REPETITIONS; loop ++) {
-            long t0 = System.currentTimeMillis ();
-            for (int i = 0; i < ITERATIONS; i++) {
-                demux.demux (src, dst);
-            }
-            long t = System.currentTimeMillis () - t0;
-            System.out.print (" " + t);
+    for (int loop = 0; loop < REPETITIONS; loop ++) {
+        long t0 = System.currentTimeMillis ();
+        for (int i = 0; i < ITERATIONS; i++) {
+            demux.demux (src, dst);
         }
-        System.out.println ();
+        long t = System.currentTimeMillis () - t0;
+        System.out.print (" " + t);
     }
+    System.out.println ();
+}
 {% endhighlight %}
 
 And the `main` method:
 
 {% highlight java %}
-    public static void main (String [] args) 
-    {
-        measure (new Reference ());
-    }
+public static void main (String [] args) 
+{
+    measure (new Reference ());
+}
 {% endhighlight %}
 
 (the entire test and measurement code can be seen [here]({{ site.REPO-E1 }}/commit/ab2a4017828c4b4560901ff1e5834ae461d1db99)).
@@ -194,13 +194,13 @@ First results
 After all the preparations, we are finally ready to run the program. I'm going to use the server VM of **Java** version 1.7_40 on Linux, running on a Dell
 blade with Intel(R) Xeon(R) CPU E5-2670 @ 2.60GHz.
 
-    $ Java -server E1
+    # Java -server E1
     E1.Reference: 2897 2860 2860 2860 2860
 
 The effect of HotSpot warm-up is visible, but it is quite small. The execution times starting from the second iteration are remarkably stable.
 Are they also stable between runs? Let's run it again
 
-    $ Java -server E1
+    # Java -server E1
     E1.Reference: 2909 2860 2859 2860 2860
 
 The results, as measured after the warm-up, are still stable. We needn't bother with running the program multiple times,
@@ -210,7 +210,7 @@ configuration are the same, the same version of OS is running and no one else is
 Just out of curiosity: how much does the HotSpot increase the speed of execution compared to interpreting of the byte code? **Java** has a special switch to
 turn HotSpot off:
 
-    $ java -Xint -server E1
+    # java -Xint -server E1
     E1.Reference: 44623 44581 44583 44584 44583
 
 The HotSpot does a really good job!
@@ -236,19 +236,19 @@ is no use comparing performance of two methods if we are not sure they are doing
 problem it sounds a bit paranoid, but who knows?). We'll compare results of all our new methods with the results of the `Reference`:
 
 {% highlight java %}
-    static void check (Demux demux)
-    {
-        byte[] src = generate ();
-        byte[][] dst0 = allocate_dst ();
-        byte[][] dst = allocate_dst ();
-        new Reference ().demux (src, dst0);
-        demux.demux (src, dst);
-        for (int i = 0; i < NUM_TIMESLOTS; i++) {
-            if (! Arrays.equals (dst0[i], dst[i])) {
-                throw new java.lang.RuntimeException ("Results not equal");
-            }
+static void check (Demux demux)
+{
+    byte[] src = generate ();
+    byte[][] dst0 = allocate_dst ();
+    byte[][] dst = allocate_dst ();
+    new Reference ().demux (src, dst0);
+    demux.demux (src, dst);
+    for (int i = 0; i < NUM_TIMESLOTS; i++) {
+        if (! Arrays.equals (dst0[i], dst[i])) {
+            throw new java.lang.RuntimeException ("Results not equal");
         }
     }
+}
 {% endhighlight %}
 
 We must still not forget to call this method from `measure ()`.
@@ -263,13 +263,13 @@ see what we can achieve without changing the order of memory access. For this I'
 Let's recall the main loop of the `Reference` implementation:
 
 {% highlight java %}
-            for (byte b : src) {
-                dst [dst_num][dst_pos] = b;
-                if (++ dst_num == NUM_TIMESLOTS) {
-                    dst_num = 0;
-                    ++ dst_pos;
-                }
-            }
+for (byte b : src) {
+    dst [dst_num][dst_pos] = b;
+    if (++ dst_num == NUM_TIMESLOTS) {
+        dst_num = 0;
+        ++ dst_pos;
+    }
+}
 {% endhighlight %}
 
 We can see that `dst_num` is initially set to 0 and is incremented in the loop until it reaches `NUM_TIMESLOTS-1`. Then it is set to zero and incremented
@@ -278,26 +278,27 @@ obscure way rather than directly using the loop statement.
 [Let's try writing it directly]({{ site.REPO-E1 }}/commit/deaab8a9965cd8b2c270ffe0b0a15e85b358a7b9):
 
 {% highlight java %}
-    static final class Src_First_1 implements Demux
+static final class Src_First_1 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert src.length % NUM_TIMESLOTS == 0;
+        assert src.length % NUM_TIMESLOTS == 0;
 
-            int src_pos = 0;
-            int dst_pos = 0;
-            while (src_pos < src.length) {
-                for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-                    dst [dst_num][dst_pos] = src [src_pos ++];
-                }
-                ++ dst_pos;
+        int src_pos = 0;
+        int dst_pos = 0;
+        while (src_pos < src.length) {
+            for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+                dst [dst_num][dst_pos] = src [src_pos ++];
             }
+            ++ dst_pos;
         }
     }
+}
 {% endhighlight %}
 
 Running it, we get the following:
 
+    # Java -server E1
     E1.Src_First_1: 2533 2482 2482 2482 2481
 
 And our results for `Reference` were:
@@ -310,7 +311,7 @@ Looking closely at the code of `Src_first_1`, we see that we increment `src_pos`
 together with `dst_num`, and we also increment `dst_pos` in the outer loop. This is excessive, for we maintain three
 variables, which are not independent. It is easy to see that these variables maintain the invariant relationship:
 
-        src_pos = dst_pos * NUM_TIMESLOTS + dst_num
+`src_pos = dst_pos * NUM_TIMESLOTS + dst_num`
 
 Why not try replacing `src_pos` with the expression on the right hand side? The outer loop then runs on `dst_pos`,
 and we mustn't forget to use the correct loop limit. Since the loop variable isn't modified inside the loop any more,
@@ -323,25 +324,25 @@ mustn't be modified anywhere else. This convention doesn't forbid emergency loop
 [Here is the new code]({{ site.REPO-E1 }}/commit/413af1583971d4d244125e5654dea66105acc96c):
 
 {% highlight java %}
-    static final class Src_First_2 implements Demux
+static final class Src_First_2 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert src.length % NUM_TIMESLOTS == 0;
+        assert src.length % NUM_TIMESLOTS == 0;
             
-            for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
-                for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-                    dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
-                }
-                ++ dst_pos;
+        for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
+            for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+                dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
             }
+            ++ dst_pos;
         }
     }
+}
 {% endhighlight %}
 
 Let's run it:
 
-    $ java -server E1
+    # java -server E1
     Exception in thread "main" java.lang.RuntimeException: Results not equal
 
 Oops! I did something wrong. The modification was not correct, and we can easily see why: I moved the updating of
@@ -354,7 +355,7 @@ convention mentioned above).
 What would have happened if the check was not there? Let's comment out the call of `check()` in `measure()` and see
 what happens:
 
-    $ java -server E1
+    # java -server E1
     E1.Src_First_2: 1205 1168 1167 1168 1166
 
 The code seems twice as efficient as `Src_First_1` -- but we know now that it only does half the work, since it
@@ -363,23 +364,24 @@ increments the loop variable twice in the loop!
 [Let's fix the error]({{ site.REPO-E1 }}/commit/57cfebd7b9b72a9a0bd2705865e8be042fb5c998) and run the test again:
 
 {% highlight java %}
-    static final class Src_First_2 implements Demux
+static final class Src_First_2 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert src.length % NUM_TIMESLOTS == 0;
+        assert src.length % NUM_TIMESLOTS == 0;
             
-            for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
-                for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-                    dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
-                }
+        for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
+            for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+                dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
             }
         }
     }
+}
 {% endhighlight %}
 
 And here is the result:
 
+    # Java -server E1
     E1.Src_First_2: 2324 2285 2287 2284 2284
 
 I remind you that the previous result was:
@@ -401,21 +403,22 @@ where exactly the byte from that index must go. This way we only need one loop.
 [Here is a new version]({{ site.REPO-E1 }}/commit/c3620aeaa91cf53ea250c63721660126b7e69284):
 
 {% highlight java %}
-    static final class Src_First_3 implements Demux
+static final class Src_First_3 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert src.length % NUM_TIMESLOTS == 0;
+        assert src.length % NUM_TIMESLOTS == 0;
 
-            for (int i = 0; i < src.length; i++) {
-                dst [i % NUM_TIMESLOTS][i / NUM_TIMESLOTS] = src [i];
-            }
+        for (int i = 0; i < src.length; i++) {
+            dst [i % NUM_TIMESLOTS][i / NUM_TIMESLOTS] = src [i];
         }
     }
+}
 {% endhighlight %}
 
 Here are the results:
 
+    # Java -server E1
     E1.Src_First_3: 4405 4359 4360 4360 4360
 
 This is impressive -- the speed has dropped almost by half from `Src_First_2`. The explanation of this fact requires
@@ -461,24 +464,25 @@ order, take the next one, etc.
 the order of the loops]({{ site.REPO-E1 }}/commit/472d121bd28cd2ece2fb29465cb4c534a781d6f9): 
 
 {% highlight java %}
-    static final class Dst_First_1 implements Demux
+static final class Dst_First_1 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert src.length % NUM_TIMESLOTS == 0;
+        assert src.length % NUM_TIMESLOTS == 0;
 
-            for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-                for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
-                    dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
-                }
+        for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+            for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
+                dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
             }
         }
     }
+}
 {% endhighlight %}
 
 
 Running it, we get this:
 
+    # Java -server E1
     E1.Dst_First_1: 1205 1154 1155 1154 1155
 
 The highest speed we achieved before was that of `Src_First_2`, which took 2284 ms, and the new method runs almost
@@ -496,27 +500,28 @@ But is our compiler good?
 [Let's test it: here is the code]({{ site.REPO-E1 }}/commit/2183d883aa6dca242a247a7497ee4bf6d92d5525):
 
 {% highlight java %}
-    static final class Dst_First_2 implements Demux
+static final class Dst_First_2 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert src.length % NUM_TIMESLOTS == 0;
+        assert src.length % NUM_TIMESLOTS == 0;
 
-            int dst_size = src.length / NUM_TIMESLOTS;
-            for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-                byte [] d = dst [dst_num];
-                int src_pos = dst_num;
-                for (int dst_pos = 0; dst_pos < dst_size; ++ dst_pos) {
-                    d[dst_pos] = src[src_pos];
-                    src_pos += NUM_TIMESLOTS;
-                }
+        int dst_size = src.length / NUM_TIMESLOTS;
+        for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+            byte [] d = dst [dst_num];
+            int src_pos = dst_num;
+            for (int dst_pos = 0; dst_pos < dst_size; ++ dst_pos) {
+                d[dst_pos] = src[src_pos];
+                src_pos += NUM_TIMESLOTS;
             }
         }
     }
+}
 {% endhighlight %}
 
 Running the method, we get the following:
 
+    # Java -server E1
     E1.Dst_First_2: 2109 2094 2094 2097 2093
 
 `Dst_First_2` is remarkably slower than `Dst_First_1`. The compiler seems to be sending a clear message:
@@ -532,22 +537,22 @@ constant (we'll replace the `assert` statement as well).
 [Here is the code]({{ site.REPO-E1 }}/commit/b2d647e778429d4a99445dc6c3292a919dc72d80):
 
 {% highlight java %}
-    static final class Dst_First_3 implements Demux
+static final class Dst_First_3 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert src.length == NUM_TIMESLOTS * DST_SIZE;
+        assert src.length == NUM_TIMESLOTS * DST_SIZE;
 
-            for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-                for (int dst_pos = 0; dst_pos < DST_SIZE; ++ dst_pos) {
-                    dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
-                }
+        for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+            for (int dst_pos = 0; dst_pos < DST_SIZE; ++ dst_pos) {
+                dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
             }
         }
     }
+}
 {% endhighlight %}
 
-
+    # Java -server E1
     E1.Dst_First_3: 1068 1021 1022 1022 1022
 
 The time went down from 1155 to 1022, which is not insignificant: 11.5%. Again, I can only speculate why it became
@@ -597,26 +602,26 @@ All that said, I want to create a new family of implementations based on `Dst_Fi
 [I'll unroll the inner loop fully]({{ site.REPO-E1 }}/commit/ba6a1e72f9dea441e36cc1572e84fb68d6610844):
 
 {% highlight java %}
-    static final class Unrolled_1 implements Demux
+static final class Unrolled_1 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert NUM_TIMESLOTS == 32;
-            assert DST_SIZE == 64;
-            assert src.length == NUM_TIMESLOTS * DST_SIZE;
+        assert NUM_TIMESLOTS == 32;
+        assert DST_SIZE == 64;
+        assert src.length == NUM_TIMESLOTS * DST_SIZE;
 
-            for (int j = 0; j < NUM_TIMESLOTS; j++) {
-                final byte[] d = dst[j];
-                d[ 0] = src[j+32* 0]; d[ 1] = src[j+32* 1];
-                d[ 2] = src[j+32* 2]; d[ 3] = src[j+32* 3]; 
-                d[ 4] = src[j+32* 4]; d[ 5] = src[j+32* 5];
-                d[ 6] = src[j+32* 6]; d[ 7] = src[j+32* 7];
+        for (int j = 0; j < NUM_TIMESLOTS; j++) {
+            final byte[] d = dst[j];
+            d[ 0] = src[j+32* 0]; d[ 1] = src[j+32* 1];
+            d[ 2] = src[j+32* 2]; d[ 3] = src[j+32* 3]; 
+            d[ 4] = src[j+32* 4]; d[ 5] = src[j+32* 5];
+            d[ 6] = src[j+32* 6]; d[ 7] = src[j+32* 7];
 <skip> 
-                d[60] = src[j+32*60]; d[61] = src[j+32*61];
-                d[62] = src[j+32*62]; d[63] = src[j+32*63]; 
-            }
+            d[60] = src[j+32*60]; d[61] = src[j+32*61];
+            d[62] = src[j+32*62]; d[63] = src[j+32*63]; 
         }
     }
+}
 {% endhighlight %}
 
 
@@ -633,6 +638,7 @@ macro-features. I can, of course, generate a **Java** class on the fly and load 
 purposes. Some compile-time code generation similar to that of a macro assembler would really have helped here.
 Now let's run it:
 
+    # Java -server E1
     E1.Unrolled_1: 707 659 658 659 659
 
 That was really worth the effort! The code runs 35% faster than before. Loop unrolling is definitely a useful trick.
@@ -644,27 +650,27 @@ Let's see if it is correct.
 [Here is a version that unrolls both loops]({{ site.REPO-E1 }}/commit/81cf573ded354f8fe816134a522b27f3910504e4):
 
 {% highlight java %}
-    static final class Unrolled_2_Full implements Demux
+static final class Unrolled_2_Full implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert NUM_TIMESLOTS == 32;
-            assert DST_SIZE == 64;
-            assert src.length == NUM_TIMESLOTS * DST_SIZE;
+        assert NUM_TIMESLOTS == 32;
+        assert DST_SIZE == 64;
+        assert src.length == NUM_TIMESLOTS * DST_SIZE;
 
-            byte[] d;
-            d = dst[0];
-            d[ 0] = src[   0]; d[ 1] = src[  32];
-            d[ 2] = src[  64]; d[ 3] = src[  96];
-            d[ 4] = src[ 128]; d[ 5] = src[ 160];
-            d[ 6] = src[ 192]; d[ 7] = src[ 224];
+        byte[] d;
+        d = dst[0];
+        d[ 0] = src[   0]; d[ 1] = src[  32];
+        d[ 2] = src[  64]; d[ 3] = src[  96];
+        d[ 4] = src[ 128]; d[ 5] = src[ 160];
+        d[ 6] = src[ 192]; d[ 7] = src[ 224];
 <skip>
-            d = dst[31];
+        d = dst[31];
 <skip>
-            d[60] = src[1951]; d[61] = src[1983];
-            d[62] = src[2015]; d[63] = src[2047];
-        }
+        d[60] = src[1951]; d[61] = src[1983];
+        d[62] = src[2015]; d[63] = src[2047];
     }
+}
 {% endhighlight %}
 
 
@@ -672,6 +678,7 @@ Again, I don't show the whole method, as it is 553 lines long -- too long for th
 repository, otherwise it would be even longer). This proves that it is really possible to write a very long program
 for a simple task if you try hard enough. How fast does this version run?
 
+    # Java -server E1
     E1.Unrolled_2_Full: 15935 15880 15883 15887 15867
 
 Oops! Something went wrong. I expected that it might get slower because of the shortage of code cache, but not twenty
@@ -679,7 +686,7 @@ times slower! The slowdown seems similar to the one we observed when running `Re
 Perhaps HotSpot panicked when it saw a single method of such a great size, and didn't compile it at all.
 To check it, let's try running `Unrolled_2_Full` with `-Xint`:
 
-    $ java -Xint -server E1
+    # java -Xint -server E1
     E1.Unrolled_2_Full: 16586 16548 16557 16551 16553
 
 This proves the point that big methods are not compiled by HotSpot. But we can split a big method into many small methods.
@@ -687,43 +694,44 @@ The HotSpot will inline some of them, so hopefully not all the call instructions
 [The code, however, looks incredibly ugly]({{ site.REPO-E1 }}/commit/93b8c56281fee894fd4d9e2c0042a47400ecd647):
 
 {% highlight java %}
-    static final class Unrolled_3 implements Demux
+static final class Unrolled_3 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert NUM_TIMESLOTS == 32;
-            assert DST_SIZE == 64;
-            assert src.length == NUM_TIMESLOTS * DST_SIZE;
+        assert NUM_TIMESLOTS == 32;
+        assert DST_SIZE == 64;
+        assert src.length == NUM_TIMESLOTS * DST_SIZE;
             
-            demux_00 (src, dst[ 0]);
-            demux_01 (src, dst[ 1]);
+        demux_00 (src, dst[ 0]);
+        demux_01 (src, dst[ 1]);
 <skip>
-            demux_30 (src, dst[30]);
-            demux_31 (src, dst[31]);
-        }
-        
-        private static void demux_00 (byte[] src, byte[] d)
-        {
-            d[ 0] = src[   0]; d[ 1] = src[  32];
-            d[ 2] = src[  64]; d[ 3] = src[  96];
-<skip>
-            d[60] = src[1920]; d[61] = src[1952];
-            d[62] = src[1984]; d[63] = src[2016];
-        }
-<skip>
-        private static void demux_31 (byte[] src, byte[] d)
-        {
-            d[ 0] = src[  31]; d[ 1] = src[  63];
-            d[ 2] = src[  95]; d[ 3] = src[ 127];
-<skip>
-            d[60] = src[1951]; d[61] = src[1983];
-            d[62] = src[2015]; d[63] = src[2047];
-        }
+        demux_30 (src, dst[30]);
+        demux_31 (src, dst[31]);
     }
+        
+    private static void demux_00 (byte[] src, byte[] d)
+    {
+        d[ 0] = src[   0]; d[ 1] = src[  32];
+        d[ 2] = src[  64]; d[ 3] = src[  96];
+<skip>
+        d[60] = src[1920]; d[61] = src[1952];
+        d[62] = src[1984]; d[63] = src[2016];
+    }
+<skip>
+    private static void demux_31 (byte[] src, byte[] d)
+    {
+        d[ 0] = src[  31]; d[ 1] = src[  63];
+        d[ 2] = src[  95]; d[ 3] = src[ 127];
+<skip>
+        d[60] = src[1951]; d[61] = src[1983];
+        d[62] = src[2015]; d[63] = src[2047];
+    }
+}
 {% endhighlight %}
 
 The entire piece of code takes 649 lines. Running it, we get the following:
 
+    # Java -server E1
     E1.Unrolled_3: 1064 790 791 789 790
 
 This is slower than 659 ms obtained using `Unrolled_1`. Possibly, we have hit a code cache size limitation.
@@ -736,34 +744,35 @@ the addressing mode of memory access instruction, or maybe get removed completel
 [Here is the code]({{ site.REPO-E1 }}/commit/ba43d3a285f616748f72c25cc047535445392cfc):
 
 {% highlight java %}
-    static final class Unrolled_4 implements Demux
+static final class Unrolled_4 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert NUM_TIMESLOTS == 32;
-            assert DST_SIZE == 64;
-            assert src.length == NUM_TIMESLOTS * DST_SIZE;
+        assert NUM_TIMESLOTS == 32;
+        assert DST_SIZE == 64;
+        assert src.length == NUM_TIMESLOTS * DST_SIZE;
             
-            demux_0 (src, dst[ 0],  0);
-            demux_0 (src, dst[ 1],  1);
-            demux_0 (src, dst[ 2],  2);
+        demux_0 (src, dst[ 0],  0);
+        demux_0 (src, dst[ 1],  1);
+        demux_0 (src, dst[ 2],  2);
 <skip>
-            demux_0 (src, dst[31], 31);
-        }
-        
-        private static void demux_0 (byte[] src, byte[] d, int i)
-        {
-            d[ 0] = src[   0+i]; d[ 1] = src[  32+i];
-            d[ 2] = src[  64+i]; d[ 3] = src[  96+i];
-<skip>
-            d[60] = src[1920+i]; d[61] = src[1952+i];
-            d[62] = src[1984+i]; d[63] = src[2016+i];
-        }
+        demux_0 (src, dst[31], 31);
     }
+        
+    private static void demux_0 (byte[] src, byte[] d, int i)
+    {
+        d[ 0] = src[   0+i]; d[ 1] = src[  32+i];
+        d[ 2] = src[  64+i]; d[ 3] = src[  96+i];
+<skip>
+        d[60] = src[1920+i]; d[61] = src[1952+i];
+        d[62] = src[1984+i]; d[63] = src[2016+i];
+    }
+}
 {% endhighlight %}
 
 And the result is:
 
+    # Java -server E1
     E1.Unrolled_4: 773 710 710 711 711
 
 This is faster than the previous one (790) but still slower than `Unrolled_1` (659). This means that we mustn't fully
@@ -780,33 +789,34 @@ duplication count. I'll show only `Unrolled_1_2` here but
 [the code for all four is available in the code repository]({{ site.REPO-E1 }}/commit/660d73f8bbf246dd5642fbf6656496bd90f02139):
 
 {% highlight java %}
-    static final class Unrolled_1_2 implements Demux
+static final class Unrolled_1_2 implements Demux
+{
+    public void demux (byte[] src, byte[][] dst)
     {
-        public void demux (byte[] src, byte[][] dst)
-        {
-            assert NUM_TIMESLOTS == 32;
-            assert DST_SIZE == 64;
-            assert src.length == NUM_TIMESLOTS * DST_SIZE;
+        assert NUM_TIMESLOTS == 32;
+        assert DST_SIZE == 64;
+        assert src.length == NUM_TIMESLOTS * DST_SIZE;
 
-            for (int j = 0; j < NUM_TIMESLOTS; j+=2) {
-                byte[] d;
-                d = dst[j];
-                d[ 0] = src[j+32* 0]; d[ 1] = src[j+32* 1];
-                d[ 2] = src[j+32* 2]; d[ 3] = src[j+32* 3]; 
+        for (int j = 0; j < NUM_TIMESLOTS; j+=2) {
+            byte[] d;
+            d = dst[j];
+            d[ 0] = src[j+32* 0]; d[ 1] = src[j+32* 1];
+            d[ 2] = src[j+32* 2]; d[ 3] = src[j+32* 3]; 
 <skip>
-                d[62] = src[j+32*62]; d[63] = src[j+32*63]; 
+            d[62] = src[j+32*62]; d[63] = src[j+32*63]; 
 
-                d = dst[j+1];
-                d[ 0] = src[j+1+32* 0]; d[ 1] = src[j+1+32* 1];
+            d = dst[j+1];
+            d[ 0] = src[j+1+32* 0]; d[ 1] = src[j+1+32* 1];
 <skip> 
-                d[60] = src[j+1+32*60]; d[61] = src[j+1+32*61];
-            }
+            d[60] = src[j+1+32*60]; d[61] = src[j+1+32*61];
         }
     }
+}
 {% endhighlight %}
 
 Here are the results:
 
+    # Java -server E1
     E1.Unrolled_1_2: 711 654 654 655 654
     E1.Unrolled_1_4: 748 637 636 637 636
     E1.Unrolled_1_8: 850 636 636 636 637
