@@ -48,7 +48,7 @@ a:visited { color: #a0a; }
 
 .posts span {
   color: #aaa;
-/*  font-family: Monaco, "Courier New", monospace;*/
+  font-family: Consolas, Monaco, "Courier New", monospace;
   font-size: 80%;
 }
 
@@ -59,9 +59,8 @@ a:visited { color: #a0a; }
 /*****************************************************************************/
 
 .site {
-/*  font-size: 115%; */
   text-align: left;
-  width: 35em;
+  width: 33em;
   margin: 3em auto 2em;
   line-height: 1.5em;
 }
@@ -141,11 +140,11 @@ a:visited { color: #a0a; }
 .highlight {
   background-color: #eef;
   margin: 0 0 1em 0;
-  overflow-x: auto;
-  overflow-y: hidden;
 }  
 
 .highlight pre code {
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid #666;
 }
 
@@ -155,9 +154,9 @@ a:visited { color: #a0a; }
 
 .post code {
   border: 1px solid #c0c0c0;
-  background-color: #e0e0ff; /*yellow; *//* #eef; */
+  background-color: #e0e0ff;
   font-weight: bold;
-  font-family: Consolas, "Courier New", monospace;
+  font-family: Consolas, Monaco, "Courier New", monospace;
 }
 
 code.language-text {
