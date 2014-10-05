@@ -92,7 +92,7 @@ Some comments on this:
 
 - Unlike macros, the template functions are truly generic and do not depend on exact values of variables.
   In our case we could even use the `DST_SIZE` (our tuning parameter) as a byte count. With macros we could
-  construct macro name dynamically (using the `'#'` operator), but all the required macros must exist already.
+  construct macro name dynamically (using the `##` operator), but all the required macros must exist already.
 
 - The templated version works with any values of `DST_SIZE` and `NUM_TIMESLOTS`, so two of the three asserts
   can be removed.
@@ -244,7 +244,7 @@ Running it
 
 Now we are ready to compile and run our templated code. But first let's recall the results for the macro-based code:
 
-    $ ./e1
+    # ./e1
     9Reference: 1939
     11Src_First_1: 1885
     11Src_First_2: 1924
@@ -261,8 +261,8 @@ Now we are ready to compile and run our templated code. But first let's recall t
     10Unrolled_3: 635
     10Unrolled_4: 655
 
-    $ c++ -O3 -o e1-template e1-template.cpp -lrt
-    $ ./e1-template
+    # c++ -O3 -o e1-template e1-template.cpp -lrt
+    # ./e1-template
     9Reference: 1940
     10Unrolled_1: 634
     12Unrolled_1_FILj2EE: 633
@@ -435,6 +435,6 @@ Conclusions
 
 Using templates for meta-programming is not that bad. Effectively we are replacing loops with recursion,
 which is not the most intuitive thing to do. However, resulting code is quite small, more flexible and,
-most important, it is efficient. A powerful function inlining engine that is built into the C++ compiler makes
+most important, it is efficient. A powerful function inlining engine that is built into the **C++** compiler makes
 the generated machine code identical to that of macro version.
 

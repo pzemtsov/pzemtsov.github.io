@@ -12,7 +12,7 @@ than in **Java**, possibly much faster; we'll check if this is true.
 
 By "**C**/**C++**" I mean "**C** with a little bit of **C++**". There will be just enough **C++** to make a program look a bit nicer
 and add a bit of safety.
-I mean small features, such as declaring of variable where it is first used rather that at the top. Perhaps occasional
+I mean small features, such as declaring of variable where it is first used rather than at the top. Perhaps occasional
 class here and there. There won't be any [multiple inheritance](http://en.wikipedia.org/wiki/Multiple_inheritance)
 or [curiously recurring template pattern](http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern),
 and the reader won't be forced to google the difference between [static](http://en.wikipedia.org/wiki/Static_cast)
@@ -91,7 +91,7 @@ public:
 };
 {% endhighlight %}
 
-Since we're not using class libraries, the buffers are represented as `byte` pointers, which, unlike **Java**'s byte arrays,
+Since we're not using class libraries, the buffers are represented as `byte` pointers, which, unlike **Java**'s `byte` arrays,
 do not keep the data size and do not provide index checking. That's why the input length must be passed as an additional
 parameter. It is the caller's responsibility to ensure that memory is correctly allocated for the output buffers.
 
@@ -195,7 +195,7 @@ It would have been expanded as
 
 and this is not quite what was intended.
 
-- For those who do not know the significance of a "do" statement in macro definitions, I'll explain it in one of the
+- For those who do not know the significance of a `do` statement in macro definitions, I'll explain it in one of the
   following articles.
 
 Here the usage of macros does not save you much typing -- you must still invoke `MOVE_BYTE` manually 64 times.
@@ -316,7 +316,7 @@ In our **Java** code there is a version that involves 32 small functions (`Unrol
 I don't expect its performance to be any better than performance of other unrolled versions in **C++**;
 in addition you can recall that the very reason for its existence was HotSpot limitation of method size.
 However, for the sake of completeness I'll convert this function as well, using another handy feature of
-**C**'s macro language: token concatenation. A hash character (`'#'`), used in macro, causes concatenation
+**C**'s macro language: token concatenation. A combination of two hash characters (`##`), used in macro, causes concatenation
 of text to the left and to the right of it without any whitespaces, allowing creation of new objects such
 as function names.
 
@@ -361,7 +361,7 @@ private:
 };
 {% endhighlight %}
 
-You can see how using `'#'` helps create necessary method names. Note absence of semicolons between calls to `DEF_DEMUX`:
+You can see how using `##` helps create necessary method names. Note absence of semicolons between calls to `DEF_DEMUX`:
 in **C**/**C++** function definitions do not end with semicolons (but class definitions do!)
 
 Making things shorter: macros as macro parameters
@@ -383,7 +383,7 @@ There are three ways to write such a multiplier. The simplest (but the longest) 
 #define DUP_8(m)  do { m(0); m(1); m(2); m(3); m(4); m(5); m(6); m(7); } while (0)
 {% endhighlight %}
 
-And so on -- definition of DUP_64 will contain 64 calls to m().
+And so on -- definition of `DUP_64` will contain 64 calls to `m()`.
 
 We can save a bit of typing by basing higher-order duplicator on lower-order one. A partial solution looks like this:
 
@@ -393,7 +393,7 @@ We can save a bit of typing by basing higher-order duplicator on lower-order one
 #define DUP_8(m)  do { DUP_4(m);  m(4); m(5); m(6); m(7); } while (0)
 {% endhighlight %}
 
-Here the lists of m() being invoked are exactly half the size.
+Here the lists of `m()` being invoked are exactly half the size.
 
 Another approach is to call each previous macro twice:
 
@@ -413,7 +413,7 @@ sizes the number may be bigger but is always limited by number of bits in the lo
 as a by-product, a set of loops that don't start at zero but at some given number, and we need these for our partially
 unrolled loop solutions. It has, however, one disadvantage. The indices in macro expansions appear as arithmetic
 expressions rather than as direct numbers; and this makes it impossible to use this macro with `CALL_DEMUX` above:
-the `'#'` concatenation operation does not evaluate expressions before concatenation. That's why we will use the
+the `##` concatenation operation does not evaluate expressions before concatenation. That's why we will use the
 partial solution. Versions of code with both solutions are in the repository:
 [this is the solution we discard]({{ site.REPO-E1-C }}/commit/f8f03136427227494847db0d52cc726fc0e629d8)
 [and this is the solution we'll use]({{ site.REPO-E1-C }}/commit/1999ca98b6308ff9107e8ebf789e5615f822012e).
@@ -444,11 +444,11 @@ Running it
 We are ready to run it all. We'll be using the same system as for the **Java** testing: Linux, running on a Dell
 blade with Intel(R) Xeon(R) CPU E5-2670 @ 2.60GHz. We'll use gcc 4.6.
 
-    $ c++ -O3 -o e1 e1.cpp -lrt
+    # c++ -O3 -o e1 e1.cpp -lrt
 
 (`-O3` indicates the highest level of optimisation, and `-lrt` is needed to include relevant run-time library).
 
-    $ ./e1
+    # ./e1
     9Reference: 1937 1930
     11Src_First_1: 1890 1878
     11Src_First_2: 1920 1916
@@ -472,6 +472,7 @@ the class name prepended by the number of characters in it isn't the worst possi
 It is clearly visible that the results for two runs are quite stable. It means that running the test twice is unnesessary
 and [we can remove appropriate code]({{ site.REPO-E1-C }}/commit/b98c060e8f01ef58b5ae6bb382b3ae1213333d8c).
 
+    # ./e1
     9Reference: 1939
     11Src_First_1: 1885
     11Src_First_2: 1924

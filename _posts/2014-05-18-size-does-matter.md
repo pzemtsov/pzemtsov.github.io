@@ -344,8 +344,8 @@ This is how writing articles can help you learn something new.
 This is what happens when we make everything `size_t`
 ([see the code in repository]({{ site.REPO-E1-C }}/commit/067109ef4d03529be893ca2fd6205d42edc58c86)):
 
-    $ c++ -O3 -falign-functions=32 -falign-loops=32 -funroll-loops -o e1 e1.cpp -lrt
-    $ ./e1
+    # c++ -O3 -falign-functions=32 -falign-loops=32 -funroll-loops -o e1 e1.cpp -lrt
+    # ./e1
     9Reference: 1367
     11Src_First_1: 987
     11Src_First_2: 986
@@ -396,7 +396,9 @@ Observations:
 The code
 --------
 
-[Let's have a look at the code generated for `Dst_First_3a`]({{ site.REPO-E1-C }}/commit/067109ef4d03529be893ca2fd6205d42edc58c86):
+Let's have a look at the code generated for `Dst_First_3a`
+(the entire assembly output is in
+[the repository]({{ site.REPO-E1-C }}/commit/067109ef4d03529be893ca2fd6205d42edc58c86)):
 
 {% highlight text %}
 _ZNK12Dst_First_3a5demuxEPKhmPPh:

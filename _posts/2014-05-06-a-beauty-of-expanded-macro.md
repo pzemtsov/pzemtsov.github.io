@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "A beauty of expanded macro"
+title:  "Beauty of expanded macro"
 date:   2014-05-06 00:00:00
 tags: C C++ macro meta-programming
 ---

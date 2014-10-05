@@ -21,18 +21,18 @@ In this article I'll implement and optimise the E1 de-multiplexing in **Java**. 
 The entire project is available on [Github](http://github.com/) in a repository:
 [{{ site.REPO-E1 }}]({{ site.REPO-E1 }})
 
-A problem definition
+Problem definition
 --------------------
 
 An **[E1 stream](http://en.wikipedia.org/wiki/E-carrier#E1_frame_structure)**
-is a network line, most commonly used in digital telephony, capable of carrying 2048000 bits per second. This capacity is used
-to carry 32 streams of 64000 bits/sec, each of which is sufficient for one side of a telephonic conversation. These individual streams are
+is a network line, most commonly used in digital telephony, capable of carrying 2,048,000 bits per second. This capacity is used
+to carry 32 streams of 64,000 bits/sec, each of which is sufficient for one side of a telephonic conversation. These individual streams are
 combined together using a technique called **[Time Division Multiplexing](http://en.wikipedia.org/wiki/Time-division_multiplexing)**.
 This simply means that time is divided into equal portions and these
 portions are allocated to the streams in round-robin fashion. That's why component streams of the E1 are called **timeslots**. Fortunately for us,
 the unit of transmission was chosen as a very convenient 8 bits, which allows us to view an E1 stream as well as its
-timeslots as byte streams. The source stream (256000 bytes/sec) can be
-considered a sequence of 32-byte frames, where the n<sup>th</sup> byte of each frame belongs to the n<sup>th</sup> timeslot. This way each timeslot receives 8000 bytes
+timeslots as byte streams. The source stream (256,000 bytes/sec) can be
+considered a sequence of 32-byte frames, where the n<sup>th</sup> byte of each frame belongs to the n<sup>th</sup> timeslot. This way each timeslot receives 8,000 bytes
 per second. These bytes per seconds are not important for the de-multiplexing process itself; I only mention them because I want to compare the
 speed of our de-multiplexer with the actual speed of the stream.
 
@@ -45,8 +45,8 @@ will be processed immediately after de-multiplexing, and can be re-used straight
 I'll also assume that both input and output data are in the processor cache. This is a simplification, but it is appropriate for our little example.
 To achieve this, I'll use an input buffer small enough to fit into the cache completely. I've chosen a buffer size of 2048 bytes, or 64 bytes per timeslot. 
 
-It seems pretty obvious that we should be able to de-multiplex an E1 even in **BASIC**: as said earlier, the byte rate of an E1 stream is 256000 bytes/sec,
-or roughly 4 microseconds a byte. Assuming a typical clock speed of a modern processor to be 2.5GHz, this means that we have 10000 CPU cycles available
+It seems pretty obvious that we should be able to de-multiplex an E1 even in **BASIC**: as said earlier, the byte rate of an E1 stream is 256,000 bytes/sec,
+or roughly 4 microseconds a byte. Assuming a typical clock speed of a modern processor to be 2.5GHz, this means that we have 10,000 CPU cycles available
 to process each incoming byte. We expect much less cycles to be needed for that, so a program in **Java** must work faster than real time. This doesn't mean
 that optimisation is useless: we can de-multiplex more than one E1 stream on one processor core. Let's see how many we can do.
 
@@ -98,7 +98,7 @@ public final class E1
 
 The method checks that the input is a multiple of `NUM_TIMESLOTS`, because it doesn't work otherwise. First of all, the interface itself relies on the fact
 that all the outputs receive the same number of bytes, and that isn't true for arbitrary input sizes. And secondly, the implementation assumes that the
-first byte in each input buffer belongs to output zero (it sets `dst_num` to 0). Both of these assumptions can be removed by appropriate modifications of
+first byte in each input buffer belongs to output zero (it sets `dst_num` to `0`). Both of these assumptions can be removed by appropriate modifications of
 the interface and implementation (I'll skip the demonstration). This is typical for reference implementations: they are usually more flexible than the
 highly optimised ones. You will see that other implementations can't be modified so easily.
 
@@ -175,7 +175,7 @@ public static void main (String [] args)
 (the entire test and measurement code can be seen [here]({{ site.REPO-E1 }}/commit/ab2a4017828c4b4560901ff1e5834ae461d1db99)).
 
 The execution time is printed in milliseconds, because such is the resolution of the standard **Java** timer.
-I like it when execution time is between 500 ms and 10000 ms. It is long enough to allow sufficient measurement accuracy
+I like it when execution time is between 500 ms and 10,000 ms. It is long enough to allow sufficient measurement accuracy
 but short enough not to get bored. In our case this can be achieved by setting the `ITERATIONS` parameter to one
 million.
 
@@ -215,10 +215,10 @@ turn HotSpot off:
 
 The HotSpot does a really good job!
 
-Let's return to our result obtained with HotSpot on: 2860 ms. How good is this result? Is the speed sufficient for practical needs? To answer this, we must
-recall that we measure time for 1000000 iterations, each time decoding a buffer of 2048 bytes, which results with the volume processed each second to be
-1000000 * 2048 * 1000 / 2860 = 716M bytes (I'm using the metric megabyte, which is exactly 1000000 bytes). Recalling also that the speed of E1 stream it 256000
-bytes/sec, we can calculate that our de-multiplexing speed is roughly 2800 times faster than the transmission speed. In ideal world this would have meant that
+Let's return to our result obtained with HotSpot on: 2,860 ms. How good is this result? Is the speed sufficient for practical needs? To answer this, we must
+recall that we measure time for 1,000,000 iterations, each time decoding a buffer of 2048 bytes, which results with the volume processed each second to be
+1000000 * 2048 * 1000 / 2860 = 716M bytes (I'm using the metric megabyte, which is exactly 1,000,000 bytes). Recalling also that the speed of E1 stream it 256,000
+bytes/sec, we can calculate that our de-multiplexing speed is roughly 2,800 times faster than the transmission speed. In ideal world this would have meant that
 we could process 2800 streams in real time on one processor core, but the reality, as usual, is far from ideal, and the number will be somewhat less.
 One reason is that 2800 source buffer won't fit into the processor cache, so our caching pre-condition won't be met. Let's leave exact measurements of
 this effect for later articles.
@@ -229,10 +229,10 @@ performance-demanding. Secondly, we can learn something of general value, not li
 faster? 
 
 Correctness check
-----------------------
+-----------------
 
 Before writing other implementations, we must add something to our test framework: the basic correctness test. There
-is no use comparing performance of two methods if we are not sure they are doing the same thing (I know for our super-simple
+is no use comparing performance of two methods if we are not sure they are doing the same thing (I admit that for our super-simple
 problem it sounds a bit paranoid, but who knows?). We'll compare results of all our new methods with the results of the `Reference`:
 
 {% highlight java %}
@@ -272,10 +272,10 @@ for (byte b : src) {
 }
 {% endhighlight %}
 
-We can see that `dst_num` is initially set to 0 and is incremented in the loop until it reaches `NUM_TIMESLOTS-1`. Then it is set to zero and incremented
+We can see that `dst_num` is initially set to `0` and is incremented in the loop until it reaches `NUM_TIMESLOTS-1`. Then it is set to zero and incremented
 again -- just as if we were running an inner loop inside the main loop. Effectively, this is what we are doing, only the inner loop is written in an
 obscure way rather than directly using the loop statement.
-[Let's try writing it directly]({{ site.REPO-E1 }}/commit/deaab8a9965cd8b2c270ffe0b0a15e85b358a7b9):
+Let's try writing it directly ([here]({{ site.REPO-E1 }}/commit/deaab8a9965cd8b2c270ffe0b0a15e85b358a7b9) is the code):
 
 {% highlight java %}
 static final class Src_First_1 implements Demux
@@ -316,7 +316,7 @@ variables, which are not independent. It is easy to see that these variables mai
 Why not try replacing `src_pos` with the expression on the right hand side? The outer loop then runs on `dst_pos`,
 and we mustn't forget to use the correct loop limit. Since the loop variable isn't modified inside the loop any more,
 we can replace the `while` loop with a `for` loop, which is my personal aesthetic preference. Strictly speaking,
-**Java** does not have a true `for` loop in the same sense as Pascal has -- its `for` is just another syntax for `while`.
+**Java** does not have a true `for` loop in the same sense as **Pascal** has -- its `for` is just another syntax for `while`.
 However, I prefer to follow a convention that `for` loop contains a dedicated loop variable (or variables) with
 explicit initialisation step, increment step, and loop condition, all specified in the loop header. The variable
 mustn't be modified anywhere else. This convention doesn't forbid emergency loop termination using `break`, though.
@@ -391,7 +391,7 @@ I remind you that the previous result was:
 `Src_First_2` shows improvement by about 200 ms, or 8.8% over `Src_First_1`.
 
 What I've done in `Src_First_2` is the reversal of a well-known program transformation often performed by optimising
-compilers, something called [operation strength reduction](http://en.wikipedia.org/wiki/Strength_reduction).
+compilers, called [operation strength reduction](http://en.wikipedia.org/wiki/Strength_reduction).
 The compiler detects [induction variables](http://en.wikipedia.org/wiki/Induction_variable) (those that are
 incremented in a loop by constant values), and if they are multiplied by constant values inside the loop, replaces
 the results of such multiplications with another, synthesised induction variables. Here I've done exactly the opposite,
@@ -425,7 +425,7 @@ This is impressive -- the speed has dropped almost by half from `Src_First_2`. T
 analysis of the machine code generated by HotSpot. Without looking at that code I can only speculate. Variable `i`
 is an induction variable, but `i % NUM_TIMESLOTS` and `i / NUM_TIMESLOTS` are not. The compiler can't easily replace
 them with any other easily maintainable variables, so it has to perform both division and modulo operations.
-Since `NUM_TIMESLOTS` equals 32, these operations can be done fast (modulo is done by a single AND instruction
+Since `NUM_TIMESLOTS` equals 32, these operations can be done fast (modulo is done by a single `AND` instruction
 and division is a shift), but even one extra instruction inside a loop can make a difference. Another possible
 source of the slowdown is the array index checking. Most compilers optimise index checking for cases where indices
 are induction variables. If the first and the last value of such variable are known, a compiler can test only those
@@ -460,8 +460,8 @@ Out of the vast number of possible byte ordering, we've tried one (iterating alo
 other order to try is the destination-first ordering. We're going to take one output array, fill it up in its natural
 order, take the next one, etc.
 
-[The `Src_First_2` class can be easily modified to iterate along destination arrays -- all that's needed is to change
-the order of the loops]({{ site.REPO-E1 }}/commit/472d121bd28cd2ece2fb29465cb4c534a781d6f9): 
+The `Src_First_2` class can be easily modified to iterate along destination arrays -- all that's needed is to change
+the order of the loops. [Here is the code]({{ site.REPO-E1 }}/commit/472d121bd28cd2ece2fb29465cb4c534a781d6f9): 
 
 {% highlight java %}
 static final class Dst_First_1 implements Demux
@@ -497,7 +497,7 @@ of `dst [dst_num]`, the inner loop contains calculation `src.length / NUM_TIMESL
 does not depend on the loop variable and can be moved out of the loop. In addition, `dst_pos` is an induction variable,
 and its multiplication by `NUM_TIMESLOTS` can be replaced by addition. A good compiler will do all of that itself.
 But is our compiler good?
-[Let's test it: here is the code]({{ site.REPO-E1 }}/commit/2183d883aa6dca242a247a7497ee4bf6d92d5525):
+Let's test it. [Here is the code]({{ site.REPO-E1 }}/commit/2183d883aa6dca242a247a7497ee4bf6d92d5525):
 
 {% highlight java %}
 static final class Dst_First_2 implements Demux
@@ -877,7 +877,7 @@ Here are the same results as a graph (I removed the worst performers to improve 
 <img src="{{ site.url }}/images/demultiplexing-of-e1-graph.png" width="709" height="501">
  
 The speeds we have achieved are miles away from those we saw in the beginning. The byte decoding rate is very impressive:
-3.2 GBytes/sec, which theoretically allows de-multiplexing of 12500 E1 streams on one core. The clock speed of our
+3.2 GBytes/sec, which theoretically allows de-multiplexing of 12,500 E1 streams on one core. The clock speed of our
 processor is 2.6GHz, which means that the program uses 0.81 CPU cycles to move each byte. Not bad for **Java**.
 
 What is my personal choice? This depends on the required performance. If the speed of `Reference` is good enough,

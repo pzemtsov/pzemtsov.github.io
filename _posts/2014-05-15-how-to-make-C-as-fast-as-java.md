@@ -17,9 +17,9 @@ These are the versions in question and the performance data, as published at the
 
 <table class="numeric">
 <tr><th>     Method               </th> <th>  Results in Java </th> <th>  Results in C  </th></tr>
-<tr><td class="label">Dst_First_1 </td> <td> 1155 </td><td> 1457></td></tr>
-<tr><td class="label">Dst_First_2 </td> <td> 2093 </td><td> 1454></td></tr>
-<tr><td class="label">Dst_First_3 </td> <td> 1022 </td><td> 1464></td></tr>
+<tr><td class="label">Dst_First_1 </td> <td> 1155 </td><td> 1457 </td></tr>
+<tr><td class="label">Dst_First_2 </td> <td> 2093 </td><td> 1454 </td></tr>
+<tr><td class="label">Dst_First_3 </td> <td> 1022 </td><td> 1464 </td></tr>
 </table>
 
 We can see that `Dst_First_1` and `Dst_First_3` are faster in **Java** than in **C**. There are other irregularities
@@ -152,7 +152,9 @@ A quick look at the inner loop (the code between `.L52` and `.L50`) reveals that
 There are three memory access instructions here. The first one reads a byte from the address `%rsi` at the offset `%r8`,
 where `%r8` is a copy of a loop variable (`%edi`), which is incremented by 32 for each loop iteration. Clearly, this is
 
+{% highlight C++ %}
     src [dst_pos * NUM_TIMESLOTS + dst_num]
+{% endhighlight %}
 
 The second one reads a quadword (8 bytes) from the address `%rcx` at the offset `%r10*8`, where `%r10` is the outer loop variable
 (it is incremented by one each iteration). This is clearly `dst[dst_num]`.
@@ -247,7 +249,8 @@ The code for `Dst_First_1a` looks better (I'll only show the inner loop, the res
 It is difficult to say why this code isn't faster than the original one. Perhaps an extra instruction got
 absorbed between the latencies of some other instructions, and the extra dependency that it creates was eliminated
 by dynamic instruction reordering. It is interesting to check how many CPU cycles it takes to perform the loop.
-This loop is executed 32 * 64 * 1000000 times in 1454 ms, or 0.71 ns per loop. The CPU runs at 2.6 GHz, or at
+This loop is executed ` 32 * 64 * 1000000`
+times in 1454 ms, which makes it 0.71 ns per loop. The CPU runs at 2.6 GHz, or at
 0.38 ns per cycle. This means that these 7 instructions take 1.87 CPU cycles to execute. For this to happen,
 a lot of parallel execution must be going on, and who knows what the limit is? Perhaps, an extra instruction can be
 squeezed in somewhere as well.
@@ -288,20 +291,20 @@ GNU C has several switches that control loop unrolling:
 <tr><td><pre>-loop-optimize</pre></td>
 <td>
 Perform loop optimizations: move constant expressions out of loops, simplify exit test conditions and optionally
-do strength-reduction and loop unrolling as well. Enabled at levels -O, -O2, -O3, -Os
+do strength-reduction and loop unrolling as well. Enabled at levels <code>-O</code>, <code>-O2</code>, <code>-O3</code>, <code>-Os</code>
 </td></tr>
 
 <tr><td><pre>-funroll-loops</pre></td>
 <td>
 Unroll loops whose number of iterations can be determined at compile time or upon entry to the loop.
--funroll-loops implies -frerun-cse-after-loop. It also turns on complete loop peeling (i.e. complete removal of
+<code>-funroll-loops</code> implies <code>-frerun-cse-after-loop</code>. It also turns on complete loop peeling (i.e. complete removal of
 loops with small constant number of iterations). This option makes code larger, and may or may not make it run faster. 
 </td></tr>
 
 <tr><td><pre>-funroll-all-loops</pre></td>
 <td>
 Unroll all loops, even if their number of iterations is uncertain when the loop is entered. This usually makes
-programs run more slowly. -funroll-all-loops implies the same options as -funroll-loops
+programs run more slowly. <code>-funroll-all-loops</code> implies the same options as <code>-funroll-loops</code>
 </td></tr>
 
 </table>
@@ -386,8 +389,10 @@ Observations:
 The unrolled code
 -----------------
 
-[Let's have a look at the unrolled code]({{ site.REPO-E1-C }}/commit/2f0d5d7566ce32993f802c2fe906329e66904b3f)
-(I'm excluding the assertion part). This is `Dst_First_1a`:
+Let's have a look at the unrolled code
+(I'm excluding the assertion part; 
+[the full text is in the repository]({{ site.REPO-E1-C }}/commit/2f0d5d7566ce32993f802c2fe906329e66904b3f)).
+This is `Dst_First_1a`:
 
 {% highlight text %}
 _ZNK12Dst_First_1a5demuxEPKhjPPh:

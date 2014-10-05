@@ -19,9 +19,9 @@ them in one single file in a [GIT repository]({{ site.REPO-ALIASING }}), togethe
 A little quiz
 -------------
 
-Here is a little quiz (true GCC experts will know the answer straight away).
+Here is a little quiz (true **C** experts will know the answer straight away).
 
-Consider the following program (let's call it [`a.c`]({{ site.REPO-ALIASING }}/blob/master/a.c))):
+Consider the following program (let's call it [`a.c`]({{ site.REPO-ALIASING }}/blob/master/a.c)):
 
 {% highlight C++ %}
 void a (int ** p)
@@ -37,7 +37,7 @@ void b (char ** p)
 }
 {% endhighlight %}
 
-Let's compile it with GCC and look at the generated code (here I use 32-bin MINGW compiler; my previous tests were
+Let's compile it with GCC and look at the generated code (here I use 32-bit MINGW compiler; my previous tests were
 in 64-bit mode but 32-bit code is a bit easier to read and I'm not going to run it anyway):
 
     > gcc -O3 -S a.c
@@ -67,7 +67,7 @@ Looking at the code
 -------------------
 
 If you don't know how to read this assembler, don't worry: I didn't know either. I grew up with MASM, which looks
-different from GNU assembler. It does not use `'%'` for registers and '`$`' for constants; besides, it specifies
+different from GNU assembler. It does not use `%` for registers and `$` for constants; besides, it specifies
 the destination before the source and the operation size on the operand rather than in the instruction code. GNU
 assembler does other way around. For instance, the instruction from the above listing:
 

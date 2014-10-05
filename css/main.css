@@ -146,6 +146,7 @@ a:visited { color: #a0a; }
   overflow-x: auto;
   overflow-y: hidden;
   border: 1px solid #666;
+  padding: 1px 0px 5px 5px
 }
 
 .post ul, .post ol {
@@ -157,6 +158,7 @@ a:visited { color: #a0a; }
   background-color: #e0e0ff;
   font-weight: bold;
   font-family: Consolas, Monaco, "Courier New", monospace;
+  white-space: pre;
 }
 
 code.language-text {
@@ -211,5 +213,5 @@ table.numeric td.label {
 table.numeric td.ttext {
   font-weight: normal;
   text-align: left;
-  font-family: Georgia, Times, serif;
+  font-family: inherit
 }

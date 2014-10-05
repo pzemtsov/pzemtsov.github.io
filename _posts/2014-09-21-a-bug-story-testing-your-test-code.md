@@ -435,8 +435,8 @@ Here is the result (I skip most of the output):
 The first output is from `Read4_Write4`, the second from `Read4_Write4_Unroll`, and they are identical. The check
 procedure seems to be working correctly.
 
-Next thing to look at is how the procedures update the memory. What was there before? [Let's dump `dst` before the
-call to `demux`]({{ site.REPO-BUG-TEST }}/commit/4678bbd6cff1c878ff2d08f0d114390959513bd2):
+Next thing to look at is how the procedures update the memory. What was there before? Let's dump `dst` before the
+call to `demux` (the code is [here]({{ site.REPO-BUG-TEST }}/commit/4678bbd6cff1c878ff2d08f0d114390959513bd2)):
 
 {% highlight C++ %}
     cout << "dst\n";

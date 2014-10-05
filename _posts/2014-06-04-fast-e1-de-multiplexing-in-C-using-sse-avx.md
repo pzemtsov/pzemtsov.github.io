@@ -58,7 +58,7 @@ We'll be writing four bytes at a time:
 We must understand clearly that we are now entering a dangerous territory -- the Non-portable land.
 **Java** programs are portable by the design of **Java**. Until now all our **C** programs were portable
 as well. They could run on every compiler and on every processor. From now on, it won't work like this anymore.
-We are now going to construct a four-byte unit (double words) from individual bytes. This requires knowledge
+We are now going to construct four-byte units (double words) from individual bytes. This requires knowledge
 of the way double-words are stored in memory. This is called [**Endianness**](http://en.wikipedia.org/wiki/Endianness)
 and differs between processors. All the code that follows will be written for so called '**little-endian**' processors
 (Intel is one of those). This is the cost of the speed.
@@ -112,10 +112,11 @@ Note the new `assert`: we must check that `DST_SIZE` is a multiple of 4, otherwi
 Our file `e1.cpp` became too long. Let's start with a new file, called `e1-new.cpp`. We'll compile it with the
 same switches as `e1.cpp`:
 
-    $ c++ -O3 -falign-functions=32 -falign-loops=32 -funroll-loops -o e1-new e1-new.cpp -lrt
-    $ ./e1-new
-        9Reference: 1406
-        6Write4: 491
+    # c++ -O3 -falign-functions=32 -falign-loops=32 -funroll-loops -o e1-new e1-new
+    .cpp -lrt
+    # ./e1-new
+    9Reference: 1406
+    6Write4: 491
 
 As we can see, the change has caused an immediate effect: previously the shortest time was 635 ms. For the first time
 we've got a result that is better than that of the fully unrolled **Java** version.
@@ -260,8 +261,8 @@ We have a choice of the following options:
 
 To keep it shorter, I'll use the last option.
 I'll only write the unrolled code where the compiler doesn't do the job,
-and the code will only be available in the repository, except for this one. [I'll show the unrolled version
-of `Read4_Write4` here as an example]({{ site.REPO-E1-C }}/commit/e38a2ae84e5a73c6e18d3da9ecd4e1749643ddf9).
+and the code will only be available in the repository, except for this one. I'll show the unrolled version
+of `Read4_Write4` here as an example (the full code is [here]({{ site.REPO-E1-C }}/commit/e38a2ae84e5a73c6e18d3da9ecd4e1749643ddf9)):
 
 {% highlight C++ %}
 class Read4_Write4_Unroll : public Demux
@@ -324,7 +325,7 @@ The performance looks like this:
 
 The performance is still bad. The unrolling helped a bit; however, in general our wonderful plan has failed.
 We could try more sophisticated versions, such as reading 4 bytes and writing 8, or even reading 8 and writing 8,
-but there is little chance it will help. It looks like numerous shifts and bitwise ORs eat up all the performance gain
+but there is little chance it will help. It looks like numerous shifts and bitwise `OR`s eat up all the performance gain
 we get from optimising the memory access. It may seem that this is the end of our story, and there is
 no way to make it faster, but we still have one more resource: the SSE.
 
@@ -384,18 +385,18 @@ Reading 4 bytes and writing 4 bytes at a time using SSE
 
 As we saw, the de-multiplexing of the E1 stream is essentially the transposition of a matrix. A natural way to transpose
 a matrix is to read data in rectangular blocks, transpose these blocks and write them to the appropriate places
-in the destination matrix. Our `Read4` and `Read8` versions used blocks of sizes 1x4 and 1x8, and the
-`Read4_Write4` version used 4x4 blocks:
+in the destination matrix. Our `Read4` and `Read8` versions used blocks of sizes 1&times;4 and 1&times;8, and the
+`Read4_Write4` version used 4&times;4 blocks:
 
 <img src="{{ site.url }}/images/e1-sse-read4-write4-sse.png" width="580" height="200">
 
-The inner loop of `Read4_Write4` transposes 4x4 blocks by calling
+The inner loop of `Read4_Write4` transposes 4&times;4 blocks by calling
 `make32()`, `byte0()`, `byte1()` and so on. If we look into the assembly code of `Read4_Write4`, we can see that this
 code is translated into a very long sequence of `OR`s and shifts. This is where SSE can help. It has a wonderful
 instruction, the `PSHUFB`, which can shuffle the bytes inside the XMM register in any order. The order is defined
 by another XMM register, where each byte contains an index in the argument for each byte of the result.
 This instruction has been added in SSSE3 and is available via the `_mm_shuffle_epi8` intrinsic. XMM registers
-are 16 bytes long, and this suggests a plan: We'll load the 4x4 matrix into one XMM register, shuffle it and write
+are 16 bytes long, and this suggests a plan: We'll load the 4&times;4 matrix into one XMM register, shuffle it and write
 the transposed matrix back.
 
 <img src="{{ site.url }}/images/e1-sse-transpose-4x4.png" width="505" height="374">
@@ -463,8 +464,9 @@ registers. Later it extracts parts of the registers straight to memory. The code
 
 We must compile the code with a switch that specifies the instruction set to use; in our case it will be SSE 4.2:
 
-    $ c++ -O3 -msse4.2 -falign-functions=32 -falign-loops=32 -funroll-loops -o e1-new e1-new.cpp -lrt
-    $ ./e1-new
+    # c++ -O3 -msse4.2 -falign-functions=32 -falign-loops=32 -funroll-loops -o e1-n
+    ew e1-new.cpp -lrt
+    # ./e1-new
     16Read4_Write4_SSE: 232
 
 This is a huge improvement: from 638 ms for a non-SSE version to 232 for SSE. This is also a big improvement
@@ -482,7 +484,7 @@ This is what we'll be doing:
 
 <img src="{{ site.url }}/images/e1-sse-reasd4-write16-sse.png" width="640" height="380">
 
-[We'll be reading a 4x16 matrix, transpose it and write as 16x4 matrix]({{ site.REPO-E1-C }}/commit/e42b85d907f5d5b53677109a190c87409f022fa8).
+We'll be reading a 4&times;16 matrix, transpose it and write as 16&times;4 matrix ([see the code]({{ site.REPO-E1-C }}/commit/e42b85d907f5d5b53677109a190c87409f022fa8)):
 
 {% highlight C++ %}
 template<unsigned i> inline __m128i combine_sse (__m128i m0, __m128i m1, __m128i m2, __m128i m3)
@@ -534,9 +536,9 @@ public:
 {% endhighlight %}
 
 The `LOAD16` macro loads four rows of four bytes each, merges them together into a XMM variable and performs
-a 4x4 transposition. When all the 16 inputs are ready and placed into four XMM registers, we must write them to
+a 4&times;4 transposition. When all the 16 inputs are ready and placed into four XMM registers, we must write them to
 the output, but only after additional re-shuffling. The shuffling is needed because our XMM registers
-at this point represent 4x4 matrices, and we need to collect the first row of all the matrices, then the
+at this point represent 4&times;4 matrices, and we need to collect the first row of all the matrices, then the
 second and so on. This shuffling is done by the template function `combine_sse`, where the template parameter
 indicates the row number.
 
@@ -544,7 +546,7 @@ Some additional comments are needed at this point.
 
 Shuffling of the 32-bit values in SSE is done by the `PSHUFD` instruction (SSE2), which is available
 via the intrinsic `_mm_shuffle_epi32()`. This instruction takes two sources and a control value,
-which consists of four constant values n0, n1, n2, n3. Each of these values occupies two bits, and they are packed in a
+which consists of four constant values `n0`, `n1`, `n2`, `n3`. Each of these values occupies two bits, and they are packed in a
 byte. This is what the instruction does: if `A` is the first argument (seen as an array of 4 double-words),
 and `B` is the second one, then the instruction produces the following result:
 
@@ -570,19 +572,24 @@ Here is an example:
 
 The insert instruction in SSE:
 
+{% highlight text %}
     PINSRD xmm1, r/m32, imm8
+{% endhighlight %}
 
 The same instruction in AVX encoded with VEX prefix:
 
+{% highlight text %}
     VPINSRD xmm1, xmm2, r32/m32, imm8
+{% endhighlight %}
 
 Both instructions insert a 32-bit word at a given position into the argument, but the second one can put its result
 into another register, while the first one must put it back into the first argument.
 
 Let's try this encoding mode:
 
-    $ c++ -O3 -mavx -falign-functions=32 -falign-loops=32 -funroll-loops -o e1-new e1-new.cpp -lrt
-    $ ./e1-new
+    # c++ -O3 -mavx -falign-functions=32 -falign-loops=32 -funroll-loops -o e1-new
+     e1-new.cpp -lrt
+    # ./e1-new
     17Read4_Write16_SSE: 164
 
 (files [e1-new-sse.asm]({{ site.REPO-E1-C }}/blob/e42b85d907f5d5b53677109a190c87409f022fa8/e1-new-sse.asm)
@@ -594,7 +601,7 @@ four times faster than what we started with. Can one ask for more?
 
 There are two observations that make us believe we can do better. First, the four calls to `combine_sse` look
 very similar to the four calls to `make_32` in `Read4_Write4`. In that case these calls in fact performed
-transposition of a 4x4 matrix of bytes. In our new case the new four calls perform transposition of a 4x4
+transposition of a 4&times;4 matrix of bytes. In our new case the new four calls perform transposition of a 4&times;4
 matrix of double-words (units of 4 bytes):
 
 <img src="{{ site.url }}/images/e1-sse-transpose-4x44-dwords.png" width="540" height="290">
@@ -604,7 +611,9 @@ can find a better way to transpose a double-word matrix?
 
 The second observation gives a hint on this better way. Look at the first lines of `_combine_sse`:
 
+{% highlight C++ %}
     __m128i x = _128i_shuffle (m0, m1, i, i, i, i);  // m0[i] m0[i] m1[i] m1[i]
+{% endhighlight %}
 
 We are using identical values (`i`) for all four parameters, as a result we get a vector where the first two components
 are the same and so are the last two. In the last line of the function only two of these components are
@@ -634,7 +643,7 @@ inline void transpose_4x4_dwords (__m128i &w0, __m128i &w1, __m128i &w2, __m128i
 {% endhighlight %}
 
 We have used eight shuffle instructions where previously we were using twelve. Hopefully, this will make a difference.
-[Let's modify the `Read4_Write16_SSE`]({{ site.REPO-E1-C }}/commit/19edc241cbce6779c2bb636bee36bbb756cea102):
+Let's modify the `Read4_Write16_SSE` (the new code is [here]({{ site.REPO-E1-C }}/commit/19edc241cbce6779c2bb636bee36bbb756cea102)):
 
 {% highlight C++ %}
 class Read4_Write16_SSE : public Demux
@@ -695,7 +704,7 @@ SSE will change something?
 Obviously, if we read 8 bytes from each line, we must write 8 lines at a time.  Each 8-byte value must be split in two,
 the first (low) 4 bytes written to the first 4 lines of the output and the next (high) 4 bytes to the next 4 lines
 (I won't draw the diagram, for it will complicate matters more than explain them).
-[We can duplicate the existing code to process 8 bytes at a time]({{ site.REPO-E1-C }}/commit/e4b95b63e9eaae4c76495de7a59cc24b28ec50f5):
+We can duplicate the existing code to process 8 bytes at a time (see [here]({{ site.REPO-E1-C }}/commit/e4b95b63e9eaae4c76495de7a59cc24b28ec50f5)):
 
 {% highlight C++ %}
 uint32_t low (uint64_t x)
@@ -860,7 +869,7 @@ This gives us another 21 ms, making our code incredibly fast.
 How about reading 16 and writing 16?
 ------------------------------------
 
-Since working with 8x16 blocks was so successful, it seems attractive to use 16x16 blocks. What if we read a 16x16 block
+Since working with 8&times;16 blocks was so successful, it seems attractive to use 16&times;16 blocks. What if we read a 16x16 block
 into 16 SSE registers, transpose this block and write to the output? 
 
 I've tried this. This was a monster of a code. I'm not going to publish it here,
@@ -1225,7 +1234,7 @@ And this is the result:
     24Read8_Write32_AVX_Unroll: 109
 
 This is the absolute winner indeed. The performance is really impressive. It is six times
-faster than what we started with. The achieved de-multiplexing speed is 18.8 Gbytes/sec, or 73400 times faster than
+faster than what we started with. The achieved de-multiplexing speed is 18.8 Gbytes/sec, or 73,400 times faster than
 the transmission speed of the E1 stream. We write 7.22 bytes every CPU cycle.
 
 In case someone is interested in the assembly listing for this code, it can be found in
