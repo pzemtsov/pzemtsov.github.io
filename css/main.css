@@ -215,3 +215,91 @@ table.numeric td.ttext {
   text-align: left;
   font-family: inherit
 }
+
+.post table.matrix {
+  border-collapse: collapse;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  font-size: 1.0em;
+  padding: 0 0 0 0;
+  margin: 0 0 0 0;
+  width: auto;
+}
+
+.post table.matrix tr {
+  line-height: 1em;
+}
+
+.post table.matrix td {
+  border-left: 1px solid #D0D0D0;
+  border-right: 1px solid #D0D0D0;
+  border-top: 1px solid #303030;
+  border-bottom: 1px solid #303030;
+  text-align: centre;
+  vertical-align: middle;
+  height: 1.5em;
+   width: 1.5em;
+}
+
+.post table.matrix td.mlabel {
+  border: none;
+  border-collapse: separate;
+}
+
+.post table.matrix td.l {
+  border-left: 1px solid #303030;
+}
+
+.post table.matrix td.r {
+  border-right: 1px solid #303030;
+}
+
+table.bigmatrix {
+  border-collapse: collapse;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  margin: auto;
+  width: auto;
+}
+
+table.grid {
+  border-collapse: collapse;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  width: auto;
+}
+
+table.bigmatrix td {
+  border: 1px solid #303030;
+  position: relative;
+  padding: 0;
+}
+
+table.grid td {
+  font-size: 0.75em;
+  line-height: 0.75em;
+  border: 1px solid #D0D0D0;
+  height: 0.75em;
+  min-width: 0.75em;
+}
+
+table.grid td:last-child {
+  border-right: none;
+}
+
+table.grid td:first-child {
+  border-left: none;
+}
+
+table.grid tr:first-child td {
+  border-top: none;
+}
+
+table.grid tr:last-child td {
+  border-bottom: none;
+}
+
+table.bigmatrix div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
