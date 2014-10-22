@@ -179,7 +179,7 @@ The program slowed down as a result of loop unrolling.
 
 Analysis of the code reveals why it happened. I won't show the entire inner loop code here, just a small fragment:
 
-{% highlight text %}
+{% highlight c-objdump %}
         vmovdqa %xmm8, 480(%rsp)
         vmovdqa %xmm7, 496(%rsp)
         vmovdqa %xmm6, 512(%rsp)
