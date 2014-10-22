@@ -44,7 +44,7 @@ in 64-bit mode but 32-bit code is a bit easier to read and I'm not going to run 
 
 We get the following (in file [`a.s`]({{ site.REPO-ALIASING }}/blob/master/a.s)), I only left relevant parts:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _a:
         movl    4(%esp), %eax
         movl    (%eax), %eax
@@ -71,7 +71,7 @@ different from GNU assembler. It does not use `%` for registers and `$` for cons
 the destination before the source and the operation size on the operand rather than in the instruction code. GNU
 assembler does other way around. For instance, the instruction from the above listing:
 
-{% highlight text %}
+{% highlight c-objdump %}
         movb    $1, 1(%eax)
 {% endhighlight %}
 
@@ -112,7 +112,7 @@ only increments by 1, which is incorrect.
 
 Let's see how GCC compiles this:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _c:
         movl    8(%esp), %edx
         movl    4(%esp), %eax
@@ -143,7 +143,7 @@ void d (int * p, int * q)
 Here not only `*q`, but `*q * 10` are loop invariant expressions, and could be moved out of the loop, were it not for
 the writing onto `*p`. The compiler is also scared:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _d:
         pushl   %ebx
         movl    8(%esp), %ebx
@@ -164,13 +164,13 @@ L6:
 
 You can see that both reading from `*q`
 
-{% highlight text %}
+{% highlight c-objdump %}
         movl    (%ecx), %edx
 {% endhighlight %}
 
 and multiplication by 10
 
-{% highlight text %}
+{% highlight c-objdump %}
         leal    (%edx,%edx,4), %edx
         addl    %edx, %edx
 {% endhighlight %}
@@ -230,7 +230,7 @@ void c_3 (int * __restrict__ p, int * __restrict__ q)
 
 Compile it:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _c_3:
         movl    8(%esp), %eax
         movl    (%eax), %edx
@@ -267,7 +267,7 @@ void d_1 (int * __restrict__ p, int * __restrict__ q)
 
 produced fantastic result:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _d_1:
         .cfi_startproc
         movl    8(%esp), %eax
@@ -324,7 +324,7 @@ void c_short (int * p, short * q)
 
 We don't expect much to change, but we are wrong:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _c_short:
         movl    8(%esp), %eax
         movswl  (%eax), %edx
@@ -340,7 +340,7 @@ made such a difference?
 Let's compile the program with a special switch: `-fno-strict-aliasing`. The full assembly can be found in
 the repository, file [a-nostrict.s]({{ site.REPO-ALIASING }}/blob/master/a-nostrict.s).
 
-{% highlight text %}
+{% highlight c-objdump %}
 _c_short:
         movl    8(%esp), %edx
         movl    4(%esp), %eax
@@ -385,7 +385,7 @@ void c_char (int * p, char * q)
 
 compiles as this:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _c_char:
         movl    8(%esp), %edx
         movl    4(%esp), %eax
@@ -476,7 +476,7 @@ int e (int * p)
 
 This is how it compiles with `-O3`:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _e:
         movl    4(%esp), %eax
         xorl    %edx, %edx
@@ -501,7 +501,7 @@ int e_char (int * p)
 
 It produces the following:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _e_char:
         movl    4(%esp), %eax
         movl    (%eax), %edx
@@ -617,7 +617,7 @@ void b_modified (char ** p)
 
 The code generated is good in both cases:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _a_modified:
         movl	4(%esp), %eax
         movl	(%eax), %eax
@@ -699,7 +699,7 @@ void c_array (int p, int q)
 
 The code looks like this:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _c_array:
         movl    8(%esp), %edx
         movl    4(%esp), %eax

@@ -97,7 +97,7 @@ Let's compile the program with all necessary flags
 
 and look at the [assembly]({{ site.REPO-E1-C }}/commit/d8d7ca6e71ae558e09098742e51b9c8963d12f15):
 
-{% highlight text %}
+{% highlight c-objdump %}
 _ZNK11Dst_First_15demuxEPKhjPPh:
 .LFB1013:
         .cfi_startproc
@@ -143,7 +143,7 @@ _ZNK11Dst_First_15demuxEPKhjPPh:
 
 A quick look at the inner loop (the code between `.L52` and `.L50`) reveals that there is something that can be optimised there:
 
-{% highlight text %}
+{% highlight c-objdump %}
         movzbl  (%rsi,%r8), %r9d
         movq    (%rcx,%r10,8), %r8
         movb    %r9b, (%r8,%rax)
@@ -235,7 +235,7 @@ speed of `Dst_First_3` did.
 The code for `Dst_First_1a` looks better (I'll only show the inner loop, the rest you can see 
 [in the repository, file e1.asm]({{ site.REPO-E1-C }}/blob/c976a9f9d44345859ac6b4c4b81dc20527842575/e1.asm)):
 
-{% highlight text %}
+{% highlight c-objdump %}
 .L37:
         movl    %edi, %r8d
         addl    $32, %edi
@@ -394,7 +394,7 @@ Let's have a look at the unrolled code
 [the full text is in the repository]({{ site.REPO-E1-C }}/commit/2f0d5d7566ce32993f802c2fe906329e66904b3f)).
 This is `Dst_First_1a`:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _ZNK12Dst_First_1a5demuxEPKhjPPh:
         subq    $8, %rsp
         testb   $31, %dl
@@ -505,7 +505,7 @@ _ZNK12Dst_First_1a5demuxEPKhjPPh:
 
 This is `Dst_First_3a`:
 
-{% highlight text %}
+{% highlight c-objdump %}
 _ZNK12Dst_First_3a5demuxEPKhjPPh:
         subq    $8, %rsp
         cmpl    $2048, %edx

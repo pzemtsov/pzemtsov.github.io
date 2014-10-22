@@ -40,7 +40,7 @@ public:
 We compiled it with function alignment and loop alignment set to 32 and loop unrolling switched on.
 [This is the assembly output](({{ site.REPO-E1-C }}/blob/c976a9f9d44345859ac6b4c4b81dc20527842575/e1.asm):
 
-{% highlight text %}
+{% highlight c-objdump %}
 _ZNK12Dst_First_3a5demuxEPKhjPPh:
         subq    $8, %rsp
         cmpl    $2048, %edx
@@ -124,7 +124,7 @@ It is easy to see how registers are allocated:
 
 Here is the code for one assignment from the inner loop (after sorting out some instruction re-ordering):
 
-{% highlight text %}
+{% highlight c-objdump %}
         leal    32(%rdx), %r10d
         movzbl  (%rsi,%r10), %r8d
         movb    %r8b, 1(%rdi,%rax)
@@ -135,7 +135,7 @@ The result of this addition is later used in the effective address of the `movzb
 register is added to it -- `%rsi` (`src`).  But wait, in Intel architecture an addressing mode can consist of
 two registers (one possibly scaled) and an offset; why is this `32` offset not placed right there, like this?
 
-{% highlight text %}
+{% highlight c-objdump %}
         movzbl  32(%rsi,%rdx), %r8d
         movb    %r8b, 1(%rdi,%rax)
 {% endhighlight %}
@@ -168,7 +168,7 @@ unsigned long z = (unsigned long) x * x; // result is 1000000000000
 In our example the multiplication was replaced with the addition (as a result of the strength reduction), but that addition was still performed
 in 32 bits for numeric safety:
 
-{% highlight text %}
+{% highlight c-objdump %}
         addl    $256, %edx
 {% endhighlight %}
 
@@ -246,7 +246,7 @@ I won't show the entire code here, it is surprisingly big
 ([you can see it in the repository]({{ site.REPO-E1-C }}/commit/4ae5a53f64aa99b946f4d26b65122a8ed64bf66e)).
 I'll only show the main loops. Here is one for `sum32`:
 
-{% highlight text %}
+{% highlight c-objdump %}
 .L5:
         addl    $1, %esi
         paddd   (%r8), %xmm0
@@ -257,7 +257,7 @@ I'll only show the main loops. Here is one for `sum32`:
 
 And here is one for `sum64`:
 
-{% highlight text %}
+{% highlight c-objdump %}
 .L17:
         addq    $1, %rsi
         paddq   (%r8), %xmm0
@@ -400,7 +400,7 @@ Let's have a look at the code generated for `Dst_First_3a`
 (the entire assembly output is in
 [the repository]({{ site.REPO-E1-C }}/commit/067109ef4d03529be893ca2fd6205d42edc58c86)):
 
-{% highlight text %}
+{% highlight c-objdump %}
 _ZNK12Dst_First_3a5demuxEPKhmPPh:
         subq    $8, %rsp
         .cfi_def_cfa_offset 16
@@ -443,14 +443,14 @@ _ZNK12Dst_First_3a5demuxEPKhmPPh:
 
 The code looks much better than before. Each line of the inner loop produces two instructions instead of three now:
 
-{% highlight text %}
+{% highlight c-objdump %}
         movzbl  32(%rdx), %r8d
         movb    %r8b, 1(%rdi,%rax)
 {% endhighlight %}
 
 Previously there were these three lines:
 
-{% highlight text %}
+{% highlight c-objdump %}
         leal    32(%rdx), %r10d
         movzbl  (%rsi,%r10), %r8d
         movb    %r8b, 1(%rdi,%rax)

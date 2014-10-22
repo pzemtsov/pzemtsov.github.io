@@ -572,13 +572,13 @@ Here is an example:
 
 The insert instruction in SSE:
 
-{% highlight text %}
+{% highlight c-objdump %}
     PINSRD xmm1, r/m32, imm8
 {% endhighlight %}
 
 The same instruction in AVX encoded with VEX prefix:
 
-{% highlight text %}
+{% highlight c-objdump %}
     VPINSRD xmm1, xmm2, r32/m32, imm8
 {% endhighlight %}
 
