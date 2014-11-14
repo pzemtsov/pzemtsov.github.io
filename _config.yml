@@ -13,6 +13,7 @@ ART-E1-C-SSE: /2014/06/04/fast-e1-de-multiplexing-in-C-using-sse-avx.html
 ART-TEMPLATE: /2014/05/07/from-macros-to-templates.html
 ART-TRANSPOSING-16X16: /2014/10/01/how-to-transpose-a-16x16-matrix.html
 ART-BUG2: /2014/10/21/bug-story-2-unrolling-16x16-transposition.html
+ART-JENSEN-DEVICE: /2014/10/28/macro-call-by-name-lambda-jensens-device.html
 
 TITLE-E1:   "De-multiplexing of E1 streams in Java"
 TITLE-E1-C: "De-multiplexing of E1 stream: converting to C"
@@ -25,6 +26,7 @@ REPO-E1-C: https://github.com/pzemtsov/article-E1-demux-C
 REPO-ALIASING: https://github.com/pzemtsov/article-GCC-pointer-aliasing
 REPO-BUG-TEST: https://github.com/pzemtsov/article-bug-test-code
 REPO-JENSEN-DEVICE: https://github.com/pzemtsov/article-jensen-device
+REPO-JAVA-CALLBACK: https://github.com/pzemtsov/article-java-callback
 
 redcarpet:
  extensions: [smart, tables]
