@@ -4,7 +4,6 @@ title:  How to make C run as fast as Java
 date:   2014-05-15 12:00:00
 tags: C C++ Java GCC optimisation
 ART-UNSTABLE: /2014/05/12/mystery-of-unstable-performance.html
-ART-ALIASING: /2014/05/09/gcc-optimisations-and-pointer-aliasing.html
 ---
 
 No, there isn't a mistake in the title. Everyone expects that **C** programs always run faster than **Java**
@@ -163,12 +162,28 @@ And the third one writes the byte read by the first instructin to the address ju
 offset `%rax`, where `%rax` is another inner loop variable. This is writing to `dst[dst_num][dst_pos]`.
 
 This means that `dst[dsn_num]` was not identified as an expression, which is invariant in the inner loop, and it
-wasn't moved out of the loop. In the article
-[GCC, optimisations and pointer aliasing]({{ page.ART-ALIASING }})
-we saw the reason for it: pointer aliasing. That article contained a test function, which served as a simple model of `Dst_First_1::demux`
-and suffered from the same problem:
+wasn't moved out of the loop. The reason is in potential [**pointer aliasing**](http://en.wikipedia.org/wiki/Pointer_aliasing).
+
+Unlike **Java**, **C** and **C++** are quite tolerant towards pointer behaviour. The original version of **C** was
+absolutely liberal -- pointers were allowed to point anywhere, and the same area of memory could be accessed via
+multiple pointers of arbitrary types. This reduced the optimisation oppotrunity, since for any two pointers of
+unknown nature the compiler should assume that they could pointer to the same memory. This is what GCC is still doing
+when strict pointer aliasing is switched off. Later (in the first **C** standard, '**ANSI/ISO 9899:1990**', commonly referred
+to as '**ANSI C**') the aliasing rules became stricter. An object now can only be accessed by two pointers of
+"similar" types (`int` and `unsigned` are considered similar), and by a `char` pointer. This allows a compiler
+to optimise pointer dereferences where types are different and neither of the pointers is a `char*`. In GNU C
+this is called a **strict aliasing rule** and is switched on by the `-fstrict-aliasing` switch, which is a part of
+the `-O2` optimisation pack.
+
+The impact of the strict aliasing rule can be seen in the following examples, where `b()` models `Dst_First_1::demux`:
 
 {% highlight C++ %}
+void a (int ** p)
+{
+    p[0][0] = 0;
+    p[0][1] = 1;
+}
+
 void b (char ** p)
 {
     p[0][0] = 0;
@@ -176,13 +191,41 @@ void b (char ** p)
 }
 {% endhighlight %}
 
-In that case the compiler assumed aliasing of `p[0]` and `p`, and did not optimise the second
-`p[0]`. In our case, the compiler assumes that `dst + dst_num` (a `char**`) can be aliased with `dst[dst_num] + dst_pos`
-(a `char*`), and does not optimise repetitive access to `dst[dst_num]`.
+This is how they are compiled:
+
+{% highlight c-objdump %}
+_a:
+        movl    4(%esp), %eax
+        movl    (%eax), %eax
+        movl    $0, (%eax)
+        movl    $1, 4(%eax)
+        ret
+
+_b:
+        movl    4(%esp), %eax
+        movl    (%eax), %edx
+        movb    $0, (%edx)
+        movl    (%eax), %eax
+        movb    $1, 1(%eax)
+        ret
+{% endhighlight %}
+
+We can see that the code for `b()` contains an extra instruction 
+
+{% highlight c-objdump %}
+        movl    (%eax), %eax
+{% endhighlight %}
+
+The reason is that the compiler assumed aliasing of `p[0]` (of type `char*`) and `p` (of type `char**`), and did not optimise the second `p[0]`.
+When compiling `a()` this did not happen because `int*` does not alias `int**`.
+
+Unfortunately, our `Dst_First_1::demux` is similar to `b()`: `dst + dst_num` is of type `char**`,
+while `dst[dst_num] + dst_pos` is a `char*`, and they are considered aliased. As a result, the compiler 
+did not optimise repetitive access to `dst[dst_num]`.
 
 The analysis of the code for `Dst_First_3` shows the same problem.
 
-The same article comes to a conclusion that the only way to improve the code is to optimise the program manually.
+The only way I know to improve the code is to optimise the program manually.
 This is what we've done in `Dst_First_2`, but there we also performed strength reduction, which could affect the
 code somehow. Let's write versions of `Dst_First_1` and `Dst_First_2` with only `dst[dst_num]` optimised,
 but no strength reduction (the code is [here]({{ site.REPO-E1-C }}/commit/c976a9f9d44345859ac6b4c4b81dc20527842575)):
@@ -288,7 +331,7 @@ such optimisations more efficiently.
 GNU C has several switches that control loop unrolling:
 
 <table>
-<tr><td><pre>-loop-optimize</pre></td>
+<tr><td><pre>-floop-optimize</pre></td>
 <td>
 Perform loop optimizations: move constant expressions out of loops, simplify exit test conditions and optionally
 do strength-reduction and loop unrolling as well. Enabled at levels <code>-O</code>, <code>-O2</code>, <code>-O3</code>, <code>-Os</code>
@@ -312,7 +355,7 @@ programs run more slowly. <code>-funroll-all-loops</code> implies the same optio
 There are also some switches that control maximal size of unrolled loop, maximal number of times loops are unrolled
 and so on. We won't use them, relying on the default values.
 
-As you can see, `-loop-optimize` is capable of performing some unrolling, and it is invoked with `-O3` option.
+As you can see, `-floop-optimize` is capable of performing some unrolling, and it is invoked with `-O3` option.
 But it didn't unroll our loops.
 
 The option `-funroll-all-loops` looks dangerous, it can easily make the program run slower.
