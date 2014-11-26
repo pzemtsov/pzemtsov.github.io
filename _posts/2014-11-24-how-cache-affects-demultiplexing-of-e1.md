@@ -32,7 +32,8 @@ miss, but we'll postpone study of TLB for later.
 
 We see that any cache miss affects us negatively, but L3 miss is a complete disaster. Fortunately, things are not
 totally bad. Firstly, we are talking about latency, not throughput. If one memory read finished in 11 cycles, it
-does not mean that two reads will require 22. Several memory accesses may interleave in time. Secondly, the out-of-order
+does not mean that two reads will require 22. It is possible that several memory accesses may interleave in time
+(although it is not explicitly mentioned in Intel manuals). Secondly, the out-of-order
 execution model of the processor allows it to do something useful while waiting for data from caches or memory. If
 all else fails, it can use its execution units for another thread if Hyperthreading is turned on (this isn't our case,
 though, since we are running a single thread). And finally, there is prefetch -- the processor detects pattern of
@@ -113,6 +114,8 @@ void measure(const Demux & demux)
     printf ("\n");
 }
 {% endhighlight %}
+
+The test program is in [repository]({{ site.REPO-E1-CACHE/commit/03c577725c9d7b902377557a64ce3f150ce3f8ad }}).
 
 The expectations
 ----------------
@@ -226,7 +229,7 @@ Why is it so fast?
 ------------------
 
 Well, it isn't really very fast -- after all, speed reduced by more than three times due to cache misses. But it is
-faster than expected. Several factors contributed to this:
+faster than expected. My guess is that several factors contributed to this:
 
 - Both source and destination data is stored in continuous blocks. The cache lines are 64 bytes long, and these lines
 are read fully when any one byte inside the line is accessed. If that byte is the only one needed, the entire cache line
@@ -234,13 +237,13 @@ load latency is used for that byte. Fortunately, we are using all 64 bytes. Only
 block, not 2048.
 
 - Memory loads do not depend on previous calculations. The out-of-order scheduler can start memory transaction while
-another transaction is still in progress. This would be impossible if new memory address depended on previously
+previous transaction or manipulation with its result is still in progress. This would be impossible if new memory address depended on previously
 read values, as it happens when traversing a linked list
 
 - Both input and output blocks are allocated in sequence, which makes it possible to detect memory access pattern and
-perform a prefetch. I'm not sure if Sandy Bridge really does it, though.
+perform a prefetch.
 
-- Input and output locality reduce possible penalties for TLB misses.
+- Input and output locality reduces possible penalties for TLB misses.
 
 These conditions are not always met, so we can't expect to be so lucky every time. Some programs will suffer
 much more from cache misses (I'll try to build some examples).
@@ -267,7 +270,7 @@ Conclusions
 
 - In our example major drop in performance (3.4 times) happens when running out of L3 cache. L1 and L2 caches gave
   much smaller penalty (14% and 56%). This means that in our case and similar cases, while fitting into L1 cache is desirable,
-  the primary focus must be in fitting the L3 cache. Fortunately, modern days' sizes of L3 caches make it possible. While
+  the primary focus must be on fitting into the L3 cache. Fortunately, modern days' sizes of L3 caches make it possible. While
   keeping all the data for any realistic job in 32K or 256K is problematic, 20MB of memory allows to store something
   meaningful (it is, after all, 32 times bigger than the entire memory of IBM PC XT).
   Any effort to squeeze the data into L3 cache or partition it into independently processed cache-sized blocks
