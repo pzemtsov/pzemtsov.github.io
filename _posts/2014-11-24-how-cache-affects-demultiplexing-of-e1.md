@@ -115,7 +115,7 @@ void measure(const Demux & demux)
 }
 {% endhighlight %}
 
-The test program is in [repository]({{ site.REPO-E1-CACHE }}/commit/f5a34c64423e886f996bf30207b0727d49701cd7).
+The test program is in [repository]({{ site.REPO-E1-CACHE }}/blob/335afeb9af840d78f0e5802b520eef22c0ad23c6/e1-multi.cpp).
 
 The expectations
 ----------------
