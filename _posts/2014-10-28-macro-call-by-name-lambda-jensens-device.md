@@ -3,6 +3,8 @@ layout: post
 title:  "Macros, call by name, lambda and Jensen's device"
 date:   2014-10-28 12:00:00
 tags: C C++ GCC optimisation
+story: callbacks
+story-title: "Performance of various callback mechanisms"
 ---
 
 

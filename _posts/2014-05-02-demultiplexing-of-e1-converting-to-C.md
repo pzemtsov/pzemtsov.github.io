@@ -3,6 +3,8 @@ layout: post
 title:  "De-multiplexing of E1 stream: converting to C"
 date:   2014-05-02 00:00:00
 tags: optimisation performance de-multiplexing C C++ macro meta-programming
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ---
 
 In the [previous article]({{ site.ART-E1 }})

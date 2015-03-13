@@ -1,12 +1,93 @@
 ---
 layout: default
-title: Notes on program optimisation
+title: Experiments in program optimisation
 ---
 
-<div id="home">
+<h1> {{ site.author }} </h1>
+<h2> {{ page.title }} </h2>
+
+<div style="height:2em;"></div>
+
+{% assign posts-forward = site.posts | sort: "date" %}
+
+<ul class="hmenu">
+ <li class="hmenu"><a class="hmenu" id="all" href="#">All articles</a></li>
+ <li class="hmenu"><a class="hmenu" id="story" href="/#story">Stories</a></li>
+ <li class="hmenu"><a class="hmenu" id="tag" href="/#tag">Tags</a></li>
+</ul> 
+
+{% assign stories = '' | split: ';' %}
+{% assign unsorted-posts = false %}
+
+{% for post in posts-forward %}
+  {% assign story = post.story %}
+  {% if story == nil %}
+    {% assign unsorted-posts = true %}
+  {% else %}
+    {% unless stories contains story %}
+      {% assign stories = stories | join: ';' | append: ';' | append: story | split: ';' %}
+    {%endunless %}
+  {% endif %}
+{% endfor %}
+
+<p></p>
+
+<div class="switch" id="story" style="display:none;">
+{% for story in stories %}
+  {% assign story-title = "" %}
+  {% for post in posts-forward %}
+    {% if post.story == story %}
+      {% assign story-title = post.story-title %}
+    {% endif %}
+  {% endfor %}
+  <p class="storyheader" id="{{ story }}"><a href="/#story:{{ story }}">{{ story-title }}</a></p>
+  <ul class="posts">
+    {% for post in posts-forward %}
+      {% if post.story == story %}
+        <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }} </a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endfor %}
+{% if unsorted-posts %}
+  <p class="storyheader" id="assorted"><a href="/#story:assorted">Assorted</a></p>
+  <ul class="posts">
+    {% for post in posts-forward %}
+      {% if post.story == nil %}
+        <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }} </a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
+</div>      
+
+<p></p>
+<div class="switch" id="tag" style="display:none;">
+<p>
+{% for tag in site.tags %}
+  {% assign tagname = tag[0] %}
+  <a href="/#tag:{{ tagname }}" class="tagheader" id="{{ tagname }}">{{ tagname }}</a>
+{% endfor %}
+</p>
+
+{% for tag in site.tags %}
+  {% assign tagname = tag[0] %}
+   <div class="tagbody" id="{{ tagname }}">
+     <ul class="posts">
+       {% for post in posts-forward %}
+         {% if post.tags contains tagname %}
+           <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }} </a></li>
+         {% endif %}
+       {% endfor %}
+     </ul>
+   </div>
+{% endfor %}
+</div>      
+
+<div class="switch" id="all">
   <ul class="posts">
     {% for post in site.posts %}
-      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }} </a></li>
     {% endfor %}
   </ul>
 </div>

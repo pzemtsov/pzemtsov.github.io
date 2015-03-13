@@ -3,6 +3,8 @@ layout: post
 title:  "More experiments with cache"
 date:   2014-12-24 12:00:00
 tags: C++ optimisation cache de-multiplexing
+story: cache
+story-title: "How cache affects performance"
 ---
 
 In the previous article ([{{ site.TITLE-E1-CACHE }}]({{ site.ART-E1-CACHE }})) we measured how de-multiplexing

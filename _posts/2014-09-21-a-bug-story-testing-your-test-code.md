@@ -3,6 +3,8 @@ layout: post
 title:  "A bug story: testing your test code"
 date:   2014-09-21 12:00:00
 tags:   C C++ bug
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ---
 
 Background

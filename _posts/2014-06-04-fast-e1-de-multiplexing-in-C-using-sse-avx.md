@@ -3,6 +3,8 @@ layout: post
 title:  Fast E1 de-multiplexing in C using SSE/AVX
 date:   2014-06-04 12:00:00
 tags: C C++ GCC optimisation SSE AVX
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ART-UNSTABLE: /2014/05/12/mystery-of-unstable-performance.html
 TITLE-UNSTABLE: "The mystery of an unstable performance"
 ART-CFAST: /2014/05/15/how-to-make-C-as-fast-as-java.html

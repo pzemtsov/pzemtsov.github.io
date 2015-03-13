@@ -3,6 +3,8 @@ layout: post
 title:  "Bug story 2: Unrolling the 16&times;16 matrix transposition, or be careful with macros"
 date:   2014-10-21 12:00:00
 tags: C C++ GCC optimisation SSE AVX bug
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ---
 
 Background

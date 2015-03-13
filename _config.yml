@@ -1,4 +1,5 @@
-name: Notes on program optimisation
+name: Experiments in program optimisation
+author: Pavel Zemtsov
 markdown: redcarpet
 pygments: true
 timezone: Africa/Johannesburg
@@ -6,6 +7,9 @@ timezone: Africa/Johannesburg
 collections:
   ququ:
     output: true
+
+TITLE-STORY-CACHE: "How cache affects performance"
+TITLE-STORY-BUFFERING: "Effects of stream buffering"
 
 ART-E1:   /2014/04/15/demultiplexing-of-e1.html
 ART-E1-C: /2014/05/02/demultiplexing-of-e1-converting-to-C.html

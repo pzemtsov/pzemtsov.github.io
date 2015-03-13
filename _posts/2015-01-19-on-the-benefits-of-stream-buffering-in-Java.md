@@ -3,6 +3,8 @@ layout: post
 title:  "On the benefits of stream buffering in Java"
 date:   2015-01-19 12:00:00
 tags: Java optimisation performance streams socket buffering
+story: buffering
+story-title: "Effect of stream buffering"
 REPO-BUFFER: https://github.com/pzemtsov/article-buffering-streams
 ---
 

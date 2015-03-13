@@ -4,6 +4,8 @@ title:  The mystery of an unstable performance
 date:   2014-05-12 12:00:00
 tags: C C++ GCC optimisation
 ART-FROM-MACROS-TO-TEMPLATES: /2014/05/07/from-macros-to-templates.html
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ---
 
 Most people love detective stories. It is a bit illogical. The situation where everyone is alive and well, and all

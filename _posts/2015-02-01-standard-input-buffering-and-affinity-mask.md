@@ -3,6 +3,8 @@ layout: post
 title:  "Standard input, buffering and affinity mask"
 date:   2015-02-01 12:00:00
 tags: Java optimisation performance streams buffering stdin stdout affinity
+story: buffering
+story-title: "Effect of stream buffering"
 ART-BUFFER: /2015/01/19/on-the-benefits-of-stream-buffering-in-Java.html
 REPO-BUFFER: https://github.com/pzemtsov/article-buffering-streams
 ---

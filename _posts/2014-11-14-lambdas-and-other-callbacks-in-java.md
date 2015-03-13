@@ -3,6 +3,8 @@ layout: post
 title:  "Lambdas and other callbacks in Java"
 date:   2014-11-14 12:00:00
 tags: Java optimisation
+story: callbacks
+story-title: "Performance of various callback mechanisms"
 ---
 
 In [the previous article]({{ site.ART-JENSEN-DEVICE}}) we constructed a **Jensen's device** in **C++**. This device is a procedure that calculates

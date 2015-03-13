@@ -3,6 +3,8 @@ layout: post
 title:  Size does matter
 date:   2014-05-18 12:00:00
 tags: C C++ GCC optimisation
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ART-CFAST: /2014/05/15/how-to-make-C-as-fast-as-java.html
 TITLE-CFAST: "How to make C run as fast as Java"
 ART-UNSTABLE: /2014/05/12/mystery-of-unstable-performance.html

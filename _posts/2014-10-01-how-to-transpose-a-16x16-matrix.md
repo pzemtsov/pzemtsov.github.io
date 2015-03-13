@@ -3,6 +3,8 @@ layout: post
 title:  "How to transpose a 16&times;16 byte matrix using SSE"
 date:   2014-10-01 12:00:00
 tags: C C++ GCC optimisation SSE AVX
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ---
 
 Background

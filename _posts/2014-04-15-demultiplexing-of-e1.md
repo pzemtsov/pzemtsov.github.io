@@ -2,7 +2,9 @@
 layout: post
 title:  "De-multiplexing of E1 streams in Java"
 date:   2014-04-15 00:00:00
-tags: optimisation performance de-multiplexing java
+tags: optimisation performance de-multiplexing Java
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ---
 
 I was looking for a simple example problem to demonstrate program optimisation, when I saw a colleague of mine busy with exactly that.

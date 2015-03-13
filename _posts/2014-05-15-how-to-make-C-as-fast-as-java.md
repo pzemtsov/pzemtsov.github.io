@@ -3,6 +3,8 @@ layout: post
 title:  How to make C run as fast as Java
 date:   2014-05-15 12:00:00
 tags: C C++ Java GCC optimisation
+story: e1-demux
+story-title: "De-multiplexing of E1 streams"
 ART-UNSTABLE: /2014/05/12/mystery-of-unstable-performance.html
 ---
 

@@ -3,6 +3,8 @@ layout: post
 title:  "How cache affects demultiplexing of E1"
 date:   2014-11-24 12:00:00
 tags: C++ optimisation cache de-multiplexing
+story: cache
+story-title: "How cache affects performance"
 ---
 
 In the series of articles ([{{ site.TITLE-E1 }}]({{ site.ART-E1 }}), [{{ site.TITLE-E1-C }}]({{ site.ART-E1-C }}),
