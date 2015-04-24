@@ -1174,7 +1174,7 @@ Here are the results as a table:
 
 And as a graph:
 
-<img src="{{ site.url }}/images/life-results.png" width="576" height="287">
+<img src="{{ site.url }}/images/life-results.png" width="580" height="318">
 
 Here are the immediate observations:
 
