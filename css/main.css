@@ -307,3 +307,24 @@ table.bigmatrix div {
   -moz-transform: translate(-50%, -50%);
 }
 
+/*****************************************************************************/
+
+button {
+   padding: 0 10px 0 10px;
+}
+
+/*****************************************************************************/
+/*
+/* Formulas
+/*
+/*****************************************************************************/
+
+
+.formula          { margin-top: 1em; margin-bottom: 1em; margin-left: 5em; }
+.formula .denom   { border-top: none }
+.formula .num     { border-bottom: 1px solid black }
+.big              { font-size: 2em ; vertical-align: middle; }
+s                 { margin-left: -0.25em }
+.formula          { font-family: "Times New Roman", Times, serif; }
+.formula table    { border-spacing: 0; border-style: none; width: auto;}
+.formula table td { text-align: center; vertical-align: middle; border-style: none; border-width: 0;   padding: 0;}
