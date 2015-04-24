@@ -228,7 +228,7 @@ co-ordinates, allowing both positive and negative ones. This means that the fiel
 point, so simulations of unbounded structures, such as gliders, will be limited in time (although I'd be very happy
 if I could hit this limitation in real life -- that would mean that the program performed several billion iterations in
 reasonable time, and this is something yet to be achieved). Another consideration
-is memory. There are configurations that grow indefinitely, such as [Gosper Glider Gun](http://en.wikipedia.org/wiki/Gun_(cellular_automaton%29):
+is memory. There are configurations that grow indefinitely, such as [Gosper Glider Gun](http://en.wikipedia.org/wiki/Gun_%28cellular_automaton%29):
 
 <canvas class="life" id="gun" shape="gun" width="255" height="255" style="outline: 1px black solid;"></canvas>
 <br/>
