@@ -166,8 +166,8 @@ grid has eight neighbours, direct and diagonal. The time runs in clock ticks. Th
 - All the cells having more than three living neighbours die of overpopulation
 - A new cell is born on any empty square that has three living neighbours.
 
-The game received attention from researches, and a lot of interesting structures have been found. There are static
-structures, oscillators, moving patterns ([gliders](http://en.wikipedia.org/wiki/Glider_(Conway's_Life%29)), and
+The game received attention from researchers, and a lot of interesting structures have been found. There are static
+structures, oscillators, moving patterns ([gliders](http://en.wikipedia.org/wiki/Glider_%28Conway's_Life%29)), and
 a lot of more complex objects. Some small patterns can multiply for a while and produce non-trivial results. Here is an example: this simple structure
 (R-pentamino piece) starts small, grows, lives a turbulent life and then deteriorates and fades away, never dying
 completely:
