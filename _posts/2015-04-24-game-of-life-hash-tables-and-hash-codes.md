@@ -395,7 +395,7 @@ There is also usual correctness check code, which isn't needed now but will be i
 measurement code. We'll run each performance test three times. Here is the run result:
 
     # java -server Life
-    Hash_Reference: time for 10000:  2726  2196  2199: 4547.5 frames/sec
+      Hash_Reference: time for 10000:  2701  2586  2543: 3932.4 frames/sec
 
 How good is the result? It is interesting that it is of the same order of magnitude as the 3200 fps I was talking
 about in the beginning of the article, even though the algorithms are of different nature, so the results aren't directly comparable.
@@ -472,7 +472,7 @@ neighbour is `w-DX-DY`. For location (1,&nbsp;1) it produces correct result (0,&
 
 which is (-2,&nbsp;-1) instead of (-1,&nbsp;-1). To resolve this, we'll add
 an offset `0x80000000` to all co-ordinates. This offset is only applied at input or output time, and does not
-affect main algorithm:
+affect the main algorithm:
 
 {% highlight Java %}
 public static final int offset = 0x8000000;
@@ -496,7 +496,7 @@ public static long fromPoint (int x, int y)
 The rest of the program stays virtually unchanged. Here is the result:
 
     # java -server Life
-          Hash_Long: time for 10000:  3878  3248  3240: 3086.4 frames/sec
+           Hash_Long: time for 10000:  3910  3901  3887: 2572.7 frames/sec
 
 This is a surprise! The performance got worse. What went wrong? It seems very unlikely that operations with `long`,
 even boxed as `Long`, are slower than with our `Point` class. The general structure of the program is the same. What is the difference?
@@ -576,9 +576,9 @@ and the two added together will cancel each other out.
 Since there is no more boxing, the code is a little bit longer, but it is also clearer and safer -- arbitrary number
 can't be passed as a point any more. Here is the result (I'll quote all three):
 
-     Hash_Reference: time for 10000:  2726  2196  2199: 4547.5 frames/sec
-          Hash_Long: time for 10000:  3878  3248  3240: 3086.4 frames/sec
-     Hash_LongPoint: time for 10000:  2312  1946  1933: 5173.3 frames/sec
+      Hash_Reference: time for 10000:  2701  2586  2543: 3932.4 frames/sec
+           Hash_Long: time for 10000:  3910  3901  3887: 2572.7 frames/sec
+      Hash_LongPoint: time for 10000:  2340  2254  2243: 4458.3 frames/sec
 
 This proves our theory. The version using `long` with the original hash code is much faster than the `Long`-based
 version and a little bit faster than the original one.
@@ -1162,25 +1162,28 @@ Here are the results as a table:
 
 <table class="numeric">
 <tr><th>Label<th>Hash</th><th>Time, <b>Java 7</b></th><th>Time, <b>Java 8</b></th></tr>
-<tr><td class="label">Ref</td><td class="ttext">Multiply by 3, 5                </td><td>2199</td><td>4161</td></tr>
-<tr><td class="label">1</td><td class="ttext"><b>Long</b> default               </td><td>3240</td><td>6454</td></tr>
-<tr><td class="label">2</td><td class="ttext">Multiply by 3, 5                  </td><td>1933</td><td>2317</td></tr>
-<tr><td class="label">3</td><td class="ttext">Multiply by 11, 17                </td><td>1642</td><td>1913</td></tr>
-<tr><td class="label">4</td><td class="ttext">Multiply by two big primes        </td><td>1628</td><td>1632</td></tr>
-<tr><td class="label">5</td><td class="ttext">Multiply by one big prime         </td><td>1645</td><td>1609</td></tr>
-<tr><td class="label">6</td><td class="ttext">Modulo big prime                  </td><td>1567</td><td>1550</td></tr>
-<tr><td class="label">7</td><td class="ttext">CRC32                             </td><td>8757</td><td>3234</td></tr>
+<tr><td class="label">Ref</td><td class="ttext">Multiply by 3, 5                </td><td>2543</td><td>5020</td></tr>
+<tr><td class="label">1</td><td class="ttext"><b>Long</b> default               </td><td>3887</td><td>7195</td></tr>
+<tr><td class="label">2</td><td class="ttext">Multiply by 3, 5                  </td><td>2243</td><td>5384</td></tr>
+<tr><td class="label">3</td><td class="ttext">Multiply by 11, 17                </td><td>1819</td><td>2238</td></tr>
+<tr><td class="label">4</td><td class="ttext">Multiply by two big primes        </td><td>1788</td><td>1796</td></tr>
+<tr><td class="label">5</td><td class="ttext">Multiply by one big prime         </td><td>1818</td><td>1793</td></tr>
+<tr><td class="label">6</td><td class="ttext">Modulo big prime                  </td><td>1701</td><td>1705</td></tr>
+<tr><td class="label">7</td><td class="ttext">CRC32                             </td><td>9294</td><td>3550</td></tr>
 </table>
 
 And as a graph:
 
-<img src="{{ site.url }}/images/life-results.png" width="580" height="318">
+<img src="{{ site.url }}/images/life-results.png" width="580" height="321">
 
 Here are the immediate observations:
 
 - When hash functions are bad, **Java 8** performs worse than **Java 7**. I can only attribute it to them abolishing bit
-  shuffling of the hash in favour of optimising the chains (binary threes instead of lists). Perhaps, our case is especially bad for
-  such implementation, but I'm not convinced that that was a good idea to begin with.
+  shuffling of the hash in favour of optimising the chains (binary threes instead of lists). The binary tree implementation
+  may become especially slow if chains grow and shrink often -- they are then converted from lists to trees and back.
+  This may well be our case, although I didn't perform measurements. In general, I'm not convinced that binary
+  trees were a good idea to begin with. Properly sized arrays and good hash functions should make binary
+  trees unnecessary.
 
 - The original hash function (multiplying by 3 and 5) is indeed not very good; multiplying by 11 and 17 is better,
   especially in **Java 8**; multiplying by two big numbers is even better on both versions.
@@ -1212,8 +1215,9 @@ Conclusions
 - There is always a trade-off between quality and speed of hash functions. Sometimes very good hash function may turn
   out to be too slow.
 
-- Time to run the test went down by 29% for **Java 7** and 63% for **Java 8**, compared with the original version
-  (much more if compared with the first `long`-based version).
+- Time to run the test went down by 33% for **Java 7** and 66% for **Java 8**, compared with the original version
+  (much more if compared with the first `long`-based version). Not bad, considering that we didn't change the algorithm
+  or the data structure -- only the hash function.
 
 Coming soon
 -----------
