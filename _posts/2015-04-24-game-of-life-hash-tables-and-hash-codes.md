@@ -1198,6 +1198,49 @@ Here are the immediate observations:
   all its benefits regarding the quality of hashing, However, there are ways to optimise this function; we'll look
   at them in the next article.
 
+Some more statistics
+--------------------
+
+Just out of curiosity I added some counters to our program and got statistics for hash table use:
+
+<table class="numeric">
+<tr><th>Operation</th><th><code>field</code></th><th><code>counts</code></th></tr>
+<tr><td class="ttext"><code>put()</code>, new      </td><td>1292359</td><td> 2481224</td></tr>
+<tr><td class="ttext"><code>put()</code>, update   </td><td>      0</td><td>15713009</td></tr>
+<tr><td class="ttext"><code>get()</code>, success  </td><td>1708139</td><td>48514853</td></tr>
+<tr><td class="ttext"><code>get()</code>, fail     </td><td>1292359</td><td> 2497339</td></tr>
+<tr><td class="ttext"><code>remove()</code>        </td><td>1291733</td><td> 2478503</td></tr>
+<tr><td class="ttext">All operations               </td><td>5584590</td><td> 71684928</td></tr>
+<tr><td class="ttext">hashCode()                   </td><td colspan="2">77269518</td></tr>
+</table>
+
+The data is collected on a single test run, 10,000 iterations, beginning with ACORN.
+
+The number of hash codes calculated equals to the total number of hash map operations, which is expected.
+In total, the hash was calculated 77&nbsp;million times, which confirms that hash table operations are indeed
+the main bottleneck of the program.
+
+In addition, the number of `equals()` calls on `Point` object is 160,526,879, or roughly two per `hashCode()` call,
+for reference implementation, and 36,383,032 (0.47 per `hashCode()`) for "Modulo big prime". This is a direct
+consequence of the latter version using much better hash function.
+
+We can also see that much more operations are performed on `counts` than on `field`, which is to be expected (eight
+values there are located and updated each time a cell is added or removed to `fields`). Any improvement there
+will improve the overall speed; the first idea that comes to mind is replacing the immutable `Integer` values
+with mutable ones -- this may reduce the number of updating `put()` calls.
+
+Another idea is more technical. In the following code
+
+{% highlight Java %}
+    for (Point w : counts.keySet ()) {
+        if (counts.get (w) == 3 && ! field.contains (w)) toSet.add (w);
+    }
+{% endhighlight %}
+
+we call `counts.get()` on a value that has just been extracted from the `counts.keySet()`. Using the `entrySet()`
+will eliminate the need for `get()`, reducing the number of operations a bit. We'll try these (and others) optimisations
+later.
+
 Conclusions
 -----------
 
@@ -1218,6 +1261,9 @@ Conclusions
 - Time to run the test went down by 33% for **Java 7** and 66% for **Java 8**, compared with the original version
   (much more if compared with the first `long`-based version). Not bad, considering that we didn't change the algorithm
   or the data structure -- only the hash function.
+
+- The achieved number of iterations per second was 5,344 (it was 3932 when we started). Let's set a goal of 10,000 and
+see if this is achievable.
 
 Coming soon
 -----------
