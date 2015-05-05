@@ -307,6 +307,34 @@ table.bigmatrix div {
   -moz-transform: translate(-50%, -50%);
 }
 
+table.squaregrid {
+  border-collapse: collapse;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  text-align: right;
+  line-height: 1em;
+  margin: auto;
+  width: auto;
+}
+
+table.squaregrid th.legend {
+  text-align: centre;
+  padding: 0.2em;
+  border: 0px;
+  background-color: inherit;
+}
+
+table.squaregrid th.header {
+  text-align: right;
+  padding: 0.2em;
+}
+
+table.squaregrid td {
+  border: 1px solid grey;
+  padding: 0.2em;
+}
+
+
+
 /*****************************************************************************/
 
 button {
