@@ -144,14 +144,14 @@ Introduction: The Game of Life
 
 You can hardly find a programmer who heard about [Conway's Game of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life)
 but has never tried to program it. Google programmers are no exception, otherwise they wouldn't have included a
-Life interpreter into the [search result page](https://www.google.co.za/?gfe_rd=cr&ei=CbwRVaTCCeKr8wfg-oKQDg&gws_rd=ssl#q=conway%27s+game+of+life).
+Life interpreter into the respective [search result page](https://www.google.co.za/?gfe_rd=cr&ei=CbwRVaTCCeKr8wfg-oKQDg&gws_rd=ssl#q=conway%27s+game+of+life).
 I am no exception either. The first time I tried to do it was on [one ancient computer](http://www.computer-museum.ru/english/minsk_22.php),
 which you are unlikely to see even in a museum these days. The processor was so slow and the field was so small that
-I didn't even bother to measure performance. Next time it was on a [8-bit 1 MHz processor](http://en.wikipedia.org/wiki/MOS_Technology_6502).
+I didn't even bother to measure performance. Next time it was on an [8-bit 1 MHz processor](http://en.wikipedia.org/wiki/MOS_Technology_6502).
 If I remember correctly, an assembly program could process 256&times;256 matrix in 6s. It seemed fast in those days.
 Since the algorithm was matrix-based (the program worked right inside the video memory), half the size meant four times the
-speed. A 32&times;32 matrix produced a movie with 10 fps. I never tried it on modern machines and/or in **Java**.
-The clock speed has become 2,500 times faster since then. How much will the speed improve? If it keeps up
+speed. A 32&times;32 matrix produced a movie with 10 fps. I haven't tried it on modern machines and/or in **Java** yet,
+so I got curious: what speed is achievable now? The clock speed has become 2,500 times faster since then. If the speed keeps up
 with the CPU clock, we should be able to process 256&times;256 at 400 fps. But our processor is 64-bit, so in theory
 it could do 3200 fps. Is it possible?
 
@@ -161,10 +161,10 @@ The rules
 The Life universe is an infinite two-dimensional square grid with some squares occupied by live cells. Each square
 has eight neighbours, direct and diagonal. The game time runs in clock ticks, and on each tick, the following events happen:
 
-- A number of live neighbours is calculated for each square
-- All the cells having less than two living neighbours die of solitude
-- All the cells having more than three living neighbours die of overpopulation
-- A new cell is born on any empty square that has three living neighbours.
+- The number of live neighbours is calculated for each square
+- All the cells having less than two live neighbours die of solitude
+- All the cells having more than three live neighbours die of overpopulation
+- A new cell is born on any empty square that has three live neighbours.
 
 The game received attention from researchers, and many interesting structures have been found: stable static
 structures, oscillators, moving patterns ([gliders](http://en.wikipedia.org/wiki/Glider_%28Conway's_Life%29)), and
@@ -185,26 +185,25 @@ What about hash tables?
 But wait, this article must have something to do with hash tables and hash codes. In which way are they relevant to
 Life?
 
-There are two major classes of Life programs. The matrix-based ones, such as those in my previous experiments,
-store a part of the universe as a matrix (possibly considered toroidal array, as in the examples above).
-The entire matrix is re-calculated on each step. These programs are very simple but have two disadvantages.
+There are two major classes of Life programs. The matrix-based ones, such as those in my old experiments,
+store a part of the universe (or the entire universe considered being a toroidal array, as in the examples above)
+as a matrix. The entire matrix is re-calculated on each step. These programs are very simple but have two disadvantages.
 Firstly, they are limited by the size of the matrix, and Life structures are known to be able to grow indefinitely (for
 example, by spawning gliders). This means such programs can only
 produce approximate results, such as the result we saw for R-pentamino above.
 Secondly, most Life colonies contain much
 fewer live cells than there're squares in the matrix, which suggests a way of improving speed -- to keep track
-of the occupied cells in some sort of a data structure and only
+of the occupied cells in some data structure and only
 process those. This is the second class of Life programs. Very sophisticated data structures have been used for
 Life simulation, some with extraordinary performance. For instance, the [HashLife](http://en.wikipedia.org/wiki/Hashlife)
 approach makes use of identifying repeating patterns both in space and time, with great results.
 
-I want to do something much simpler than HashLife --  use the data structure that is readily available in **Java** -- the `HashMap`
-(and its buddy `HashSet`). This has additional advantage that a hash map is a very common
-data structure in typical **Java** programs. Learning something about it may prove useful in general programming
-practice.
+I want to do something much simpler than HashLife --  use a data structure that is readily available in **Java** -- the `HashMap`
+(and its buddy `HashSet`). This has an additional advantage that the `HashMap` is a used a lot in production
+**Java** code, so learning something about it may prove useful in general programming practice.
 
 The timing results, however, won't be directly comparable with my old results, since the algorithms are different.
-I'll try the matrix approach later, too.
+I'll try the matrix approach later too.
 
 The test
 --------
@@ -224,11 +223,11 @@ the R-pentamino does at 116.
 The plan
 --------
 
-The algorithm will be trivial, and the initial implementation will be based directly on the classes provided by **Java** library.
+The algorithm is very simple, and the initial implementation will be based directly on the classes provided by **Java** library.
 We'll represent locations on the grid as values of class `Point`, encapsulating two co-ordinates, `x` and `y`.
 This class will be equipped with appropriate `equals()` and `hashCode()` methods to be used as a hash map key.
-Then we can keep a field as simply a set of `Point` objects (`HashSet` will do). We'll use `int` values as our
-co-ordinates, allowing both positive and negative ones. This means that the field is still finite and will wrap around at some
+Then we can maintain a state of the colony (which we'll call "field") simply as a set of `Point` objects (`HashSet` will do). We'll use `int` values as our
+co-ordinates, allowing both positive and negative ones. This means that the grid is still finite and will wrap around at some
 point, so simulations of unbounded structures, such as gliders, will be limited in time (although I'd be very happy
 if I could hit this limitation in real life -- that would mean that the program performed several billion iterations in
 reasonable time, and this is something yet to be achieved). Another consideration
@@ -296,10 +295,10 @@ class Point
 {% endhighlight %}
 
 The only part of this class worth explanation is the `hashCode()` method. Why such hash function? 
-We need something that depends on both numbers in some not-completely-trivial way. Multiplying
+We need something that depends on both numbers in a not-completely-trivial way. Multiplying
 by some prime numbers and adding seems good enough. We'll come back to this issue later.
 
-We'll use `HashSet` as a field:
+We'll use a `HashSet` of `Point`s as a field:
 
 {% highlight Java %}
 public static final int HASH_SIZE = 8192;
@@ -316,8 +315,12 @@ private HashMap<Point, Integer> counts =
         new HashMap<Point, Integer> (HASH_SIZE);
 {% endhighlight %}
 
-It will contain a number of live neighbours for each point (zero assumed for points not included in this map). We'll
-update this structure each time we create or destroy a living cell:
+It will contain the number of live neighbours for each square. Zero will be assumed for squares not included in this map;
+the reverse will be maintained in the first implementation -- a square will be removed from the map when its neighbour
+count becomes zero. This isn't necessarily the best strategy -- we may reconsider it
+later.
+
+We'll update this structure each time we create or destroy a living cell:
 
 {% highlight Java %}
 private void inc (Point w)
@@ -362,9 +365,9 @@ int c = counts.get (w) - 1;
 counts.put (w, c);
 {% endhighlight %}
 
-gives impression that the map holds primitive values of type `int`, which are updated when we call `put()`.
+gives an impression that the map holds primitive values of type `int`, which are updated when we call `put()`.
 This illusion is a result of **Java**'s automatic boxing. Actually, the map contains objects of the class `Integer`,
-and a new object is allocated each time the values changes. This is hardly the most efficient way to store numbers in a hash table.
+and a new object is allocated each time a values changes. This is hardly the most efficient way to store numbers in a hash table.
 But we'll ignore these inefficiencies for now. Let's first see what speed we can achieve without any optimisations.
 
 Still missing is the main step operation:
@@ -418,7 +421,7 @@ There is a disadvantage, too: the code loses some clarity and type safety. A `Po
 a `long`. You can't by mistake pass a loop index or current time as a `Point`, but you can as a `long`. A `Point`
 gives immediate access to its components (`x` and `y`), while `long` must still be decoded, and it is much easier
 to make a mistake there. In short, if we get a speed increase (and we're not even sure we do), it will come with a
-price tag. This is a common case in optimisation.
+price tag. This is a common case with optimisation.
 
 There are some interesting technical details, too. Here is the code we use to combine two `int` values into one `long`
 and split it back:
@@ -442,11 +445,11 @@ public static int lo (long w)
 
 The significance of `& 0xFFFFFFFFL` (and of that trailing `L`) is known to every experienced **Java** programmer,
 because few of them haven't made a mistake in such code at least once. When converted to `long`, `int` values are
-sign-extended. As a result, the entire high part of a `w()` result will be filled with ones for any negative `lo`
-that isn't first converted to `long` and then `AND`ed with the appropriate mask.
+sign-extended. As a result, the entire high part of a `w()` result would be filled with ones for any negative `lo`
+unless it is first converted to a `long` and then `AND`ed with the appropriate mask.
 
 Storing `x` and `y` together in a `long` makes it easy to calculate positions of the neighbours.
-Here is what `set()` method looks like using `long`s:
+Here is what the `set()` method looks like using `long`s:
 
 {% highlight Java %}
 public static final long DX = 0x100000000L;
@@ -513,7 +516,7 @@ public final int hashCode ()
 }
 {% endhighlight %}
 
-And this is the same method from the standard class `Long`:
+And here is the same method from the standard class `Long`:
 
 {% highlight Java %}
 public int hashCode() {
@@ -524,7 +527,7 @@ public int hashCode() {
 Can this be the reason?
 -----------------------
 
-Could the difference in hash functions have caused such performance difference? This is easy to check. We must write
+Could the difference in hash functions have caused such performance difference? This is easy to check. We'll write
 a version similar to the one based on `long` but with the same hash code as the original one. Extending the `Long`
 class would have done the trick, but this is impossible, because that class is `final` (besides, boxing would have created values of
 the original class anyway). We need to write our own version of `Long`, with modified hash code. Obviously,
@@ -589,30 +592,29 @@ version and a little bit faster than the original one.
 How good are your hash codes?
 -----------------------------
 
-Finally, we arrived at the main topic of the article: the hash codes. Very few programmers fine-tune their hash functions,
-usually relying on default implementations, or on those that intuitively seem good. And, as we have just seen,
-the choice of a hash function has significant impact on
-performance (50% slowdown in our case). Why?
+At last, we arrived at the main topic of the article: the hash codes. Very few programmers fine-tune their hash functions,
+relying either on default implementations, or on those that intuitively seem good. But, as we have just seen,
+the choice of a hash function has significant impact on performance (50% slowdown in our case). Why?
 
 **Java** uses a classic hash map structure, which features an array of a certain "big enough" size and a direct mapping
 of hash codes to positions in this array, called slots. Typically the hash value is divided by the array size and the remainder is
-used as an index. This is how the `HashTable` was implemented. In `HashMap` the array size is always a power of two,
-so the division operation is replaced with a bitwise `AND` -- the required number of lowest bits is taken.
-It would be great to develop a hash function, which, provided that the number of elements is less than the array size,
-would map them all to different slots. Perhaps, this can be achieved in some special cases, but not in the general-purpose
+used as an index. This is how the `HashTable` was implemented. In `HashMap`, the array size is always a power of two,
+so the remainder operation is replaced with a bitwise `AND` -- the required number of lowest bits is taken.
+It would be great to develop a hash function, which, provided that the number of entries is less than the array size,
+would map them all to different slots. Perhaps, this can be achieved in some special cases, but not in a general-purpose
 implementation. This means that such implementation must deal with hash collisions. A classic hash map
 does that by storing more than one entry per slot in some data collection. The simplest, and most offen used for that purpose,
-collection is a linked list, growing from the array elements -- this is what **Java 7** uses. **Java 8** introduces
+collection is a simple linked list -- this is what **Java 7** uses. **Java 8** introduces
 a change: it uses binary trees for long chains (eight elements and more).
 We'll concentrate on **Java 7** for now (most of findings are also applicable to **Java 8**, since chains of eight and more
 elements are a pathological case).
 
-Each insert operation requires a full traversal of the entire list for the given slot,
+Each insert operation requires a traversal of the entire list for the given slot,
 and so does each unsuccessful lookup. An average successful
-lookup requires traversal of half the list. In short, the number of inspected entries is roughly
+lookup requires a traversal of half the list. In short, the number of inspected entries is roughly
 proportional to the average length of the list, which equals the number of elements in the hash table
 divided by the number of non-empty slots. So we need the hash function to spread values evenly across the array.
-The above hash functions would both work well if `x` and `y` values were truly random 32-bit numbers.
+Probably, both the above hash functions would work well if `x` and `y` values were truly random 32-bit numbers.
 However, our co-ordinates, as most real life values, are not random; they follow some patterns, and hash functions
 may react badly to those patterns. This means that some hash functions may be much better than the other ones for
 specific tasks, one example of which we have just seen.
@@ -642,8 +644,8 @@ final int hash(Object k) {
 }
 {% endhighlight %}
 
-This bit shuffling helps against hash functions that generate sufficient number of different values, but
-those values differ mostly in higher-order bits and therefore hit small number of slots.
+This bit shuffling helps against hash functions that generate a sufficient number of different values, but
+those values differ mostly in higher-order bits and therefore hit a small number of slots.
 This shuffling has been removed in **Java 8** -- binary trees are supposed to
 take care of partial conflicts. However, neither bit shuffling nor binary trees help against full hash conflicts, which originate
 from poor-quality hash functions that generate too few distinct hash values for the given set of inputs.
@@ -744,7 +746,7 @@ Fortunately, it does not stall -- the bounding rectangle keeps expanding:
     9998: -2321 ..  2400; -2445 ..  2447; field size:   633; counts size:  2755
     9999: -2322 ..  2400; -2445 ..  2448; field size:   633; counts size:  2755
 
-This is caused by some gliders flying away. Closer inspection of the colony shows that there are thirteen
+This is caused by some gliders flying away. A closer inspection of the colony shows that there are thirteen
 gliders and some pulsars. 108 cells die and 108 are born on each step -- the test isn't meaningless at all.
 
 Let's apply various hash functions at step 4,400 and see how many slots in the 8,192-sized table are used:
@@ -810,7 +812,7 @@ Here is the result:
     Field size: 1034; slots used:  240; avg= 4.31
     Count size: 3938; slots used:  302; avg=13.04
 
-The result really looks bad. List size of 13 is too big. With the table whose element count is less than
+The result really looks bad. List size of 13 is too big. With a table with the element count less than
 half the number of slots, we should be able to do better.
 
 Now let's look at our original `Point` hash:
@@ -874,7 +876,7 @@ hashtest (new Hash () { public int hash (Point p) {
     Field size: 1034; slots used:  978; avg= 1.06
     Count size: 3938; slots used: 3201; avg= 1.23
 
-It performs slightly better. However, division is expensive, which may cancel out the speed improvement caused by better hashing.
+It performs slightly better. However, division is expensive, which may cancel out any speed improvement caused by better hashing.
 
 Knuth also suggested using polynomial binary codes. There is one such code readily available in the **Java** library --
 `CRC32` (in package `java.util.zip`). 
@@ -917,7 +919,7 @@ hashtest (new Hash () { public int hash (Point p) {
 Even truly random hash didn't reduce the average chain size to 1. Moreover, it performed worse than `CRC32`. Why is that?
 In fact, this is exactly what we'd expect from random numbers. Truly random selection of a slot will choose an already
 occupied slot with the same probability as any other slot. The hash function must be rather _non-random_ to spread
-all the values to different slots. Let's look at probabilities.
+all the values over different slots. Let's look at probabilities.
 
 Some calculations
 -----------------
@@ -1149,7 +1151,7 @@ Normally distributed random variable falls within 3&sigma; from its mean value w
 probabilities for 1&sigma; and 2&sigma; are 68.2% and 95.4%. Physicists usually require the difference to be 5&sigma; to be
 really sure that they have discovered something new. That was the achieved confidence in the Higgs boson search.
 
-In our case we want the opposite -- the result to be close to the mean value. The first three hash functions,
+In our case, we want the opposite -- the result to be close to the mean value. The first three hash functions,
 as we see, perform very badly, the `Long` one being the absolute negative champion. No wonder the program ran so slowly.
 Our "fast" version, the one multiplying by 3 and 5, however, also turned out to be bad. We'll need to replace it with
 something better. All the other functions seem to behave reasonably well, mostly measuring within 1&nbsp;--&nbsp;2&sigma;.
@@ -1206,7 +1208,7 @@ And as a graph:
 
 Immediate observations:
 
-- When hash functions are bad, **Java 8** performs worse than **Java 7**. I can only attribute it to the abolishment of bit
+- When hash functions are bad, **Java 8** performs _worse_ than **Java 7**. I can only attribute it to abandoning the bit
   shuffling in favour of optimising the chains (binary trees instead of lists). The binary tree implementation
   may become especially slow if chains grow and shrink often -- they are then converted from lists to trees and back.
   This is likely to happen a lot in Life, although I didn't measure it. In general, I'm not convinced that binary
@@ -1265,14 +1267,14 @@ Another idea is more technical. In the following code
     }
 {% endhighlight %}
 
-we call `counts.get()` on a value that has just been extracted from the `counts.keySet()`. Using the `entrySet()`
+we call `counts.get()` on a value that has just been extracted from `counts.keySet()`. Using the `entrySet()`
 will eliminate the need for `get()`, reducing the number of operations a bit. We'll try these (and others) optimisations
 later.
 
 Conclusions
 -----------
 
-- Quality of hash functions is important. For applications with heavy usage of hash tables the choice of
+- The quality of hash functions is important. For applications with heavy usage of hash tables, the choice of
   hash functions can be the single most significant factor determining the performance.
 
 - The default hash function of `Long` isn't friendly towards packed values. If several values are kept in one
