@@ -310,27 +310,28 @@ table.bigmatrix div {
 table.squaregrid {
   border-collapse: collapse;
   font-family: Consolas, Monaco, "Courier New", monospace;
-  text-align: right;
+  text-align: center;
   line-height: 1em;
   margin: auto;
   width: auto;
+  align: center;
 }
 
 table.squaregrid th.legend {
   text-align: centre;
-  padding: 0.2em;
+  padding: 0.1em;
   border: 0px;
   background-color: inherit;
 }
 
 table.squaregrid th.header {
   text-align: right;
-  padding: 0.2em;
+  padding: 0.1em;
 }
 
 table.squaregrid td {
   border: 1px solid grey;
-  padding: 0.2em;
+  padding: 0.1em;
 }
 
 
@@ -356,3 +357,26 @@ s                 { margin-left: -0.25em }
 .formula          { font-family: "Times New Roman", Times, serif; }
 .formula table    { border-spacing: 0; border-style: none; width: auto;}
 .formula table td { text-align: center; vertical-align: middle; border-style: none; border-width: 0;   padding: 0;}
+
+/*****************************************************************************/
+/*
+/* Colours
+/*
+/*****************************************************************************/
+
+.C0  {background-color: black;   color:white;}
+.C1  {background-color: maroon;  color:white;}
+.C2  {background-color: green;   color:white;}
+.C3  {background-color: olive;   color:white;}
+.C4  {background-color: navy;    color:white;}
+.C5  {background-color: purple;  color:white;}
+.C6  {background-color: teal;    color:white;}
+.C7  {background-color: silver;  color:black;}
+.C8  {background-color: gray;    color:white;}
+.C9  {background-color: red;     color:black;}
+.C10 {background-color: lime;    color:black;}
+.C11 {background-color: yellow;  color:black;}
+.C12 {background-color: blue;    color:white;}
+.C13 {background-color: fuchsia; color:black;}
+.C14 {background-color: aqua;    color:black;}
+.C15 {background-color: white;   color:black;}
