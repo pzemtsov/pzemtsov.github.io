@@ -100,7 +100,7 @@ public final class E1
 
 The method checks that the input is a multiple of `NUM_TIMESLOTS`, because it doesn't work otherwise. First of all, the interface itself relies on the fact
 that all the outputs receive the same number of bytes, and that isn't true for arbitrary input sizes. And secondly, the implementation assumes that the
-first byte in each input buffer belongs to output zero (it sets `dst_num` to `0`). Both of these assumptions can be removed by appropriate modifications of
+first byte in each input buffer belongs to output zero (it sets `dst_num` to 0). Both of these assumptions can be removed by appropriate modifications of
 the interface and implementation (I'll skip the demonstration). This is typical for reference implementations: they are usually more flexible than the
 highly optimised ones. You will see that other implementations can't be modified so easily.
 
@@ -274,7 +274,7 @@ for (byte b : src) {
 }
 {% endhighlight %}
 
-We can see that `dst_num` is initially set to `0` and is incremented in the loop until it reaches `NUM_TIMESLOTS-1`. Then it is set to zero and incremented
+We can see that `dst_num` is initially set to 0 and is incremented in the loop until it reaches `NUM_TIMESLOTS-1`. Then it is set to zero and incremented
 again -- just as if we were running an inner loop inside the main loop. Effectively, this is what we are doing, only the inner loop is written in an
 obscure way rather than directly using the loop statement.
 Let's try writing it directly ([here]({{ site.REPO-E1 }}/commit/deaab8a9965cd8b2c270ffe0b0a15e85b358a7b9) is the code):

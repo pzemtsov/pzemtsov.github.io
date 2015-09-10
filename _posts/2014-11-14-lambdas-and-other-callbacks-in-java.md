@@ -263,8 +263,8 @@ static class Test_Reflection implements Test
 {% endhighlight %}
 
 Note that reflection doesn't operate on parameters and results of primitive types. Everything we pass to methods
-and everything methods return is objects. That's why parameters are boxed and unboxed for each call, and is the result.
-This will inevitably reduce performance.
+and everything methods return is objects. That's why parameters are boxed and unboxed for each call, and so is the result.
+This will inevitably reduce the performance.
 
 Method pointers
 ---------------
@@ -480,7 +480,7 @@ The reflection test ran too long, I had to abort it. Let's reduce the iteration 
     class Lambda$Test_MethodHandle:  40850 40345 40411; sum = -8620570440000
 
 We see that direct computation and all types of simple callbacks are reasonably fast, and, very important, there is
-no difference in speed in tests with callbacks and the test without (`Test_Direct`). Reflection is slow, and method
+no difference in speed between tests with callbacks and tests without them (`Test_Direct`). Reflection is slow, and method
 handles are incredibly slow.
 
 Now let's try **Java** 1.8:
@@ -507,7 +507,7 @@ this is not a final result. Let's comment out all the sophisticated tests, excep
     class Lambda$Test_Lambda_Capture_2:  3352 3350 3350; sum = -862057044000000
 
 Suddenly two of the lambda versions run fast, and the ordinary lambda even runs faster than a direct loop test!
-`Static_Ferlection` is somehow important. If we comment it out, we get
+`Static_Reflection` is somehow important. If we comment it out, we get
 
     # java  Lambda
     class Lambda$Test_Direct:  577 517 517; sum = -862057044000000
@@ -515,7 +515,7 @@ Suddenly two of the lambda versions run fast, and the ordinary lambda even runs 
     class Lambda$Test_Lambda_Capture:  587 516 516; sum = -862057044000000
     class Lambda$Test_Lambda_Capture_2:  3357 3359 3353; sum = -862057044000000
 
-The plain lambda test still runs fast, but not faster than direct test.
+The plain lambda test still runs fast, but not faster than the direct test.
 
 Finally, let's change the order of tests and repeat them twice:
 
@@ -609,7 +609,7 @@ In a table form (again, adjusted for `1,000,000` iterations):
 A direct test runs virtually at the same speed in **Java** as in **C++**. Inlining of virtual calls is still
 better in **Java**. Lambdas are a bit slower than direct loops this time, but lambdas with capture are faster
 than in **C++** (however, the unexpected behaviour where lambdas are slow still occurs). What is surprising is
-the faster execution of synamic proxy tests.
+the faster execution of dynamic proxy tests.
 
 Conclusions
 -----------

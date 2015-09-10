@@ -48,7 +48,7 @@ We get:
 This explains the slow speed. The stream is already buffered. Obviously, wrapping the `BufferedInputStream` into
 another `BufferedInputStream` can only reduce speed (although I didn't expect so much of the speed loss).
 
-Replacing the `readInt` with the optimised version (see [here]({{ page.REPO-BUFFER }}/commit/854a9a87d56114eb01011c01332f1368ddd2c796)), we get:
+Replacing the `readInt` from the optimised version (see [here]({{ page.REPO-BUFFER }}/commit/854a9a87d56114eb01011c01332f1368ddd2c796)), we get:
 
     Time for 10000000 msg: 1669; speed: 5991611 msg/s; 647.1 MB/s
 

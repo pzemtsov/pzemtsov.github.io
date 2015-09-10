@@ -23,7 +23,7 @@ The caches
 
 The Sandy Bridge processor has three levels of cache:
 
-- Level 1 (L1) cache  has a size of 32K bytes per core and a latency of 4 CPU cycles (this is a time required to read a value in case of a cache hit)
+- Level 1 (L1) cache  has a size of 32K bytes per core and a latency of 4 CPU cycles (this is a time required to read a value in case of a cache miss)
 - Level 2 (L2) cache has a size of 256K bytes per core and a latency of 11 CPU cycles
 - Level 3 (L3) cache is shared between all the cores and has a size of 20M bytes and a latency of 30-40 cycles.
 
@@ -181,7 +181,7 @@ ran 3.7 times slower. However, this "slower" case is still three times faster th
 This means that, in general, our optimisation effort wasn't in vain at all.
 
 However, the prediction about relative performance of different versions happened to be correct. We can see that
-cache misses have changed the the champion. The fastest version now is `Read8_Write16_SSE` with 433 ms and not `Read8_Write32_AVX_Unroll`
+cache misses have changed the champion. The fastest version now is `Read8_Write16_SSE` with 433 ms and not `Read8_Write32_AVX_Unroll`
 which is 439 (they were, respectively, 132 ms and 119 ms when in L1 cache). Let's magnify the part of the graph with
 the fastest versions:
 
@@ -221,7 +221,7 @@ cases:
 
 The extra times correspond to about 5 latencies of L2 cache, 5 -- 6 latencies of L3 cache and 2 -- 3 memory latencies,
 respectively, which is not bad, considering that we read 32 lines of cache (2048 bytes in total), and also write
-32 lines of cache for each source block. The processor did good job in either prefetching the data from memory,
+32 lines of cache for each source block. The processor did a good job in either prefetching the data from memory,
 or overlapping several memory requests in time.
 
 Even in the out-of-L3-cache case, we still process 2 bytes per CPU cycle and move 5 Gbytes per second, which

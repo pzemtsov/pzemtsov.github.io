@@ -193,7 +193,7 @@ and then pass it as a parameter:
     return sum_func(0, SRC_SIZE, f);
 {% endhighlight %}
 
-Since **C++** standard versin 11, the language contains definitions of inline functions (lambdas),
+Since **C++** standard version 11, the language contains definitions of inline functions (lambdas),
 so the call may now look much neater:
 
 {% highlight C++ %}
@@ -224,7 +224,7 @@ class Lambda_Capture : public Test
 {
     const int* x;
 public:
-    Lambda_Capture(const int * x) : x(x)
+    Lambda_Capture(const int* x) : x(x)
     {}
 
 public:
@@ -288,7 +288,7 @@ int sum_std_function(int lo, int hi, std::function<int (int)> f)
 
 This declaration has additional advantage: templates must be declared in header files while functions can be placed
 wherever appropriate, provided that the prototype is visible. This is definitely a nicer way to write such functions --
-provided, of course, that performance is not compromise. This is what we are going to measure.
+provided, of course, that performance is not compromised. This is what we are going to measure.
 
 Object-oriented approach
 ------------------------
@@ -859,7 +859,7 @@ Another way to reduce the difference is to disable loop unrolling. Removing `-fu
     14Test_Interface: 4.99939e+12: 7748
     19Test_Abstract_Class: 4.99939e+12: 7750
 
-This may seem cheating (surely slowing down a fast solution to reduce the difference between it and the fast one isn't
+This may seem cheating (surely slowing down a fast solution to reduce the difference between it and the slow one isn't
 the recommended optimisation practice), but it shows that there might be cases where loop unrolling isn't applicable
 and the performance loss due to indirect calls isn't so big.
 
@@ -891,9 +891,9 @@ Conclusions
   to calculate, cases where host function is large and irregular, and cases where the whole calculation isn't
   performance-critical
 
-- Sometimes the compiler can optimise out the callbacks; however, this is never garranteed. The optimisations may
-  improve with new versions of the compiler, so the best is to check the output of your specific compiler.
-
+- Sometimes the compiler can optimise out the callbacks; however, this is never guarranteed. The optimisations may
+  improve with new versions of the compiler, so the best is to check the output of your specific compiler
+  
 - In general, I would suggest not to use callbacks for performance-critical code; definitely not for Jensen's device
 
 - Nothing can beat a good old macro for performance-critical code

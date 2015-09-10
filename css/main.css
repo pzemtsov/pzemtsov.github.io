@@ -15,7 +15,10 @@ html, body { height: 100%; }
 body {
   background-color: #EEE;
   color: #444;
-  font: 19px Georgia, Times, serif;
+/*  font: 19px Georgia, Times, serif;*/
+
+font: 20px "Times New Roman", Times, serif;
+
 /*  font-size: large; */
   text-align: center;
 }
@@ -185,6 +188,11 @@ code.language-text {
 
 .post table td {
   border: 1px solid black;
+  padding: 1px 5px; 1px; 5px;
+}
+
+.post table td.noborder {
+  border: 0px;
   padding: 1px 5px; 1px; 5px;
 }
 
