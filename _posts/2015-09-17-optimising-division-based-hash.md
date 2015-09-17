@@ -166,7 +166,7 @@ And here are the results for unsigned division:
 
 The results haven't changed much for `field` but have changed for `count`: they became worse. It does not mean they became
 very bad. Previously, the result was equal to E + 3.59&sigma;, where E is the expected value 3126.69, and &sigma;
-is the standard deviation 20.68. Now the result is E + 0.11 &sigma;, which- still falls well within good statistical
+is the standard deviation 20.68. Now the result is E + 0.11 &sigma;, which still falls well within good statistical
 limits and performs better than some other hash functions. It just does not
 perform as well as the unsigned division, which I remarked on back then as demonstrating unusually good behaviour.
 
@@ -214,7 +214,7 @@ or, graphically,
 
 This is a 128-bit unsigned number, which we will represent as two `long`s, one for high and one for low part of the result.
 Both will be interpreted as unsigned 64-bit values. Each of the terms `AC`, `AD`, `BC`, `BD` is a 64-bit number.
-The low part of the result can be calculated with the obvious code:
+The low part of the result can be calculated by the obvious code:
 
 {% highlight Java %}
     long mult_unsigned_lopart (long x, long y)
@@ -239,7 +239,7 @@ The low part of the result can be calculated with the obvious code:
 {% endhighlight %}
 
 Note the `uhi` and `ulo` functions ("unsigned `hi`" and "unsigned `lo`") and their difference from `hi` and `lo` that
-we used to extract integer parts of a value stored as 'long':
+we used to extract integer parts of a value stored as `long`:
 
 {% highlight Java %}
     public static int hi (long w)
@@ -346,7 +346,7 @@ The formulae we used above:
 
  <div class="formula">
   x = 2<sup>32</sup>A + B<br>
-  y = 2<sup>32</sup>C + D
+  y = 2<sup>32</sup>C + D<br>
   xy = (2<sup>32</sup>A + B) (2<sup>32</sup>C + D)<br>
   <ul>= 2<sup>64</sup>AC + 2<sup>32</sup>(AD + BC) + BD</ul>
  </div>
@@ -425,7 +425,7 @@ Here are the results (in milliseconds for 100M iterations):
 
 The results are surprising. Our optimisation did work! The code above, being rather long and complex, still runs faster than
 the modulo operation as implemented by **Java 8**. And quite a bit faster: if we subtract the calling overhead
-(measured as the time of `NullPoint`, we get:
+(measured as the time of `NullPoint`), we get:
 
 <table class="numeric">
 <tr><th>Class name</th>                <th>Comment</th>                              <th>Time, <b>Java&nbsp;7</b></th><th>Time, <b>Java&nbsp;8</b></th></tr>
@@ -451,7 +451,7 @@ are faster than the original one. Nothing beats unoptimised **Java 7** version.
 </table>
 
 Even though **Java 8** figures are bigger than those of **Java 7**, they are still surprisingly small. The processor must
-be very advanced to calculate our unsigned version in 2.8 cycles.
+be very advanced to calculate our unsigned version in 4 cycles.
 
 The disassembly
 ---------------
@@ -613,7 +613,7 @@ small constants with shifts, additions or `LEA` instructions, but compilers are 
 has been removed from **Java** VM in version 8.
 
 - This optimisation requires a 128-bit multiplication, which isn't available in **Java** directly. It can be implemented
-from scratch, although in some ugly way).
+from scratch, although in some ugly way.
 
 - The code we produced was very long. It contained five multiplications and several shifts and additions; still, it
 was faster than the original code using division (on **Java 8**).
