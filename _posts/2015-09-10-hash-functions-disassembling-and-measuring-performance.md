@@ -794,45 +794,45 @@ causing the compiler to avoid making any assumptions about the classes. I tried 
 
 This is the result for **Java 7**:
 
-                Point:    517   518   518; sum = 1040261632
-       java.lang.Long:    519   518   519; sum = -1786864128
-            LongPoint:    518   517   518; sum = 1040261632
-           LongPoint3:    518   517   517; sum = -1308103168
-           LongPoint4:    518   518   518; sum = 1455681024
-           LongPoint5:    518   517   518; sum = 26862080
-           LongPoint6:    548   548   548; sum = -2103278592
-           LongPoint7:   9924  9922  9935; sum = 1732665600
-            NullPoint:    488   488   487; sum = 0
-                Point:    518   518   519; sum = 1040261632
-       java.lang.Long:    519   519   517; sum = -1786864128
-            LongPoint:    518   518   517; sum = 1040261632
-           LongPoint3:    519   518   518; sum = -1308103168
-           LongPoint4:    519   519   518; sum = 1455681024
-           LongPoint5:    518   518   518; sum = 26862080
-           LongPoint6:    548   549   548; sum = -2103278592
-           LongPoint7:   9924  9921  9923; sum = 1732665600
-            NullPoint:    488   487   487; sum = 0
+                Point:    548   547   547; sum = 1040261632
+       java.lang.Long:    547   547   547; sum = -1786864128
+            LongPoint:    548   547   547; sum = 1040261632
+           LongPoint3:    548   547   547; sum = -1308103168
+           LongPoint4:    547   547   547; sum = 1455681024
+           LongPoint5:    547   547   548; sum = 26862080
+           LongPoint6:    577   577   578; sum = -2103278592
+           LongPoint7:  10262 10263 10266; sum = 1732665600
+            NullPoint:    652   517   518; sum = 0
+                Point:    547   547   548; sum = 1040261632
+       java.lang.Long:    551   575   564; sum = -1786864128
+            LongPoint:    564   564   550; sum = 1040261632
+           LongPoint3:    548   549   575; sum = -1308103168
+           LongPoint4:    547   548   548; sum = 1455681024
+           LongPoint5:    548   547   548; sum = 26862080
+           LongPoint6:    591   578   578; sum = -2103278592
+           LongPoint7:  10403 10443 10473; sum = 1732665600
+            NullPoint:    517   518   517; sum = 0
 
 And this is for **Java 8**:
 
-                Point: --   489--   488--   488; sum = 1040261632
-       java.lang.Long: --   488--   488--   487; sum = -1786864128
-            LongPoint: --   488--   488--   488; sum = 1040261632
-           LongPoint3: --   488--   488--   488; sum = -1308103168
-           LongPoint4: --   488--   487--   488; sum = 1455681024
-           LongPoint5: --   488--   488--   488; sum = 26862080
-           LongPoint6: --  1660--  1661--  1661; sum = -2103278592
-           LongPoint7: --  1888--  1889--  1888; sum = 1732665600
-            NullPoint: --   519--   487--   458; sum = 0
-                Point: --   488--   487--   487; sum = 1040261632
-       java.lang.Long: --   488--   488--   488; sum = -1786864128
-            LongPoint: --   488--   488--   488; sum = 1040261632
-           LongPoint3: --   488--   488--   488; sum = -1308103168
-           LongPoint4: --   488--   489--   488; sum = 1455681024
-           LongPoint5: --   488--   488--   488; sum = 26862080
-           LongPoint6: --  1664--  1663--  1663; sum = -2103278592
-           LongPoint7: --  1891--  1891--  1892; sum = 1732665600
-            NullPoint: --   457--   458--   458; sum = 0
+                Point:    489   488   488; sum = 1040261632
+       java.lang.Long:    488   488   487; sum = -1786864128
+            LongPoint:    488   488   488; sum = 1040261632
+           LongPoint3:    488   488   488; sum = -1308103168
+           LongPoint4:    488   487   488; sum = 1455681024
+           LongPoint5:    488   488   488; sum = 26862080
+           LongPoint6:   1660  1661  1661; sum = -2103278592
+           LongPoint7:   1888  1889  1888; sum = 1732665600
+            NullPoint:    519   487   458; sum = 0
+                Point:    488   487   487; sum = 1040261632
+       java.lang.Long:    488   488   488; sum = -1786864128
+            LongPoint:    488   488   488; sum = 1040261632
+           LongPoint3:    488   488   488; sum = -1308103168
+           LongPoint4:    488   489   488; sum = 1455681024
+           LongPoint5:    488   488   488; sum = 26862080
+           LongPoint6:   1664  1663  1663; sum = -2103278592
+           LongPoint7:   1891  1891  1892; sum = 1732665600
+            NullPoint:    457   458   458; sum = 0
 
 Observations:
 
@@ -860,7 +860,7 @@ in parallel with the return sequence from a virtual call). In addition, the reso
 - The times reported are in milliseconds for 100M iterations. Dividing the result by 100 gives us nanoseconds per call,
 and multiplying it afterwards by 2.6 gives us CPU cycles (our processor runs at 2.6 GHz). The results on **Java 8** are 11.9 for `NullPoint`,
 12.7 for all simple functions, 43 for `LongPoint6` and 49 cycles for `LongPoint7`. The **Java 7** result for `LongPoint7` is
-258 CPU cycles, which is very slow.
+267 CPU cycles, which is very slow.
 
 - Some features of the code (manipulations with the mark word) are caused by the fact that the method we are testing
 is `hashCode()`. Had we created our own method without default intrinsic implementation, the code samples would have
