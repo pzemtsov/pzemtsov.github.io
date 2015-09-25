@@ -244,8 +244,7 @@ Perhaps, we'll do the gun next time.
 The code
 --------
 
-The code can be found [here]({{ site.REPO-LIFE }}/tree/5f854d30eefd64bb2f4cc594250cbe32cc32c1d2).
-
+The code can be found [here]({{ site.REPO-LIFE }}/tree/28d4e13343b954bdaa4eab3ab27693debd8ce348).
 First of all, we need a `Point` class. Here it is:
 
 {% highlight Java %}
