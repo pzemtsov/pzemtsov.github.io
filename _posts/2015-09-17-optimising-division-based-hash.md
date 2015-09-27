@@ -18,7 +18,7 @@ hash function between **Java 7** and **Java 8**. Let's look at this case.
 The function in question
 ------------------------
 
-Let's repeat the [source code]({{ site.REPO-LIFE }}/blob/master/LongPoint6.java) of `LongPoint6.hashCode()`:
+Let's repeat the [source code]({{ site.REPO-LIFE }}/blob/28d4e13343b954bdaa4eab3ab27693debd8ce348/LongPoint6.java) of `LongPoint6.hashCode()`:
 
 {% highlight Java %}
     public int hashCode ()
@@ -154,7 +154,7 @@ in which case we need to add a divisor again:
     }
 {% endhighlight %}
 
-Here are the slot counts we got with signed division (see [])
+Here are the slot counts we got with signed division (see [here]({{ site.ART-LIFE }})):
 
     Field size: 1034; slots used:  978; avg=  1.1
     Count size: 3938; slots used: 3201; avg=  1.2
@@ -399,12 +399,13 @@ Performance measurements
 ------------------------
 
 Let's add new unsigned and signed versions to our hash function test suit (they'll be called
-[`LongPoint60`]({{ site.REPO-LIFE }}/commit/14cb925c285202d02cdc770ec7f3760b1102bbaf#diff-958edd30998de2c5ad8d40317800aee7)
+[`LongPoint60`]({{ site.REPO-LIFE }}/blob/d59b6b9a681d60ff011a6b800f8d5f63851eeb83/LongPoint60.java)
  and
-[`LongPoint61`]({{ site.REPO-LIFE }}/commit/14cb925c285202d02cdc770ec7f3760b1102bbaf#diff-e2c17e8c2f6a3861a50e12b17c67bf6d) to indicate the fact that they are modified versions of `LongPoint6`).
+[`LongPoint61`]({{ site.REPO-LIFE }}/blob/d59b6b9a681d60ff011a6b800f8d5f63851eeb83/LongPoint61.java)
+to indicate the fact that they are modified versions of `LongPoint6`).
 
-The full new test suite is [here]({{ site.REPO-LIFE }}/tree/9720f931a3dd0237b7d9826c5cab5e5c6fdb69c0). The class to run
-is `HashTime1`.
+The full new test suite is [here]({{ site.REPO-LIFE }}/tree/d59b6b9a681d60ff011a6b800f8d5f63851eeb83).
+The class to run is `HashTime1`.
 
 Here are the results (in milliseconds for 100M iterations):
 
