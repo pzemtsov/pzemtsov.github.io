@@ -895,7 +895,7 @@ does not show on the full test (Life implementation).
 where the time was 1,979 ms on **Java 7** and 1,553 ms on **Java 8**. The `LongPoint7` behaves differently: there
 the full test time did drop (from 10,115 ms to 3,206 ms).
 
--- The previous observation shows that we must be careful with microbenchmarks, and always remember that our real
+- The previous observation shows that we must be careful with microbenchmarks, and always remember that our real
 goal is the improvement of the real program performance.
 
 - We've seen that overheads of the infrastructure (such as those of virtual calls) may greatly exceed the costs of the
