@@ -401,7 +401,7 @@ There is also usual correctness check code, which isn't needed now but will be i
 measurement code. We'll run each performance test three times. Here is the run result:
 
     # java -server Life
-      Hash_Reference: time for 10000:  2701  2586  2543: 3932.4 frames/sec
+      Hash_Reference: time for 10000:  2937  2719  2763: 3619.3 frames/sec
 
 How good is it? Interestingly, it is of the same order of magnitude as the 3,200 fps I was talking
 about in the beginning of the article. However, the algorithms are of different nature, so the results aren't directly comparable.
@@ -479,7 +479,7 @@ an offset of `0x80000000` to all co-ordinates. This offset is only applied at in
 affect the main algorithm:
 
 {% highlight Java %}
-public static final int offset = 0x8000000;
+public static final int offset = 0x80000000;
 
 public static int x (long w)
 {
@@ -497,10 +497,11 @@ public static long fromPoint (int x, int y)
 }
 {% endhighlight %}
 
-The rest of the program stays virtually unchanged. Here is the result:
+The rest of the program stays virtually unchanged. We'll run the test alone -- comment out the test for `Point` in `main ()` and leave only
+the new one. This will remove any possible effects one test can have on another. Here is the result:
 
     # java -server Life
-           Hash_Long: time for 10000:  3910  3901  3887: 2572.7 frames/sec
+           Hash_Long: time for 10000:  4290  4237  4273: 2340.3 frames/sec
 
 What a surprise! The performance got worse. What went wrong? It seems very unlikely that operations with `long`,
 even boxed as `Long`, are slower than with our `Point` class. The general structure of the program is the same. What is the difference?
@@ -578,11 +579,11 @@ fact, the hash value will be exactly the same: 0x80000000 multiplied by 3 (or 5)
 and the two added together will cancel each other out.
 
 Since there is no more boxing, the code is a little bit longer, but it is also clearer and safer -- arbitrary number
-can't be passed as a point any more. Here is the result (I'll quote all three):
+can't be passed as a point any more. Again, I'll run it alone. Here is the result (I'll quote all three):
 
-      Hash_Reference: time for 10000:  2701  2586  2543: 3932.4 frames/sec
-           Hash_Long: time for 10000:  3910  3901  3887: 2572.7 frames/sec
-      Hash_LongPoint: time for 10000:  2340  2254  2243: 4458.3 frames/sec
+      Hash_Reference: time for 10000:  2937  2719  2763: 3619.3 frames/sec
+           Hash_Long: time for 10000:  4290  4237  4273: 2340.3 frames/sec
+      Hash_LongPoint: time for 10000:  2864  2651  2602: 3843.2 frames/sec
 
 This proves our theory. The version using `long` with the hash formula from `Point` is much faster than the one with
 the built-in hash function of `Long`. It is also a bit faster than the original `Point`-based version, which proves
@@ -791,9 +792,9 @@ private static void hashtest (Hash h)
     int nonzero_counts = b2.cardinality ();
     double avg_counts = (double) r.counts.size () / nonzero_counts;
 
-    System.out.printf ("Field size: %4d; slots used: %4d; avg=%5.1f\n",
+    System.out.printf ("Field size: %4d; slots used: %4d; avg=%5.2f\n",
                        r.field.size (), nonzero_field, avg_field);
-    System.out.printf ("Count size: %4d; slots used: %4d; avg=%5.1f\n",
+    System.out.printf ("Count size: %4d; slots used: %4d; avg=%5.2f\n",
                        r.counts.size (), nonzero_counts, avg_counts);
 }
 {% endhighlight %}
@@ -858,12 +859,15 @@ How about multiplying the entire `long` by some big enough prime number?
 
 {% highlight Java %}
 hashtest (new Hash () { public int hash (Point p) {
-                          long x = w(p.x, p.y) * 541725397157L;
+                          long x = fromPoint (p.x, p.y) * 541725397157L;
                           return lo(x) ^ hi(x);}} );
 {% endhighlight %}
 
-    Field size: 1034; slots used:  970; avg= 1.07
-    Count size: 3938; slots used: 3096; avg= 1.27
+Note that we can't ignore adding `OFFSET` any more; it affects the value of the hash function. That's why we use `fromPoint (p.x, p.y)`
+and not just `w (p.x, p.y)`:
+
+    Field size: 1034; slots used:  969; avg= 1.07
+    Count size: 3938; slots used: 3144; avg= 1.25
 
 One of the methods Knuth (_The art of computer programming, vol. 3, 6.4_) suggests is dividing by some prime number and getting a remainder.
 We need a number small enough to distribute remainders evenly, but big enough to generate sufficient number of
@@ -871,14 +875,14 @@ these remainders and prevent full hash conflicts.
 
 {% highlight Java %}
 hashtest (new Hash () { public int hash (Point p) {
-                          long x = w (p.x,  p.y);
+                          long x = fromPoint (p.x,  p.y);
                           return (int) (x % 946840871);}} );
 {% endhighlight %}
 
-    Field size: 1034; slots used:  978; avg= 1.06
-    Count size: 3938; slots used: 3201; avg= 1.23
+    Field size: 1034; slots used:  982; avg= 1.05
+    Count size: 3938; slots used: 3236; avg= 1.22
 
-It performs slightly better. However, division is expensive, which may cancel out any speed improvement caused by better hashing.
+It performs even better. However, division is expensive, which may cancel out any speed improvement caused by better hashing.
 
 Knuth also suggested using polynomial binary codes. There is one such code readily available in the **Java** library --
 `CRC32` (in package `java.util.zip`). 
@@ -899,13 +903,13 @@ static int crc_hash (long n)
 }
 
 hashtest (new Hash () { public int hash (Point p) {
-                          return crc_hash (w(p.x, p.y));}} );
+                          return crc_hash (fromPoint (p.x, p.y));}} );
 {% endhighlight %}
 
     Field size: 1034; slots used:  981; avg= 1.05
     Count size: 3938; slots used: 3228; avg= 1.22
 
-We've got some more progress. However, 1.22 still seems a bit high. We want 1.0! Is `CRC32` still not shuffling bits well?
+It also looks very good. However, 1.22 still seems a bit high. We want 1.0! Is `CRC32` still not shuffling bits well?
 Let's try the ultimate test: random numbers. Obviously, we're not planning of using them as real hash values, we'll
 just measure the number of used slots and the average chain size:
 
@@ -923,8 +927,8 @@ In fact, this is exactly what we'd expect from random numbers. Truly random sele
 occupied slot with the same probability as any other slot. The hash function must be rather _non-random_ to spread
 all the values over different slots. Let's look at probabilities.
 
-Some calculations
------------------
+Some high school mathematics
+----------------------------
 
 Let's define two random variables. Let <i>Num<sub>k</sub></i> be the number of non-empty slots in the table
 after _k_ insertions, and <i>Len<sub>k</sub></i> be the average chain size.
@@ -1106,7 +1110,8 @@ our formula is good enough to compute distributions and standard deviations:
 The values for <i>E[Num]</i> are the same as those computed before, which inspires confidence in our results.
 
 Let's have a look how far the values measured for various hash functions are from the expected values.
-Here are the data for the `field` structure (element count 1,034) collected in a table. The last column shows the distance, in sigmas, from
+Here are the data for the `field` structure (element count 1,034) collected in a table. The last column shows the distance,
+in sigmas (&sigma;&nbsp;=&nbsp;7.27) from
 the expected value (E[Num]&nbsp;=&nbsp;971.46):
 
 <table class="numeric">
@@ -1115,8 +1120,8 @@ the expected value (E[Num]&nbsp;=&nbsp;971.46):
 <tr><td class="label">2</td><td class="ttext">Multiply by 3, 5           </td><td>595</td><td>-376.46</td><td> -51.78</td></tr>
 <tr><td class="label">3</td><td class="ttext">Multiply by 11, 17         </td><td>885</td><td> -86.46</td><td> -11.89</td></tr>
 <tr><td class="label">4</td><td class="ttext">Multiply by two big primes </td><td>972</td><td>  +0.54</td><td>  +0.07</td></tr>
-<tr><td class="label">5</td><td class="ttext">Multiply by one big prime  </td><td>970</td><td>  -1.46</td><td>  -0.20</td></tr>
-<tr><td class="label">6</td><td class="ttext">Modulo big prime           </td><td>978</td><td>  +6.54</td><td>  +0.90</td></tr>
+<tr><td class="label">5</td><td class="ttext">Multiply by one big prime  </td><td>969</td><td>  -2.46</td><td>  -0.38</td></tr>
+<tr><td class="label">6</td><td class="ttext">Modulo big prime           </td><td>982</td><td> +10.54</td><td>  +1.45</td></tr>
 <tr><td class="label">7</td><td class="ttext">CRC32                      </td><td>981</td><td>  +9.54</td><td>  +1.31</td></tr>
 <tr><td class="label">8</td><td class="ttext">Random                     </td><td>968</td><td>  -3.46</td><td>  -0.48</td></tr>
 </table>
@@ -1130,7 +1135,7 @@ The solid vertical line shows the expected value; the thin vertical lines indica
 from it in both directions. Red dots correspond to the values from the table above (some were so far away though that they didn't fit
 into the picture).
 
-Here are the results for the `counts` structure (element count 3938, E&nbsp;[Num]&nbsp;=&nbsp;3126.69), first as a table:
+Here are the results for the `counts` structure (element count 3938, E&nbsp;[Num]&nbsp;=&nbsp;3126.69, &sigma;&nbsp;[Num]&nbsp;=&nbsp;20.68), first as a table:
 
 <table class="numeric">
 <tr><th>Label<th>Hash</th><th>Num</th><th>Num&minus;E</th><th>(Num&minus;E)/&sigma;</th></tr>
@@ -1138,8 +1143,8 @@ Here are the results for the `counts` structure (element count 3938, E&nbsp;[Num
 <tr><td class="label">2</td><td class="ttext">Multiply by 3, 5                  </td><td>1108</td><td>-2018.69</td><td>  -97.57</td></tr>
 <tr><td class="label">3</td><td class="ttext">Multiply by 11, 17                </td><td>2252</td><td> -901.69</td><td>  -43.58</td></tr>
 <tr><td class="label">4</td><td class="ttext">Multiply by two big primes        </td><td>3099</td><td>  -27.69</td><td>   -1.34</td></tr>
-<tr><td class="label">5</td><td class="ttext">Multiply by one big prime         </td><td>3096</td><td>  -30.69</td><td>   -1.48</td></tr>
-<tr><td class="label">6</td><td class="ttext">Modulo big prime                  </td><td>3201</td><td>  +74.31</td><td>   +3.59</td></tr>
+<tr><td class="label">5</td><td class="ttext">Multiply by one big prime         </td><td>3144</td><td>  +17.31</td><td>   +0.84</td></tr>
+<tr><td class="label">6</td><td class="ttext">Modulo big prime                  </td><td>3236</td><td> +109.31</td><td>   +5.29</td></tr>
 <tr><td class="label">7</td><td class="ttext">CRC32                             </td><td>3228</td><td> +101.31</td><td>   +4.90</td></tr>
 <tr><td class="label">8</td><td class="ttext">Random                            </td><td>3151</td><td>  +24.31</td><td>   +1.17</td></tr>
 </table>
@@ -1161,10 +1166,13 @@ We can see that the random number test gave &minus;0.48&sigma; in one case and 1
 such variations are quite achievable by chance.
 
 There are, however, two interesting cases, both for `counts`, where "modulo big prime" and `CRC32` produced exceptionally
-good results, both differing from the mean value by over 3&sigma; positively. The point for `CRC32` (number `7`)
-didn't even fit into the graph, so far to the right it is positioned. Why this happens and whether it means that
+good results, both differing from the mean value by over 3&sigma; positively. These points
+didn't even fit into the graph, so far to the right they were positioned. Why this happens and whether it means that
 these two hash functions are better then the others for any Life simulation, I don't know. Perhaps
 some mathematically inclined reader can answer this.
+
+These statistics are applicable to **Java 7**, because the results of hash functions are shuffled the way **Java 7** does it.
+However, the results without shuffling are similar.
 
 Note on the test data
 ---------------------
@@ -1183,30 +1191,30 @@ Which one is the best, depends on their own speed -- a well-hashing, but slow fu
 Let's measure. We'll create several versions of the `LongPoint` class, their names ending with labels from the table above.
 We'll also make special versions of `Hash_LongPoint`, using those `LongPoint`s. We'll run the tests on both **Java 7** and **Java 8**.
 
-Various versions of `LongPoint` only differ in hash function, and in theory could be implemented as classes derived
+Various versions of `LongPoint` only differ in hash function, and could be implemented as classes derived
 from `LongPoint`. However, the amount of re-used code will be very small, hardly worth the effort.
 Various versions of `Hash_LongPoint` only differ in the versions of `LongPoint` they use. They could
 have been implemented as one generic class if they didn't need to instantiate `LongPoint` objects. We could work that around
 by introducing factory classes, but this would complicate our code and hardly improve performance. This is where **C++**
 templates once again would have worked better than **Java** generics (I haven't yet found examples of the opposite).
 
-Here are the results as a table:
+Here are the results as a table (again, each test was executed on its own):
 
 <table class="numeric">
 <tr><th>Label<th>Hash</th><th>Time, <b>Java 7</b></th><th>Time, <b>Java 8</b></th></tr>
-<tr><td class="label">Ref</td><td class="ttext">Multiply by 3, 5                </td><td>2543</td><td>5020</td></tr>
-<tr><td class="label">1</td><td class="ttext"><b>Long</b> default               </td><td>3887</td><td>7195</td></tr>
-<tr><td class="label">2</td><td class="ttext">Multiply by 3, 5                  </td><td>2243</td><td>5384</td></tr>
-<tr><td class="label">3</td><td class="ttext">Multiply by 11, 17                </td><td>1819</td><td>2238</td></tr>
-<tr><td class="label">4</td><td class="ttext">Multiply by two big primes        </td><td>1788</td><td>1796</td></tr>
-<tr><td class="label">5</td><td class="ttext">Multiply by one big prime         </td><td>1818</td><td>1793</td></tr>
-<tr><td class="label">6</td><td class="ttext">Modulo big prime                  </td><td>1701</td><td>1705</td></tr>
-<tr><td class="label">7</td><td class="ttext">CRC32                             </td><td>9294</td><td>3550</td></tr>
+<tr><td class="label">Ref</td><td class="ttext">Multiply by 3, 5                </td><td>2763</td><td>4961</td></tr>
+<tr><td class="label">1</td><td class="ttext"><b>Long</b> default               </td><td>4273</td><td>6755</td></tr>
+<tr><td class="label">2</td><td class="ttext">Multiply by 3, 5                  </td><td>2602</td><td>4836</td></tr>
+<tr><td class="label">3</td><td class="ttext">Multiply by 11, 17                </td><td>2074</td><td>2028</td></tr>
+<tr><td class="label">4</td><td class="ttext">Multiply by two big primes        </td><td>2000</td><td>1585</td></tr>
+<tr><td class="label">5</td><td class="ttext">Multiply by one big prime         </td><td>1979</td><td>1553</td></tr>
+<tr><td class="label">6</td><td class="ttext">Modulo big prime                  </td><td>1890</td><td>1550</td></tr>
+<tr><td class="label">7</td><td class="ttext">CRC32                             </td><td>10115</td><td>3206</td></tr>
 </table>
 
 And as a graph:
 
-<img src="{{ site.url }}/images/life-results.png" width="580" height="321">
+<img src="{{ site.url }}/images/life-results.png" width="667" height="383">
 
 Immediate observations:
 
@@ -1237,13 +1245,13 @@ Just out of curiosity I've added some counters to our program and got statistics
 
 <table class="numeric">
 <tr><th>Operation</th><th><code>field</code></th><th><code>counts</code></th></tr>
-<tr><td class="ttext"><code>put()</code>, new      </td><td>1292359</td><td> 2481224</td></tr>
-<tr><td class="ttext"><code>put()</code>, update   </td><td>      0</td><td>15713009</td></tr>
-<tr><td class="ttext"><code>get()</code>, success  </td><td>1708139</td><td>48514853</td></tr>
-<tr><td class="ttext"><code>get()</code>, fail     </td><td>1292359</td><td> 2497339</td></tr>
-<tr><td class="ttext"><code>remove()</code>        </td><td>1291733</td><td> 2478503</td></tr>
-<tr><td class="ttext">All operations               </td><td>5584590</td><td> 71684928</td></tr>
-<tr><td class="ttext"><code>hashCode()</code>      </td><td colspan="2">77269518</td></tr>
+<tr><td class="ttext"><code>put()</code>, new      </td><td>1,292,359</td><td>  2,481,224</td></tr>
+<tr><td class="ttext"><code>put()</code>, update   </td><td>        0</td><td> 15,713,009</td></tr>
+<tr><td class="ttext"><code>get()</code>, success  </td><td>1,708,139</td><td> 48,514,853</td></tr>
+<tr><td class="ttext"><code>get()</code>, fail     </td><td>1,292,359</td><td>  2,497,339</td></tr>
+<tr><td class="ttext"><code>remove()</code>        </td><td>1,291,733</td><td>  2,478,503</td></tr>
+<tr><td class="ttext">All operations               </td><td>5,584,590</td><td> 71,684,928</td></tr>
+<tr><td class="ttext"><code>hashCode()</code>      </td><td colspan="2">77,269,518</td></tr>
 </table>
 
 The data is collected on a single test run, 10,000 iterations, beginning with ACORN.
@@ -1254,7 +1262,8 @@ the main bottleneck of the program.
 
 In addition, the number of `equals()` calls on `Point` object is 160,526,879, or roughly two per `hashCode()` call,
 for the reference implementation, and 36,383,032 (0.47 per `hashCode()`) for "Modulo big prime". This is a direct
-consequence of the latter version using much better hash function.
+consequence of the latter version using much better hash function. The reason the number of `equals()` invocations
+per `hashCode()` is less than one is in unsuccessful `get()` calls, which are very frequent in Life.
 
 We can also see that much more operations are performed on `counts` than on `field`, which is to be expected (eight
 lookups and updates are performed for each modification of `fields`). Any improvement there
@@ -1290,12 +1299,12 @@ Conclusions
 - There is always a trade-off between quality and speed of hash functions. Sometimes a very good hash function may turn
   out to be too slow.
 
-- Time to run the test went down by 33% for **Java 7** and 66% for **Java 8**, compared with the original version
+- Time to run the test went down by 32% for **Java 7** and 69% for **Java 8**, compared with the original version
   (much more if compared with the first `long`-based version). Not bad, considering that we didn't change the algorithm
   or the data structure -- only the hash function.
 
-- The achieved number of iterations per second was 5,344 (it was 3,932 when we started). Let's set a goal of 10,000 and
-see if this is achievable on the same computer.
+- The achieved number of iterations per second was 6,451 (it was 3,619 when we started). Let's set a goal of 10,000 and
+  see if this is achievable on the same computer.
 
 Coming soon
 -----------
