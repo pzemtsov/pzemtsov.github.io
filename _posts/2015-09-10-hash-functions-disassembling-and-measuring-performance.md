@@ -890,6 +890,14 @@ for this procedure to stop working in future versions of **Java** VM.
 - Two primary questions so far are why `LongPoint6` (employing a division operation) is so fast on **Java 7** and so slow on **Java 8**,
 and why it is the other way around with `LongPoint7` (employing `CRC32`).
 
+- Also interesting is why the performance difference of `LongPoint6` between **Java 7** and **Java 8**
+does not show on the full test (Life implementation).
+where the time was 1,979 ms on **Java 7** and 1,553 ms on **Java 8**. The `LongPoint7` behaves differently: there
+the full test time did drop (from 10,115 ms to 3,206 ms).
+
+-- The previous observation shows that we must be careful with microbenchmarks, and always remember that our real
+goal is the improvement of the real program performance.
+
 - We've seen that overheads of the infrastructure (such as those of virtual calls) may greatly exceed the costs of the
 methods themselves. This means that often the costs of the methods are less important than the quality of their results.
 This also means that those infrastructural overheads must be reduced at all costs. Whenever you can replace a virtual
