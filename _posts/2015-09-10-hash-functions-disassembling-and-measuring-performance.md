@@ -903,6 +903,12 @@ methods themselves. This means that often the costs of the methods are less impo
 This also means that those infrastructural overheads must be reduced at all costs. Whenever you can replace a virtual
 call with a direct one (or help the compiler with it) -- do it.
 
+- Microbenchmarking is the case where measurement is more important than the performance itself. What we've done
+is actually jumping through hoops in order to make the program _slower_ -- disable some optimisations. Obviously,
+for real programs we want the opposite -- optimise them to the extreme. That's why the trick used today mustn't
+be used for the full test. On the contrary, we must run each test alone, providing as much help as possible to
+**Java**'s type inference engine.
+
 - We can now re-visit some earlier experiments in optimising **Java** code. The knowledge acquired today may help
 improve stability of the results and explain them. In the earlier articles (such as [here]({{ site.ART-E1 }}))
 we made some guesses about the causes of the performance differences we observed. Now we can verify those guesses.
@@ -910,5 +916,6 @@ we made some guesses about the causes of the performance differences we observed
 Coming soon
 -----------
 
-In the next articles, we'll measure the performance of the hash functions we've tried so far. Then we'll try our best
-to optimise them to the limit, and then check how this optimisation affects the overall performance of the original program.
+In the next articles, we'll try using this measurement technique to
+optimise our hash functions to the limit, starting with the division-based one, and then check how this optimisation
+affects the overall performance of the original program.

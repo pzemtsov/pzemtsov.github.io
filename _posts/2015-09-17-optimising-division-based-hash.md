@@ -73,7 +73,7 @@ There aren't any division instructions in the code. The pseudo-code looks like t
 I call this pseudo-code rather than just code because it contains an operation that is not accessible in **Java**:
 a 128-bit multiplication, which takes two 64-bit numbers and produces a 128-bit result (I wrote it as `**`). There is such operation
 in the instruction set -- both `MUL` and `IMUL` have 128-bit versions. The result
-is placed into `rdx` and `rax`, we are using `rdx`, that's why the total shift is `0x1B` + `64` = `91`.
+is placed into `rdx` and `rax`, we are using `rdx`, that's why the total shift is 0x1B + 64 = 91.
 
 What we see is the result of a well-known optimisation: replacing of division by a constant divisor with a multiplication
 and some shifts. It is well described in [Agner Fog. Optimizing subroutines in assembly
@@ -118,61 +118,6 @@ instructions. It calls a runtime routine. It even goes as far as checking that f
 In short, this is really awful code, no wonder it runs slowly. Perhaps, HotSpot developers considered division by
 a constant a rare and unimportant case, and removed corresponding optimisation to keep their code short.
 
-Signed or unsigned?
--------------------
-
-The code of  `LongPoint6.hashCode()` uses regular **Java**'s arithmetic to divide a `long` number by an `int` and
-find a remainder. **Java**'s numbers are signed by definition. If `v` is negative, we are going to divide a negative number
-by a positive one. In **Java** this produces a negative result:
-
- <div class="formula">
-  25 % 3 = 1<br>
-  &minus;25 % 3 = &minus;1
- </div>
-
-This isn't what is usually called "a remainder" in mathematics. Proper mathematical remainder isn't ever negative:
-
- <div class="formula">
-  0 &le; x % y &lt; y
- </div>
-
-Hash functions are allowed to return negative results, so there is nothing harmful here.
-It is interesting, however, to check what the quality of hashing will be like if we use unsigned arithmetic (we can do it
-in **C** or in assembly). We can't do it directly in **Java**, but we can emulate it.
-A positive signed 64-bit number keeps its value when interpreted as unsigned. A negative number becomes a big
-positive, 2<sup>64</sup> added to its value, so we must add (2<sup>64</sup> mod 946840871) = 518863773 to the
-remainder. Since the remainder was zero or negative before, it won't exceed the divisor, but it may stay negative,
-in which case we need to add a divisor again:
-
-{% highlight Java %}
-    public int hashCode ()
-    {
-        int r = (int) (v % 946840871);
-        if (v < 0) r += 518863773;
-        if (r < 0) r += 946840871;
-        return r;
-    }
-{% endhighlight %}
-
-Here are the slot counts we got with signed division (see [here]({{ site.ART-LIFE }})):
-
-    Field size: 1034; slots used:  978; avg=  1.1
-    Count size: 3938; slots used: 3201; avg=  1.2
-
-And here are the results for unsigned division:
-
-    Field size: 1034; slots used:  979; avg=  1.1
-    Count size: 3938; slots used: 3129; avg=  1.3
-
-The results haven't changed much for `field` but have changed for `count`: they became worse. It does not mean they became
-very bad. Previously, the result was equal to E + 3.59&sigma;, where E is the expected value 3126.69, and &sigma;
-is the standard deviation 20.68. Now the result is E + 0.11 &sigma;, which still falls well within good statistical
-limits and performs better than some other hash functions. It just does not
-perform as well as the unsigned division, which I remarked on back then as demonstrating unusually good behaviour.
-
-This means that if we manage to write an incredibly fast version of the hash function based on the unsigned division,
-we have chances to improve the overall speed, otherwise the signed version is a better choice.
-
 
 Optimising division: unsigned case
 ----------------------------------
@@ -187,6 +132,8 @@ no `**` operation in **Java**.
 
 This doesn't mean we must stop here: after all, we have a general-purpose computer, and there is nothing mystical
 about 128-bit multiplication. It can be programmed in **Java** using available arithmetic.
+
+Let's first simplify the problem by considering our numbers unsigned.
 
 Let `x` and `y` be unsigned 64-bit values, and `A`, `B`, `C` and `D` be unsigned 32-bit values,
 where
@@ -335,12 +282,70 @@ Now it is very easy to program the hash function:
 It seems very unlikely that this monster will work faster than the original code. It contains five multiplications, one
 shift and six additions. This makes it a very interesting test: how fast can it possibly run?
 
+Signed or unsigned?
+-------------------
+
+We have just calculated an unsigned version of the remainder-based hash function. However, the code of  `LongPoint6.hashCode()`
+uses regular **Java**'s arithmetic, which is signed. How important is that? What impact does it have on the quality of hashing?
+In **Java** dividing a negative number by a positive one produces negative remainder:
+
+ <div class="formula">
+  25 % 3 = 1<br>
+  &minus;25 % 3 = &minus;1
+ </div>
+
+Strictly speaking, this isn't what is usually called "a remainder" in mathematics. Proper mathematical remainder isn't ever negative:
+
+ <div class="formula">
+  0 &le; x % y &lt; y
+ </div>
+
+and should be 2 for &minus;25 % 3.
+ 
+To check the quality of unsigned hashing, we must emulate unsigned calculations in **Java**.
+A positive signed 64-bit number keeps its value when interpreted as unsigned. A negative number becomes a big
+positive, 2<sup>64</sup> added to its value, so we must add (2<sup>64</sup> mod 946840871) = 518863773 to the
+remainder. Since the remainder was zero or negative before, it won't exceed the divisor, but it may stay negative,
+in which case we need to add a divisor again:
+
+{% highlight Java %}
+    public int hashCode ()
+    {
+        int r = (int) (v % 946840871);
+        if (v < 0) r += 518863773;
+        if (r < 0) r += 946840871;
+        return r;
+    }
+{% endhighlight %}
+
+Here are the slot counts we got with signed division (see [here]({{ site.ART-LIFE }})):
+
+    Field size: 1034; slots used:  982; avg= 1.05
+    Count size: 3938; slots used: 3236; avg= 1.22
+
+And here are the results for unsigned division:
+
+    Field size: 1034; slots used:  968; avg= 1.07
+    Count size: 3938; slots used: 3133; avg= 1.26
+
+The results haven't changed much for `field` but have changed for `count`: they became worse. It does not mean they became
+very bad. Previously, the result was equal to E + 5.28&sigma;, where E is the expected value 3126.69, and &sigma;
+is the standard deviation 20.68. Now the result is E + 0.3&sigma;, which still falls well within good statistical
+limits and performs better than some other hash functions. It just does not
+perform as well as the signed division, which I remarked on back then as demonstrating unusually good behaviour.
+
+This means that if we manage to write an incredibly fast version of the hash function based on the unsigned division,
+we have chances to improve the overall speed, otherwise the signed version is a better choice.
+
+Another approach is to change our `OFFSET`, which is now 0x80000000, to some positive value. This will leave less bits
+for `x` and `y` parts, but the `long` values will always be positive, and unsigned version will produce the same result as
+the signed one. Some of these values perform better than the others: for instance, 0x40000000 gives 3118 (E &minus; 0.42&sigma;)
+as `count` size, while 0x8000000 gives 3234 (E + 5.18&sigma;). We won't do it to keep the story short.
 
 Optimising division: signed case
-----------------------------------
+--------------------------------
 
-The code in the previous section performed unsigned multiplication and calculated unsigned remainder. As we saw, a signed
-version is potentially better, unless it is too slow. How can we modify the code to work in signed case?
+We've seen that the signed version has some potential advantages. Can we modify the code to work in signed case?
 
 The formulae we used above:
 
@@ -352,7 +357,7 @@ The formulae we used above:
  </div>
 
 are still applicable if _x_ and _y_ are signed 64-bit numbers. In this case A and C are signed 32-bit values,
-while B and D are unsigned. The picture stays the same, except for important change: AC and BD can now be negative,
+while B and D are unsigned. The picture stays the same, except for important change: AD and BC can now be negative,
 so the values must be sign-extended before addition:
 
 <table>
@@ -581,31 +586,33 @@ A full test
 -----------
 
 How do the optimised versions perform in the full test (a Life application)? Let's try them.
-Here are the times (in milliseconds for 10,000 iterations). Note that they are a bit unstable due to garbage collection:
+Here are the times (in milliseconds for 10,000 iterations). The times for other versions are taken from
+the [original article]({{ site.ART-HASH }}):
 
 <table class="numeric">
 <tr><th>Class name</th>                <th>Comment</th>                           <th>Time, <b>Java 7</b></th><th>Time, <b>Java 8</b></th></tr>
-<tr><td class="label">Point</td>       <td class="ttext">Multiply by 3, 5                  </td><td> 2800</td><td> 4952</td></tr>
-<tr><td class="label">Long</td>        <td class="ttext"><code>Long</code> default         </td><td> 4188</td><td> 6021</td></tr>
-<tr><td class="label">LongPoint</td>   <td class="ttext">Multiply by 3, 5                  </td><td> 2459</td><td> 5547</td></tr>
-<tr><td class="label">LongPoint3</td>  <td class="ttext">Multiply by 11, 17                </td><td> 2017</td><td> 2234</td></tr>
-<tr><td class="label">LongPoint4</td>  <td class="ttext">Multiply by two big primes        </td><td> 1909</td><td> 1755</td></tr>
-<tr><td class="label">LongPoint5</td>  <td class="ttext">Multiply by one big prime         </td><td> 1965</td><td> 1796</td></tr>
-<tr><td class="label">LongPoint6</td>  <td class="ttext">Modulo big prime                  </td><td> 1828</td><td> 1948</td></tr>
-<tr><td class="label">LongPoint60</td> <td class="ttext">Modulo optimised, unsigned        </td><td> 2007</td><td> 1819</td></tr>
-<tr><td class="label">LongPoint61</td> <td class="ttext">Modulo optimised, signed          </td><td> 2088</td><td> 1936</td></tr>
-<tr><td class="label">LongPoint7</td>  <td class="ttext"><code>java.util.zip.CRC32</code>  </td><td> 9849</td><td> 3408</td></tr>
+<tr><td class="label">Point</td>       <td class="ttext">Multiply by 3, 5                  </td><td>  2743</td><td> 4961</td></tr>
+<tr><td class="label">Long</td>        <td class="ttext"><code>Long</code> default         </td><td>  4273</td><td> 6755</td></tr>
+<tr><td class="label">LongPoint</td>   <td class="ttext">Multiply by 3, 5                  </td><td>  2602</td><td> 4836</td></tr>
+<tr><td class="label">LongPoint3</td>  <td class="ttext">Multiply by 11, 17                </td><td>  2074</td><td> 2028</td></tr>
+<tr><td class="label">LongPoint4</td>  <td class="ttext">Multiply by two big primes        </td><td>  2000</td><td> 1585</td></tr>
+<tr><td class="label">LongPoint5</td>  <td class="ttext">Multiply by one big prime         </td><td>  1979</td><td> 1553</td></tr>
+<tr><td class="label">LongPoint6</td>  <td class="ttext">Modulo big prime                  </td><td>  1890</td><td> 1550</td></tr>
+<tr><td class="label">LongPoint60</td> <td class="ttext">Modulo optimised, unsigned        </td><td>  2124</td><td> 1608</td></tr>
+<tr><td class="label">LongPoint61</td> <td class="ttext">Modulo optimised, signed          </td><td>  2198</td><td> 1689</td></tr>
+<tr><td class="label">LongPoint7</td>  <td class="ttext"><code>java.util.zip.CRC32</code>  </td><td> 10115</td><td> 3206</td></tr>
 </table>
 
-As we see, the versions using the code we've developed today are slower than the one using normal division on **Java 7**,
-but faster on **Java 8**, especially the unsigned version (by 6.6%). The optimisation did indeed work -- however, the results
-are worse than on **Java 7**, which performs native optimisation for constant division. The results are also worse than the
-multiplication-based ones (`LongPoint4` and `LongPoint5`), so one of these two is probably the better choice on **Java 8**.
+
+The new versions do not perform badly, compared to other hash functions, but they are not nearly as fast as the microbenchmarks suggest.
+In particular, they don't outperform the original division-based version. Why this happend is a mystery, perhaps **Java 8** is capable of some magic
+we don't know about yet.
 
 Conclusions
 -----------
 
 - A division operation is very slow compared to other arithmetic; it should be avoided in performance-critical code
+unless there is evidence that **Java** VM can optimise it.
 
 - On the contrary, a multiplication operation is relatively fast; it still makes sense to replace multiplication by
 small constants with shifts, additions or `LEA` instructions, but compilers are usually good at that.
@@ -617,13 +624,12 @@ has been removed from **Java** VM in version 8.
 from scratch, although in some ugly way.
 
 - The code we produced was very long. It contained five multiplications and several shifts and additions; still, it
-was faster than the original code using division (on **Java 8**).
+was faster than the original code using division (on **Java 8**) -- although, only in a microbenchmark test.
 
-- Still, the optimisation didn't make the division-based hash function the version of choice on **Java 8**, as it was on **Java 7**.
+- The optimisation didn't increase the speed of the full test, or, simply speaking, failed.
 
 Coming soon
 -----------
 
-The CRC-based hash function has improved a lot in **Java 8**: from 10109 to 1882 ms in the stand-alone test and from 9849 to 3400 ms
-in the integrated test. This is still quite a bit slower than the other functions (including division-based). Can it be improved?
-We'll look at it in one of the next articles.
+Is there any way to improve division even more? Can we outperform the original division-based version on the full test this way,
+and if not, why? We'll see soon.
