@@ -314,8 +314,8 @@ Now we are ready to run the full test, our best hopes now placed on `LongPoint62
 <tr><td class="label">LongPoint6</td>  <td class="ttext">Original version           </td><td>  2032</td><td> 1650</td></tr>
 <tr><td class="label">LongPoint60</td> <td class="ttext">Optimised, unsigned        </td><td>  2247</td><td> 1877</td></tr>
 <tr><td class="label">LongPoint61</td> <td class="ttext">Optimised, signed          </td><td>  2368</td><td> 1885</td></tr>
-<tr><td class="label">LongPoint61</td> <td class="ttext">Optimised and specialised  </td><td>  2191</td><td> 1726</td></tr>
-<tr><td class="label">LongPoint61</td> <td class="ttext">Karatsuba's multiplication </td><td>  2239</td><td> 1776</td></tr>
+<tr><td class="label">LongPoint62</td> <td class="ttext">Optimised and specialised  </td><td>  2191</td><td> 1726</td></tr>
+<tr><td class="label">LongPoint63</td> <td class="ttext">Karatsuba's multiplication </td><td>  2239</td><td> 1776</td></tr>
 </table>
 
 As expected, the new versions are both faster than the first optimised unsigned version, Karatsuba's one being the slower one of the two. However, the original division-based
