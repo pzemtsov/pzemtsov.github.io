@@ -22,6 +22,8 @@ ART-E1-CACHE: /2014/11/24/how-cache-affects-demultiplexing-of-e1.html
 ART-HASH: /2015/04/24/game-of-life-hash-tables-and-hash-codes.html
 ART-MEASURING-HASH: /2015/09/10/hash-functions-disassembling-and-measuring-performance.html
 ART-DIVISION-HASH: /2015/09/17/optimising-division-based-hash.html
+ART-DIVISION-HASH-MORE: /2015/10/20/more-optimisations-of-division-based-hash-karatsuba-method.html 
+ART-MICROBENCHMARK: /2015/10/28/dont-trust-a-micro-benchmark.html
 
 TITLE-E1:   "De-multiplexing of E1 streams in Java"
 TITLE-E1-C: "De-multiplexing of E1 stream: converting to C"
@@ -32,6 +34,8 @@ TITLE-E1-CACHE: "How cache affects demultiplexing of E1"
 TITLE-HASH: "Game of Life, hash tables and hash codes"
 TITLE-MEASURING-HASH:  "Hash functions: disassembling and measuring performance"
 TITLE-DIVISION-HASH: "Optimising division-based hash functions"
+TITLE-DIVISION-HASH-MORE: "More optimisations of division-based hash: Karatsuba's method"
+TITLE-MICROBENCHMARK: "Don't trust a micro-benchmark"
 
 REPO-E1:   https://github.com/pzemtsov/article-E1-demux-Java
 REPO-E1-C: https://github.com/pzemtsov/article-E1-demux-C
@@ -44,3 +48,4 @@ REPO-LIFE: https://github.com/pzemtsov/article-life
 
 redcarpet:
  extensions: [smart, tables]
+ 
