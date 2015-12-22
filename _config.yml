@@ -47,6 +47,7 @@ REPO-JENSEN-DEVICE: https://github.com/pzemtsov/article-jensen-device
 REPO-JAVA-CALLBACK: https://github.com/pzemtsov/article-java-callback
 REPO-E1-CACHE: https://github.com/pzemtsov/article-e1-cache
 REPO-LIFE: https://github.com/pzemtsov/article-life
+REPO-PEANO: https://github.com/pzemtsov/article-peano
 
 redcarpet:
  extensions: [smart, tables]
