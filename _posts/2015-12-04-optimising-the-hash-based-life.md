@@ -181,11 +181,11 @@ neighbours by adding a single offset (see `set()` and `reset()`). Various classe
 is called `LongPoint6`, where this method looks like this:
 
 {% highlight Java %}
-    @Override
-    public int hashCode ()
-    {
-        return (int) (v % 946840871);
-    }
+@Override
+public int hashCode ()
+{
+    return (int) (v % 946840871);
+}
 {% endhighlight %}
   
 The Life implementation maintains two hash-based structures: a hash set `field` that contains `LongPoint` objects for all the live cells, and a hash map `counts` that keeps
@@ -236,56 +236,56 @@ The new Life implementation is called `Hash1` (see [here]({{ site.REPO-LIFE }}/b
 The first thing we need is a new definition for `counts`:
 
 {% highlight Java %}
-    private HashMap<LongPoint, Count> counts
-      = new HashMap<LongPoint, Count> (HASH_SIZE);
+private HashMap<LongPoint, Count> counts
+  = new HashMap<LongPoint, Count> (HASH_SIZE);
 {% endhighlight %}
 
 Then we must modify `inc()` and `dec()`:
 
 {% highlight Java %}
-    private void inc (long w)
-    {
-        LongPoint key = factory.create (w);
-        Count c = counts.get (key);
-        if (c == null) {
-            counts.put (key, new Count (1));
-        } else {
-            c.inc ();
-        }
+private void inc (long w)
+{
+    LongPoint key = factory.create (w);
+    Count c = counts.get (key);
+    if (c == null) {
+        counts.put (key, new Count (1));
+    } else {
+        c.inc ();
     }
+}
 
-    private void dec (long w)
-    {
-        LongPoint key = factory.create (w);
-        if (! counts.get (key).dec ()) {
-            counts.remove (key);
-        }
+private void dec (long w)
+{
+    LongPoint key = factory.create (w);
+    if (! counts.get (key).dec ()) {
+        counts.remove (key);
     }
+}
 {% endhighlight %}
 
 Unlike `Integer`, the new class `Count` does not support automatic boxing and unboxing, that's why `step()` must be changed as well:
 
 {% highlight Java %}
-    public void step ()
-    {
-        ArrayList<LongPoint> toReset = new ArrayList<LongPoint> ();
-        ArrayList<LongPoint> toSet = new ArrayList<LongPoint> ();
-        for (LongPoint w : field) {
-            Count c = counts.get (w);
-            if (c == null || c.value < 2 || c.value > 3) toReset.add (w);
-        }
-        for (LongPoint w : counts.keySet ()) {
-            if (counts.get (w).value == 3 && ! field.contains (w)) {
-                toSet.add (w);
-            }
-        }
-        for (LongPoint w : toSet) {
-            set (w);
-        }
-        for (LongPoint w : toReset) {
-            reset (w);
+public void step ()
+{
+    ArrayList<LongPoint> toReset = new ArrayList<LongPoint> ();
+    ArrayList<LongPoint> toSet = new ArrayList<LongPoint> ();
+    for (LongPoint w : field) {
+        Count c = counts.get (w);
+        if (c == null || c.value < 2 || c.value > 3) toReset.add (w);
+    }
+    for (LongPoint w : counts.keySet ()) {
+        if (counts.get (w).value == 3 && ! field.contains (w)) {
+            toSet.add (w);
         }
     }
+    for (LongPoint w : toSet) {
+        set (w);
+    }
+    for (LongPoint w : toReset) {
+        reset (w);
+    }
+}
 {% endhighlight %}
 
 This is the new execution time:
@@ -352,98 +352,98 @@ to remove cells only when `count == 0 && !live`. Let's make [a new implementatio
 First, we replace two hash structures with one:
 
 {% highlight Java %}
-    private HashMap<LongPoint, Value> field
-      = new HashMap<LongPoint, Value> (HASH_SIZE);
+private HashMap<LongPoint, Value> field
+  = new HashMap<LongPoint, Value> (HASH_SIZE);
 {% endhighlight %}
 
 The methods `inc()` and `dec()` must now work with the new class:
 
 {% highlight Java %}
-    private void inc (long w)
-    {
-        LongPoint key = factory.create (w);
-        Value c = field.get (key);
-        if (c == null) {
-            field.put (key, new Value (1));
-        } else {
-            c.inc ();
-        }
+private void inc (long w)
+{
+    LongPoint key = factory.create (w);
+    Value c = field.get (key);
+    if (c == null) {
+        field.put (key, new Value (1));
+    } else {
+        c.inc ();
     }
+}
 
-    private void dec (long w)
-    {
-        LongPoint key = factory.create (w);
-        Value v = field.get (key);
-        if (! v.dec () && ! v.live) {
-            field.remove (key);
-        }
+private void dec (long w)
+{
+    LongPoint key = factory.create (w);
+    Value v = field.get (key);
+    if (! v.dec () && ! v.live) {
+        field.remove (key);
     }
+}
 {% endhighlight %}
 
 `set()` and `reset()` must also change: modifying of the live status of a cell now requires a couple of extra lines:
 
 {% highlight Java %}
-    void set (LongPoint k)
-    {
-        long w = k.v;
-        inc (w-DX-DY);
-        inc (w-DX);
-        inc (w-DX+DY);
-        inc (w-DY);
-        inc (w+DY);
-        inc (w+DX-DY);
-        inc (w+DX);
-        inc (w+DX+DY);
-        Value c = field.get (k);
-        if (c == null) {
-            field.put (k,  new Value (0, true));
-        } else {
-            c.live = true;
-        }
+void set (LongPoint k)
+{
+    long w = k.v;
+    inc (w-DX-DY);
+    inc (w-DX);
+    inc (w-DX+DY);
+    inc (w-DY);
+    inc (w+DY);
+    inc (w+DX-DY);
+    inc (w+DX);
+    inc (w+DX+DY);
+    Value c = field.get (k);
+    if (c == null) {
+        field.put (k,  new Value (0, true));
+    } else {
+        c.live = true;
     }
+}
     
-    void reset (LongPoint k)
-    {
-        long w = k.v;
-        dec (w-DX-DY);
-        dec (w-DX);
-        dec (w-DX+DY);
-        dec (w-DY);
-        dec (w+DY);
-        dec (w+DX-DY);
-        dec (w+DX);
-        dec (w+DX+DY);
-        Value v = field.get (k);
-        if (v.count == 0) {
-            field.remove (k);
-        } else {
-            v.live = false;
-        }
+void reset (LongPoint k)
+{
+    long w = k.v;
+    dec (w-DX-DY);
+    dec (w-DX);
+    dec (w-DX+DY);
+    dec (w-DY);
+    dec (w+DY);
+    dec (w+DX-DY);
+    dec (w+DX);
+    dec (w+DX+DY);
+    Value v = field.get (k);
+    if (v.count == 0) {
+        field.remove (k);
+    } else {
+        v.live = false;
     }
+}
 {% endhighlight %}
 
 Finally, the main iteration function must only iterate one structure:
 
 {% highlight Java %}
-    public void step ()
-    {
-        ArrayList<LongPoint> toReset = new ArrayList<LongPoint> ();
-        ArrayList<LongPoint> toSet = new ArrayList<LongPoint> ();
-        for (LongPoint w : field.keySet ()) {
-            Value c = field.get (w);
-            if (c.live) {
-                if (c.count < 2 || c.count > 3) toReset.add (w);
-            } else {
-                if (c.count == 3) toSet.add (w);
-            }
-        }
-        for (LongPoint w : toSet) {
-            set (w);
-        }
-        for (LongPoint w : toReset) {
-            reset (w);
+public void step ()
+{
+    ArrayList<LongPoint> toReset = new ArrayList<LongPoint> ();
+    ArrayList<LongPoint> toSet = new ArrayList<LongPoint> ();
+    for (LongPoint w : field.keySet ()) {
+        Value c = field.get (w);
+        if (c.live) {
+            if (c.count < 2 || c.count > 3) toReset.add (w);
+        } else {
+            if (c.count == 3) toSet.add (w);
         }
     }
+    for (LongPoint w : toSet) {
+        set (w);
+    }
+    for (LongPoint w : toReset) {
+        reset (w);
+    }
+}
 {% endhighlight %}
 
 Here are the results:
@@ -462,66 +462,66 @@ A minor improvement: unnecessary check
 The `set()` method contains a null check:
 
 {% highlight Java %}
-    void set (LongPoint k)
-    {
-        long w = k.v;
-        inc (w-DX-DY);
-        inc (w-DX);
-        inc (w-DX+DY);
-        inc (w-DY);
-        inc (w+DY);
-        inc (w+DX-DY);
-        inc (w+DX);
-        inc (w+DX+DY);
-        Value c = field.get (k);
-        if (c == null) {
-            field.put (k,  new Value (0, true));
-        } else {
-            c.live = true;
-        }
+void set (LongPoint k)
+{
+    long w = k.v;
+    inc (w-DX-DY);
+    inc (w-DX);
+    inc (w-DX+DY);
+    inc (w-DY);
+    inc (w+DY);
+    inc (w+DX-DY);
+    inc (w+DX);
+    inc (w+DX+DY);
+    Value c = field.get (k);
+    if (c == null) {
+        field.put (k,  new Value (0, true));
+    } else {
+        c.live = true;
     }
+}
 {% endhighlight %}
 
 This check is unnecessary during iterations: `set()` is always called on a cell that is present in the `field` structure (its neighbour count is 3).
 We can remove this check (see [`Hash3`]({{ site.REPO-LIFE }}/blob/7b79fc5c66e23164a57e55ad380d33f39aa9a6bb/Hash3.java)):
 
 {% highlight Java %}
-    void set (LongPoint k)
-    {
-        long w = k.v;
-        inc (w-DX-DY);
-        inc (w-DX);
-        inc (w-DX+DY);
-        inc (w-DY);
-        inc (w+DY);
-        inc (w+DX-DY);
-        inc (w+DX);
-        inc (w+DX+DY);
-        Value c = field.get (k);
-        c.live = true;
-    }
+void set (LongPoint k)
+{
+    long w = k.v;
+    inc (w-DX-DY);
+    inc (w-DX);
+    inc (w-DX+DY);
+    inc (w-DY);
+    inc (w+DY);
+    inc (w+DX-DY);
+    inc (w+DX);
+    inc (w+DX+DY);
+    Value c = field.get (k);
+    c.live = true;
+}
 {% endhighlight %}
 
 This check, however, is needed during initial population of the field. We'll have to modify the initial population routine accordingly, from
 
 {% highlight Java %}
-    public void put (int x, int y)
-    {
-        set (factory.create (x, y));
-    }
+public void put (int x, int y)
+{
+    set (factory.create (x, y));
+}
 {% endhighlight %}
 
 to
 
 {% highlight Java %}
-    public void put (int x, int y)
-    {
-        LongPoint k = factory.create (x, y);
-        if (! field.containsKey (k)) {
-            field.put (k, new Value (0));
-        }
-        set (k);
+public void put (int x, int y)
+{
+    LongPoint k = factory.create (x, y);
+    if (! field.containsKey (k)) {
+        field.put (k, new Value (0));
     }
+    set (k);
+}
 {% endhighlight %}
 
 <table class="numeric">
@@ -538,33 +538,33 @@ Another minor improvement: entry iterator
 This fragment in `step()`
 
 {% highlight Java %}
-        for (LongPoint w : field.keySet ()) {
-            Value c = field.get (w);
+    for (LongPoint w : field.keySet ()) {
+        Value c = field.get (w);
 {% endhighlight %}
 
 is inefficient: we are looking up in the hash map the key value that has just been extracted from the same hash map during iteration. This can be easily eliminated
 (see [`Hash4`]({{ site.REPO-LIFE }}/blob/e406657efb9260d4ac6e10ff37e656de794adce4/Hash4.java)):
 
 {% highlight Java %}
-    public void step ()
-    {
-        ArrayList<LongPoint> toReset = new ArrayList<LongPoint> ();
-        ArrayList<LongPoint> toSet = new ArrayList<LongPoint> ();
-        for (Entry<LongPoint, Value> w : field.entrySet ()) {
-            Value c = w.getValue ();
-            if (c.live) {
-                if (c.count < 2 || c.count > 3) toReset.add (w.getKey ());
-            } else {
-                if (c.count == 3) toSet.add (w.getKey ());
-            }
-        }
-        for (LongPoint w : toSet) {
-            set (w);
-        }
-        for (LongPoint w : toReset) {
-            reset (w);
+public void step ()
+{
+    ArrayList<LongPoint> toReset = new ArrayList<LongPoint> ();
+    ArrayList<LongPoint> toSet = new ArrayList<LongPoint> ();
+    for (Entry<LongPoint, Value> w : field.entrySet ()) {
+        Value c = w.getValue ();
+        if (c.live) {
+            if (c.count < 2 || c.count > 3) toReset.add (w.getKey ());
+        } else {
+            if (c.count == 3) toSet.add (w.getKey ());
         }
     }
+    for (LongPoint w : toSet) {
+        set (w);
+    }
+    for (LongPoint w : toReset) {
+        reset (w);
+    }
+}
 {% endhighlight %}
 
 <table class="numeric">
@@ -585,75 +585,75 @@ This is easy to achieve: all we need is declare `toReset` and `toSet` as `ArrayL
 (see [`Hash5`]({{ site.REPO-LIFE }}/blob/4819ad053b8ef7b86163e48522bff99c052b3468/Hash5.java)):
 
 {% highlight Java %}
-    void set (LongPoint k, Value v)
-    {
-        long w = k.v;
-        inc (w-DX-DY);
-        inc (w-DX);
-        inc (w-DX+DY);
-        inc (w-DY);
-        inc (w+DY);
-        inc (w+DX-DY);
-        inc (w+DX);
-        inc (w+DX+DY);
-        v.live = true;
-    }
+void set (LongPoint k, Value v)
+{
+    long w = k.v;
+    inc (w-DX-DY);
+    inc (w-DX);
+    inc (w-DX+DY);
+    inc (w-DY);
+    inc (w+DY);
+    inc (w+DX-DY);
+    inc (w+DX);
+    inc (w+DX+DY);
+    v.live = true;
+}
     
-    void reset (LongPoint k, Value v)
-    {
-        long w = k.v;
-        dec (w-DX-DY);
-        dec (w-DX);
-        dec (w-DX+DY);
-        dec (w-DY);
-        dec (w+DY);
-        dec (w+DX-DY);
-        dec (w+DX);
-        dec (w+DX+DY);
-        if (v.count == 0) {
-            field.remove (k);
+void reset (LongPoint k, Value v)
+{
+    long w = k.v;
+    dec (w-DX-DY);
+    dec (w-DX);
+    dec (w-DX+DY);
+    dec (w-DY);
+    dec (w+DY);
+    dec (w+DX-DY);
+    dec (w+DX);
+    dec (w+DX+DY);
+    if (v.count == 0) {
+        field.remove (k);
+    } else {
+        v.live = false;
+    }
+}
+
+public void step ()
+{
+    ArrayList<Entry<LongPoint, Value>> toReset
+              = new ArrayList<Entry<LongPoint, Value>> ();
+    ArrayList<Entry<LongPoint, Value>> toSet
+              = new ArrayList<Entry<LongPoint, Value>> ();
+
+    for (Entry<LongPoint, Value> w : field.entrySet ()) {
+        Value c = w.getValue ();
+        if (c.live) {
+            if (c.count < 2 || c.count > 3) toReset.add (w);
         } else {
-            v.live = false;
+            if (c.count == 3) toSet.add (w);
         }
     }
-
-    public void step ()
-    {
-        ArrayList<Entry<LongPoint, Value>> toReset
-                  = new ArrayList<Entry<LongPoint, Value>> ();
-        ArrayList<Entry<LongPoint, Value>> toSet
-                  = new ArrayList<Entry<LongPoint, Value>> ();
-
-        for (Entry<LongPoint, Value> w : field.entrySet ()) {
-            Value c = w.getValue ();
-            if (c.live) {
-                if (c.count < 2 || c.count > 3) toReset.add (w);
-            } else {
-                if (c.count == 3) toSet.add (w);
-            }
-        }
-        for (Entry<LongPoint, Value> w : toSet) {
-            set (w.getKey (), w.getValue ());
-        }
-        for (Entry<LongPoint, Value> w : toReset) {
-            reset (w.getKey (), w.getValue ());
-        }
+    for (Entry<LongPoint, Value> w : toSet) {
+        set (w.getKey (), w.getValue ());
     }
+    for (Entry<LongPoint, Value> w : toReset) {
+        reset (w.getKey (), w.getValue ());
+    }
+}
 {% endhighlight %}
 
 The initial population routine must be changed as well:
 
 {% highlight Java %}
-    @Override
-    public void put (int x, int y)
-    {
-        LongPoint k = factory.create (x, y);
-        Value v = field.get (k);
-        if (v == null) {
-            field.put (k, v = new Value (0));
-        }
-        set (k, v);
+@Override
+public void put (int x, int y)
+{
+    LongPoint k = factory.create (x, y);
+    Value v = field.get (k);
+    if (v == null) {
+        field.put (k, v = new Value (0));
     }
+    set (k, v);
+}
 {% endhighlight %}
 
 <table class="numeric">
@@ -672,7 +672,7 @@ executed 10,000 times. However, there is additional cost: management of the arra
 the `ArrayList` grows. The rule for expanding is
 
 {% highlight Java %}
-        int newCapacity = oldCapacity + (oldCapacity >> 1);
+int newCapacity = oldCapacity + (oldCapacity >> 1);
 {% endhighlight %}
 
 This means that the array will be allocated of size 10, 15, 22, 33, 49, 73, 109, 163, 244 and so on -- nine allocations for a list size of 250, which is typical for our
@@ -680,21 +680,21 @@ program. While staying with `ArrayList` class, we can't avoid checking for suffi
 we put the following in the beginning of the new class ([`Hash6`]({{ site.REPO-LIFE }}/blob/dbfa6e85160d122e9d86be85ed7285937cac491e/Hash6.java)):
 
 {% highlight Java %}
-    private final ArrayList<Entry<LongPoint, Value>> toReset
-            = new ArrayList<Entry<LongPoint, Value>> ();
-    private final ArrayList<Entry<LongPoint, Value>> toSet
-            = new ArrayList<Entry<LongPoint, Value>> ();
+private final ArrayList<Entry<LongPoint, Value>> toReset
+        = new ArrayList<Entry<LongPoint, Value>> ();
+private final ArrayList<Entry<LongPoint, Value>> toSet
+        = new ArrayList<Entry<LongPoint, Value>> ();
 {% endhighlight %}
 
 Instead of allocating an array, it is sufficient to clear it:
 
 {% highlight Java %}
-    public void step ()
-    {
-        toReset.clear ();
-        toSet.clear ();
-        for (Entry<LongPoint, Value> w : field.entrySet ()) {
-        ...
+public void step ()
+{
+    toReset.clear ();
+    toSet.clear ();
+    for (Entry<LongPoint, Value> w : field.entrySet ()) {
+    ...
 {% endhighlight %}
 
 <table class="numeric">
@@ -715,8 +715,8 @@ standard library. We will still do it to check if it provides any speed advantag
 Let's define two arrays of appropriate types and of some reasonable size (see [`Hash7`]({{ site.REPO-LIFE }}/blob/0a84db39335b49aa6c83543c1afdce6ba8d491c1/Hash7.java)):
 
 {% highlight Java %}
-    private Entry<LongPoint, Value> [] toReset = new Entry [128];
-    private Entry<LongPoint, Value> [] toSet = new Entry [128];
+private Entry<LongPoint, Value> [] toReset = new Entry [128];
+private Entry<LongPoint, Value> [] toSet = new Entry [128];
 {% endhighlight %}
 
 `javac` gives warning on these lines:
@@ -733,32 +733,32 @@ In the beginning of `step()` we must make sure both arrays are of sufficient siz
 frequent resizing, even bigger?
 
 {% highlight Java %}
-    public void step ()
-    {
-        if (field.size () > toSet.length) {
-            toReset = new Entry [field.size () * 2];
-            toSet = new Entry [field.size () * 2];
-        }
-        int setCount = 0;
-        int resetCount = 0;
+public void step ()
+{
+    if (field.size () > toSet.length) {
+        toReset = new Entry [field.size () * 2];
+        toSet = new Entry [field.size () * 2];
+    }
+    int setCount = 0;
+    int resetCount = 0;
         
-        for (Entry<LongPoint, Value> w : field.entrySet ()) {
-            Value c = w.getValue ();
-            if (c.live) {
-                if (c.count < 2 || c.count > 3) toReset[resetCount ++] = w;
-            } else {
-                if (c.count == 3) toSet[setCount ++] = w;
-            }
-        }
-        for (int i = 0; i < setCount; i++) {
-            set (toSet[i].getKey (), toSet[i].getValue ());
-            toSet[i] = null;
-        }
-        for (int i = 0; i < resetCount; i++) {
-            reset (toReset[i].getKey (), toReset[i].getValue ());
-            toReset[i] = null;
+    for (Entry<LongPoint, Value> w : field.entrySet ()) {
+        Value c = w.getValue ();
+        if (c.live) {
+            if (c.count < 2 || c.count > 3) toReset[resetCount ++] = w;
+        } else {
+            if (c.count == 3) toSet[setCount ++] = w;
         }
     }
+    for (int i = 0; i < setCount; i++) {
+        set (toSet[i].getKey (), toSet[i].getValue ());
+        toSet[i] = null;
+    }
+    for (int i = 0; i < resetCount; i++) {
+        reset (toReset[i].getKey (), toReset[i].getValue ());
+        toReset[i] = null;
+    }
+}
 {% endhighlight %}
 
 Note that we set used elements of the arrays to `null`. This is done to improve garbage collection. If we don't clean the arrays, some elements at the high indices may

@@ -142,10 +142,10 @@ Let's change the access pattern. We can't change the pattern within each block (
 of the code), but we can process the blocks in random order. We'll just rewrite the inner loop of `measure()`:
 
 {% highlight C++ %}
-    for (unsigned j = 0; j < count; j++) {
-        unsigned p = rand() & (count - 1);
-        demux.demux(src + SRC_SIZE * p, SRC_SIZE, dst + NUM_TIMESLOTS * p);
-    }
+for (unsigned j = 0; j < count; j++) {
+    unsigned p = rand() & (count - 1);
+    demux.demux(src + SRC_SIZE * p, SRC_SIZE, dst + NUM_TIMESLOTS * p);
+}
 {% endhighlight %}
 
 The text is [here]({{ site.REPO-E1-CACHE }}/blob/eb4190c90138c546297e18a72f273a1c4e30ac28/e1-multi.cpp).

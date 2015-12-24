@@ -38,7 +38,7 @@ Buffering of the `System.in` made the program slower -- it now runs at less than
 What is the `System.in` anyway? Let's print it:
 
 {% highlight Java %}
-    System.out.println (System.in);
+System.out.println (System.in);
 {% endhighlight %}
 
 We get:
@@ -70,15 +70,15 @@ In Linux, the files corresponding to all file handles are available via paths in
 This is how we can access standard input as a channel:
 
 {% highlight Java %}
-        FileChannel chan = new FileInputStream ("/proc/self/fd/0")
-                           .getChannel ();
+FileChannel chan = new FileInputStream ("/proc/self/fd/0")
+                   .getChannel ();
 {% endhighlight %}
 
 And this is how we access standard output:
 
 {% highlight Java %}
-        FileChannel chan = new FileOutputStream ("/proc/self/fd/1")
-                           .getChannel ();
+FileChannel chan = new FileOutputStream ("/proc/self/fd/1")
+                   .getChannel ();
 {% endhighlight %}
 
 We'll now modify both the server and the client to work with channels. We'll test two versions of the client.

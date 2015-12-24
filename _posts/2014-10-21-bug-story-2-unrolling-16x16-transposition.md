@@ -182,6 +182,7 @@ The program slowed down as a result of loop unrolling.
 Analysis of the code reveals why it happened. I won't show the entire inner loop code here, just a small fragment:
 
 {% highlight c-objdump %}
+
         vmovdqa %xmm8, 480(%rsp)
         vmovdqa %xmm7, 496(%rsp)
         vmovdqa %xmm6, 512(%rsp)
@@ -289,12 +290,13 @@ void dump(__m128i x)
 The main loop is modified in the following way:
 
 {% highlight C++ %}
-    printf ("Before: \n");\
-    DUMP (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15);\
-    _transpose_16x16 (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15);\
-    printf("After: \n");\
-    DUMP(w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15); \
-    exit (0);\
+
+printf ("Before: \n");\
+DUMP (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15);\
+_transpose_16x16 (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15);\
+printf("After: \n");\
+DUMP(w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15); \
+exit (0);\
 {% endhighlight %}
 
 The call to `exit()` is there to prevent flooding of the output. Just one dump of a matrix before and after transposition
@@ -435,30 +437,30 @@ representation of the actual parameters from their internals. In fact, they do e
 parameters are substituted _as is_. This is what the macro body looks like after the substitution:
 
 {% highlight C++ %}
-    transpose_4x4_dwords(w0, w1, w2, w3, w00, w01, w02, w03);
-    transpose_4x4_dwords(w4, w5, w6, w7, w10, w11, w12, w13);
-    transpose_4x4_dwords(w8, w9, w10, w11, w20, w21, w22, w23);
-    transpose_4x4_dwords(w12, w13, w14, w15, w30, w31, w32, w33);
-    w00 = transpose_4x4(w00);
-    w01 = transpose_4x4(w01);
-    w02 = transpose_4x4(w02);
-    w03 = transpose_4x4(w03);
-    w10 = transpose_4x4(w10);
-    w11 = transpose_4x4(w11);
-    w12 = transpose_4x4(w12);
-    w13 = transpose_4x4(w13);
-    w20 = transpose_4x4(w20);
-    w21 = transpose_4x4(w21);
-    w22 = transpose_4x4(w22);
-    w23 = transpose_4x4(w23);
-    w30 = transpose_4x4(w30);
-    w31 = transpose_4x4(w31);
-    w32 = transpose_4x4(w32);
-    w33 = transpose_4x4(w33);
-    transpose_4x4_dwords(w00, w10, w20, w30, w0, w1, w2, w3);
-    transpose_4x4_dwords(w01, w11, w21, w31, w4, w5, w6, w7);
-    transpose_4x4_dwords(w02, w12, w22, w32, w8, w9, w10, w11);
-    transpose_4x4_dwords(w03, w13, w23, w33, w12, w13, w14, w15);
+transpose_4x4_dwords(w0, w1, w2, w3, w00, w01, w02, w03);
+transpose_4x4_dwords(w4, w5, w6, w7, w10, w11, w12, w13);
+transpose_4x4_dwords(w8, w9, w10, w11, w20, w21, w22, w23);
+transpose_4x4_dwords(w12, w13, w14, w15, w30, w31, w32, w33);
+w00 = transpose_4x4(w00);
+w01 = transpose_4x4(w01);
+w02 = transpose_4x4(w02);
+w03 = transpose_4x4(w03);
+w10 = transpose_4x4(w10);
+w11 = transpose_4x4(w11);
+w12 = transpose_4x4(w12);
+w13 = transpose_4x4(w13);
+w20 = transpose_4x4(w20);
+w21 = transpose_4x4(w21);
+w22 = transpose_4x4(w22);
+w23 = transpose_4x4(w23);
+w30 = transpose_4x4(w30);
+w31 = transpose_4x4(w31);
+w32 = transpose_4x4(w32);
+w33 = transpose_4x4(w33);
+transpose_4x4_dwords(w00, w10, w20, w30, w0, w1, w2, w3);
+transpose_4x4_dwords(w01, w11, w21, w31, w4, w5, w6, w7);
+transpose_4x4_dwords(w02, w12, w22, w32, w8, w9, w10, w11);
+transpose_4x4_dwords(w03, w13, w23, w33, w12, w13, w14, w15);
 {% endhighlight %}
 
 No wonder it does not work.

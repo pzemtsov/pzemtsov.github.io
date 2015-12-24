@@ -196,12 +196,12 @@ at the assembly than learning the rules of this mangling.
 A quick look at the assembly output shows the symbol names:
 
 {% highlight c-objdump %}
-    _ZNK11Dst_First_1ILi5EE5demuxEPKhjPPh
-    _ZNK11Dst_First_1ILi4EE5demuxEPKhjPPh
-    _ZNK11Dst_First_1ILi3EE5demuxEPKhjPPh
-    _ZNK11Dst_First_1ILi2EE5demuxEPKhjPPh
-    _ZNK11Dst_First_1ILi1EE5demuxEPKhjPPh
-    _ZNK11Dst_First_1ILi0EE5demuxEPKhjPPh
+_ZNK11Dst_First_1ILi5EE5demuxEPKhjPPh
+_ZNK11Dst_First_1ILi4EE5demuxEPKhjPPh
+_ZNK11Dst_First_1ILi3EE5demuxEPKhjPPh
+_ZNK11Dst_First_1ILi2EE5demuxEPKhjPPh
+_ZNK11Dst_First_1ILi1EE5demuxEPKhjPPh
+_ZNK11Dst_First_1ILi0EE5demuxEPKhjPPh
 {% endhighlight %}
 
 Clearly, the digit after the `ILi` indicates the value of the template parameter `N`. Note the order -- the
@@ -313,8 +313,8 @@ the depth of the assembly listings.
 These are the names of our methods:
 
 {% highlight c-objdump %}
-    _ZNK11Dst_First_15demuxEPKhjPPh:
-    _ZNK11Dst_First_35demuxEPKhjPPh:
+_ZNK11Dst_First_15demuxEPKhjPPh:
+_ZNK11Dst_First_35demuxEPKhjPPh:
 {% endhighlight %}
 
 the former one being `Dst_First_1::demux` and the latter `Dst_First_3::demux`. Now back to the gdb:
@@ -378,13 +378,13 @@ These offsets look very round. Is it a coincidence? No, it is not. There are sus
 before the loops:
 
 {% highlight c-objdump %}
-    nopl   0x0(%rax)
+nopl   0x0(%rax)
 {% endhighlight %}
 
 (7 bytes long) in the first case, and
 
 {% highlight c-objdump %}
-    nopl   (%rax)
+nopl   (%rax)
 {% endhighlight %}
 
 (3 bytes long) in another.

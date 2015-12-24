@@ -1273,9 +1273,9 @@ with mutable ones -- this may reduce the number of updating `put()` calls.
 Another idea is more technical. In the following code
 
 {% highlight Java %}
-    for (Point w : counts.keySet ()) {
-        if (counts.get (w) == 3 && ! field.contains (w)) toSet.add (w);
-    }
+for (Point w : counts.keySet ()) {
+    if (counts.get (w) == 3 && ! field.contains (w)) toSet.add (w);
+}
 {% endhighlight %}
 
 we call `counts.get()` on a value that has just been extracted from `counts.keySet()`. Using the `entrySet()`

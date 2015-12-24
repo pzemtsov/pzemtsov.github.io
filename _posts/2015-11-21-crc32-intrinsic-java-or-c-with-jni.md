@@ -29,19 +29,19 @@ The method in question
 The full code of the project is [here]({{ site.REPO-LIFE }}/tree/0161781215b7e713e7222a21f628c29b6764b778). This is the function we are talking about -- `LongPoint7.hashCode()`:
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        CRC32 crc = new CRC32 ();
-        crc.update ((int)(v>>> 0) & 0xFF);
-        crc.update ((int)(v >>> 8) & 0xFF);
-        crc.update ((int)(v >>> 16) & 0xFF);
-        crc.update ((int)(v >>> 24) & 0xFF);
-        crc.update ((int)(v >>> 32) & 0xFF);
-        crc.update ((int)(v >>> 40) & 0xFF);
-        crc.update ((int)(v >>> 48) & 0xFF);
-        crc.update ((int)(v >>> 56) & 0xFF);
-        return (int) crc.getValue ();
-    }
+public int hashCode ()
+{
+    CRC32 crc = new CRC32 ();
+    crc.update ((int)(v>>> 0) & 0xFF);
+    crc.update ((int)(v >>> 8) & 0xFF);
+    crc.update ((int)(v >>> 16) & 0xFF);
+    crc.update ((int)(v >>> 24) & 0xFF);
+    crc.update ((int)(v >>> 32) & 0xFF);
+    crc.update ((int)(v >>> 40) & 0xFF);
+    crc.update ((int)(v >>> 48) & 0xFF);
+    crc.update ((int)(v >>> 56) & 0xFF);
+    return (int) crc.getValue ();
+}
 {% endhighlight %}
 
 Here are the execution times, in milliseconds for 100M iterations (for comparison, I added times for one other hash function and for the null function, which does nothing):
@@ -63,11 +63,11 @@ The `CRC32` class we are using comes from `java.util.zip`. Let's look inside thi
 This is the code of `update()` in both **Java 7** and **Java 8**:
 
 {% highlight Java %}
-    public void update(int b) {
-        crc = update(crc, b);
-    }
+public void update(int b) {
+    crc = update(crc, b);
+}
 
-    private native static int update(int crc, int b);
+private native static int update(int crc, int b);
 {% endhighlight %}
 
 A native call is made for every input byte, and we know that native calls are expensive.
@@ -75,61 +75,61 @@ This suggests our first idea for improvement: to make just one native call for t
 The `CRC32` class contains a method we can use for that (at a cost of an array allocation):
 
 {% highlight Java %}
-    public void update(byte[] b, int off, int len) {
-        if (b == null) {
-            throw new NullPointerException();
-        }
-        if (off < 0 || len < 0 || off > b.length - len) {
-            throw new ArrayIndexOutOfBoundsException();
-        }
-        crc = updateBytes(crc, b, off, len);
+public void update(byte[] b, int off, int len) {
+    if (b == null) {
+        throw new NullPointerException();
     }
+    if (off < 0 || len < 0 || off > b.length - len) {
+        throw new ArrayIndexOutOfBoundsException();
+    }
+    crc = updateBytes(crc, b, off, len);
+}
 
-    private native static int updateBytes(int crc, byte[] b, int off, int len);
+private native static int updateBytes(int crc, byte[] b, int off, int len);
 {% endhighlight %}
 
 [Here is the new code]({{ site.REPO-LIFE }}/blob/2a500aaa1164f05cace692f17841c0522fca1ccb/LongPoint71.java) (class `LongPoint71`):
 
 {% highlight Java %}
-    @Override
-    public int hashCode ()
-    {
-        byte[] b = new byte[8];
-        b[0] = (byte) (v >>>  0);
-        b[1] = (byte) (v >>>  8);
-        b[2] = (byte) (v >>> 16);
-        b[3] = (byte) (v >>> 24);
-        b[4] = (byte) (v >>> 32);
-        b[5] = (byte) (v >>> 40);
-        b[6] = (byte) (v >>> 48);
-        b[7] = (byte) (v >>> 56);
-        CRC32 crc = new CRC32 ();
-        crc.update (b,  0,  8);
-        return (int) crc.getValue ();
-    }
+@Override
+public int hashCode ()
+{
+    byte[] b = new byte[8];
+    b[0] = (byte) (v >>>  0);
+    b[1] = (byte) (v >>>  8);
+    b[2] = (byte) (v >>> 16);
+    b[3] = (byte) (v >>> 24);
+    b[4] = (byte) (v >>> 32);
+    b[5] = (byte) (v >>> 40);
+    b[6] = (byte) (v >>> 48);
+    b[7] = (byte) (v >>> 56);
+    CRC32 crc = new CRC32 ();
+    crc.update (b,  0,  8);
+    return (int) crc.getValue ();
+}
 {% endhighlight %}
 
 One immediate observation about this code is that we don't have to allocate a new byte array each time and can re-use an existing one. This may seem obvious that this
 way it will be faster but I won't be convinced until I try. Here is the new class [`LongPoint72`]({{ site.REPO-LIFE }}/blob/2a500aaa1164f05cace692f17841c0522fca1ccb/LongPoint72.java):
 
 {% highlight Java %}
-    private byte[] b = new byte[8];
+private byte[] b = new byte[8];
     
-    @Override
-    public int hashCode ()
-    {
-        b[0] = (byte) (v >>>  0);
-        b[1] = (byte) (v >>>  8);
-        b[2] = (byte) (v >>> 16);
-        b[3] = (byte) (v >>> 24);
-        b[4] = (byte) (v >>> 32);
-        b[5] = (byte) (v >>> 40);
-        b[6] = (byte) (v >>> 48);
-        b[7] = (byte) (v >>> 56);
-        CRC32 crc = new CRC32 ();
-        crc.update (b,  0,  8);
-        return (int) crc.getValue ();
-    }
+@Override
+public int hashCode ()
+{
+    b[0] = (byte) (v >>>  0);
+    b[1] = (byte) (v >>>  8);
+    b[2] = (byte) (v >>> 16);
+    b[3] = (byte) (v >>> 24);
+    b[4] = (byte) (v >>> 32);
+    b[5] = (byte) (v >>> 40);
+    b[6] = (byte) (v >>> 48);
+    b[7] = (byte) (v >>> 56);
+    CRC32 crc = new CRC32 ();
+    crc.update (b,  0,  8);
+    return (int) crc.getValue ();
+}
 {% endhighlight %}
 
 Another improvement that seems obvious is to re-use the `CRC32` object as well. We'll try this, too, but there is one important point to note: after this the `hashCode()` function
@@ -138,24 +138,24 @@ the same values into the elements of this array. Our program is single-threaded,
 (see [`LongPoint73`]({{ site.REPO-LIFE }}/blob/2a500aaa1164f05cace692f17841c0522fca1ccb/LongPoint73.java)):
 
 {% highlight Java %}
-    private byte[] b = new byte[8];
-    private CRC32 crc = new CRC32 ();
+private byte[] b = new byte[8];
+private CRC32 crc = new CRC32 ();
     
-    @Override
-    public int hashCode ()
-    {
-        b[0] = (byte) (v >>>  0);
-        b[1] = (byte) (v >>>  8);
-        b[2] = (byte) (v >>> 16);
-        b[3] = (byte) (v >>> 24);
-        b[4] = (byte) (v >>> 32);
-        b[5] = (byte) (v >>> 40);
-        b[6] = (byte) (v >>> 48);
-        b[7] = (byte) (v >>> 56);
-        crc.reset ();
-        crc.update (b,  0,  8);
-        return (int) crc.getValue ();
-    }
+@Override
+public int hashCode ()
+{
+    b[0] = (byte) (v >>>  0);
+    b[1] = (byte) (v >>>  8);
+    b[2] = (byte) (v >>> 16);
+    b[3] = (byte) (v >>> 24);
+    b[4] = (byte) (v >>> 32);
+    b[5] = (byte) (v >>> 40);
+    b[6] = (byte) (v >>> 48);
+    b[7] = (byte) (v >>> 56);
+    crc.reset ();
+    crc.update (b,  0,  8);
+    return (int) crc.getValue ();
+}
 {% endhighlight %}
 
 Now it's time to start running the programs (the main class is `HashTime`):
@@ -189,27 +189,27 @@ Our next step is replacing an array with a direct byte buffer. This offers two p
 Unfortunately, only **Java 8** contains a method that applies CRC32 to a byte buffer. Here it is:
 
 {% highlight Java %}
-    public void update(ByteBuffer buffer) {
-        int pos = buffer.position();
-        int limit = buffer.limit();
-        assert (pos <= limit);
-        int rem = limit - pos;
-        if (rem <= 0)
-            return;
-        if (buffer instanceof DirectBuffer) {
-            crc = updateByteBuffer(crc, ((DirectBuffer)buffer).address(), pos, rem);
-        } else if (buffer.hasArray()) {
-            crc = updateBytes(crc, buffer.array(), pos + buffer.arrayOffset(), rem);
-        } else {
-            byte[] b = new byte[rem];
-            buffer.get(b);
-            crc = updateBytes(crc, b, 0, b.length);
-        }
-        buffer.position(limit);
+public void update(ByteBuffer buffer) {
+    int pos = buffer.position();
+    int limit = buffer.limit();
+    assert (pos <= limit);
+    int rem = limit - pos;
+    if (rem <= 0)
+        return;
+    if (buffer instanceof DirectBuffer) {
+        crc = updateByteBuffer(crc, ((DirectBuffer)buffer).address(), pos, rem);
+    } else if (buffer.hasArray()) {
+        crc = updateBytes(crc, buffer.array(), pos + buffer.arrayOffset(), rem);
+    } else {
+        byte[] b = new byte[rem];
+        buffer.get(b);
+        crc = updateBytes(crc, b, 0, b.length);
     }
+    buffer.position(limit);
+}
 
-    private native static int updateByteBuffer(int adler, long addr,
-                                               int off, int len);
+private native static int updateByteBuffer(int adler, long addr,
+                                           int off, int len);
 {% endhighlight %}
 
 This method doesn't even use the JNI support for direct buffers.
@@ -220,18 +220,18 @@ Let's write a version that uses this method and run it on **Java 8**.
 [Here is the code]({{ site.REPO-LIFE }}/blob/f23fcdee9191717969294d72c8cd583278824d53/LongPoint74.java) (`LongPoint74`):
 
 {% highlight Java %}
-    static private ByteBuffer buf = ByteBuffer.allocateDirect (8)
-                                              .order (ByteOrder.LITTLE_ENDIAN);
+static private ByteBuffer buf = ByteBuffer.allocateDirect (8)
+                                          .order (ByteOrder.LITTLE_ENDIAN);
     
-    @Override
-    public int hashCode ()
-    {
-        CRC32 crc = new CRC32 ();
-        buf.putLong (0,  v);
-        buf.position (0);
-        crc.update (buf);
-        return (int) crc.getValue ();
-    }
+@Override
+public int hashCode ()
+{
+    CRC32 crc = new CRC32 ();
+    buf.putLong (0,  v);
+    buf.position (0);
+    crc.update (buf);
+    return (int) crc.getValue ();
+}
 {% endhighlight %}
 
 Note that this code went one step further in re-using the same object than `LongPoint73`: it made the buffer a static object. There is a reason for it: direct buffers are allocated
@@ -260,37 +260,37 @@ CRC32 according to its strict definition (division of polynoms). There is a fast
 and to a `long` look like:
 
 {% highlight Java %}
-     public static int update (byte b, int crc)
-     {
-         return (crc >>> 8) ^ crc_table[(crc ^ b) & 0xff];
-     }
+public static int update (byte b, int crc)
+{
+    return (crc >>> 8) ^ crc_table[(crc ^ b) & 0xff];
+}
 
-     public static int update (long n, int crc)
-     {
-         return update ((byte) (n >>> 56),
-                update ((byte) (n >>> 48),
-                update ((byte) (n >>> 40),
-                update ((byte) (n >>> 32),
-                update ((byte) (n >>> 24),
-                update ((byte) (n >>> 16),
-                update ((byte) (n >>>  8),
-                update ((byte) (n >>>  0), crc))))))));
-     }
+public static int update (long n, int crc)
+{
+    return update ((byte) (n >>> 56),
+           update ((byte) (n >>> 48),
+           update ((byte) (n >>> 40),
+           update ((byte) (n >>> 32),
+           update ((byte) (n >>> 24),
+           update ((byte) (n >>> 16),
+           update ((byte) (n >>>  8),
+           update ((byte) (n >>>  0), crc))))))));
+}
 
-     public static int crc32 (long n)
-     {
-         return update (n, -1) ^ -1;
-     }
+public static int crc32 (long n)
+{
+    return update (n, -1) ^ -1;
+}
 {% endhighlight %}
 
 And this is our [new hash function]({{site.REPO-LIFE }}/blob/75e4a5986c46434f4d4ccf6af36bc695f2b7fe38/LongPoint75.java):
 
 {% highlight Java %}
-    @Override
-    public int hashCode ()
-    {
-        return TableCRC32.crc32 (v);
-    }
+@Override
+public int hashCode ()
+{
+    return TableCRC32.crc32 (v);
+}
 {% endhighlight %}
 
 The results look much better:
@@ -392,11 +392,11 @@ JNIEXPORT jint JNICALL Java_NativeCRC32_crc32c (JNIEnv *env, jclass clazz,
 We'll also need another class, [`LongPoint77`]({{ site.REPO-LIFE }}/blob/3e26e50861210b163f9e30beb89af3b6a2eb2543/LongPoint77.java), to use this function:
 
 {% highlight Java %}
-    @Override
-    public int hashCode ()
-    {
-        return NativeCRC32.crc32c (v);
-    }
+@Override
+public int hashCode ()
+{
+    return NativeCRC32.crc32c (v);
+}
 {% endhighlight %}
 
 
@@ -458,30 +458,30 @@ The mystery of fast CRC32 on Java 8
 To answer this question, we'll have to look at the assembly listings of `LongPoint7.hashCode`. In **Java 7** the code of this method contains eight calls to `CRC32.update`:
 
 {% highlight c-objdump %}
-  0x00007f99ad0736cf: mov    r10,QWORD PTR [rsi+0x10]
-  0x00007f99ad0736d3: mov    edx,r10d
-  0x00007f99ad0736d6: movzx  edx,dl             ;*iand
-                                                ; - LongPoint7::hashCode@19 (line 23)
-  0x00007f99ad0736d9: xor    esi,esi
-  0x00007f99ad0736db: call   0x00007f99ad037f60  ; OopMap{rbp=Oop off=64}
-                                                ;*invokestatic update
-                                                ; - java.util.zip.CRC32::update@6 (line 52)
-                                                ; - LongPoint7::hashCode@20 (line 23)
-                                                ;   {static_call}
-  0x00007f99ad0736e0: mov    DWORD PTR [rsp],eax  ;*synchronization entry
-                                                ; - java.util.zip.CRC32::update@-1 (line 52)
-                                                ; - LongPoint7::hashCode@36 (line 24)
-  0x00007f99ad0736e3: mov    r10,QWORD PTR [rbp+0x10]
-  0x00007f99ad0736e7: shr    r10,0x8
-  0x00007f99ad0736eb: mov    edx,r10d
-  0x00007f99ad0736ee: movzx  edx,dl             ;*iand
-                                                ; - LongPoint7::hashCode@35 (line 24)
-  0x00007f99ad0736f1: mov    esi,eax
-  0x00007f99ad0736f3: call   0x00007f99ad037f60  ; OopMap{rbp=Oop off=88}
-                                                ;*invokestatic update
-                                                ; - java.util.zip.CRC32::update@6 (line 52)
-                                                ; - LongPoint7::hashCode@36 (line 24)
-                                                ;   {static_call}
+0x00007f99ad0736cf: mov    r10,QWORD PTR [rsi+0x10]
+0x00007f99ad0736d3: mov    edx,r10d
+0x00007f99ad0736d6: movzx  edx,dl             ;*iand
+                                              ; - LongPoint7::hashCode@19 (line 23)
+0x00007f99ad0736d9: xor    esi,esi
+0x00007f99ad0736db: call   0x00007f99ad037f60  ; OopMap{rbp=Oop off=64}
+                                               ;*invokestatic update
+                                               ; - java.util.zip.CRC32::update@6 (line 52)
+                                               ; - LongPoint7::hashCode@20 (line 23)
+                                               ;   {static_call}
+0x00007f99ad0736e0: mov    DWORD PTR [rsp],eax ;*synchronization entry
+                                               ; - java.util.zip.CRC32::update@-1 (line 52)
+                                               ; - LongPoint7::hashCode@36 (line 24)
+0x00007f99ad0736e3: mov    r10,QWORD PTR [rbp+0x10]
+0x00007f99ad0736e7: shr    r10,0x8
+0x00007f99ad0736eb: mov    edx,r10d
+0x00007f99ad0736ee: movzx  edx,dl             ;*iand
+                                              ; - LongPoint7::hashCode@35 (line 24)
+0x00007f99ad0736f1: mov    esi,eax
+0x00007f99ad0736f3: call   0x00007f99ad037f60 ; OopMap{rbp=Oop off=88}
+                                              ;*invokestatic update
+                                              ; - java.util.zip.CRC32::update@6 (line 52)
+                                              ; - LongPoint7::hashCode@36 (line 24)
+                                              ;   {static_call}
 {% endhighlight %}
 
 This fragment shows only two calls to `update()`. The entire code is [here]({{ site.REPO-LIFE }}/blob/a44e2a418d046cef6f21cac4da52260962875dd4/java7.LongPoint7.hashCode.asm).
@@ -552,10 +552,10 @@ public int hashCode()
 This is exactly the code of `crc32 (long)` in `TableCRC32`. It starts at `crc = -1` and applies the function
 
 {% highlight Java %}
-     public static int update (byte b, int crc)
-     {
-         return (crc >>> 8) ^ crc_table[(crc ^ b) & 0xff];
-     }
+public static int update (byte b, int crc)
+{
+    return (crc >>> 8) ^ crc_table[(crc ^ b) & 0xff];
+}
 
 {% endhighlight %}
 
@@ -574,21 +574,21 @@ falls outside the scope of this article, but a brief examination shows that the 
 of 87. For instance, a single table access takes four instructions:
 
 {% highlight c-objdump %}
-  0x00007fbf51311aab: movzx  ecx,cl
-  0x00007fbf51311aae: xor    eax,DWORD PTR [r8+rcx*4+0x10]
-  0x00007fbf51311ab3: xor    ebp,eax
-  0x00007fbf51311ab5: shr    eax,0x8
+0x00007fbf51311aab: movzx  ecx,cl
+0x00007fbf51311aae: xor    eax,DWORD PTR [r8+rcx*4+0x10]
+0x00007fbf51311ab3: xor    ebp,eax
+0x00007fbf51311ab5: shr    eax,0x8
 {% endhighlight %}
 
 while in the intrinsic version it took six:
 
 {% highlight c-objdump %}
-  0x00007f9a0131ba5e: movzx  ecx,cl
-  0x00007f9a0131ba61: shl    ecx,0x2
-  0x00007f9a0131ba64: movsxd r8,ecx
-  0x00007f9a0131ba67: xor    eax,DWORD PTR [rdx+r8*1]  ;*invokestatic update
-  0x00007f9a0131ba6b: xor    ebp,eax
-  0x00007f9a0131ba6d: shr    eax,0x8
+0x00007f9a0131ba5e: movzx  ecx,cl
+0x00007f9a0131ba61: shl    ecx,0x2
+0x00007f9a0131ba64: movsxd r8,ecx
+0x00007f9a0131ba67: xor    eax,DWORD PTR [rdx+r8*1]  ;*invokestatic update
+0x00007f9a0131ba6b: xor    ebp,eax
+0x00007f9a0131ba6d: shr    eax,0x8
 {% endhighlight %}
 
 Interestingly, the access to the array in both cases is done using the static address rather than indirectly using a reference. While in the intrinsic case thia may be

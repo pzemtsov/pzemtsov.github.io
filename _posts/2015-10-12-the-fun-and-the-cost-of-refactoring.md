@@ -457,7 +457,7 @@ final class Hash_LongPoint extends Worker
 Finally, the main class can now run
 
 {% highlight Java %}
-        test (new Hash_LongPoint (new LongPoint3.Factory ()));
+test (new Hash_LongPoint (new LongPoint3.Factory ()));
 {% endhighlight %}
 
 where `test()` is a test method that creates a Life structure, runs a given number of iterations and measures time.
@@ -492,31 +492,31 @@ interested, I recommend skipping this chapter and going straight to test results
 The main test routine (in the class [`Life`]({{ site.REPO-LIFE }}/blob/d59b6b9a681d60ff011a6b800f8d5f63851eeb83/Life.java))  previously looked like this:
 
 {% highlight Java %}
-    private static void measure (Class<? extends Worker> cw) throws Exception
-    {
-        int K = 10000;
-        System.out.printf ("%20s: time for %5d:", cw.getName (), K);
+private static void measure (Class<? extends Worker> cw) throws Exception
+{
+    int K = 10000;
+    System.out.printf ("%20s: time for %5d:", cw.getName (), K);
         
-        long t = 0;
-        for (int n = 0; n < 3; n++) {
-            Worker w = cw.newInstance ();
-            put (w, ACORN);
-            long t1 = System.currentTimeMillis ();
-            for (int i = 0; i < K; i++) {
-                w.step ();
-            }
-            long t2 = System.currentTimeMillis ();
-            t = t2 - t1;
-            System.out.printf (" %5d", t);
+    long t = 0;
+    for (int n = 0; n < 3; n++) {
+        Worker w = cw.newInstance ();
+        put (w, ACORN);
+        long t1 = System.currentTimeMillis ();
+        for (int i = 0; i < K; i++) {
+            w.step ();
         }
-        System.out.printf (": %6.1f frames/sec\n", K * 1000.0 / t);
+        long t2 = System.currentTimeMillis ();
+        t = t2 - t1;
+        System.out.printf (" %5d", t);
     }
+    System.out.printf (": %6.1f frames/sec\n", K * 1000.0 / t);
+}
 
-    private static void test (Worker w) throws Exception
-    {
-        test (new Hash_Reference(), w, 100);
-        measure (w.getClass ());
-    }
+private static void test (Worker w) throws Exception
+{
+    test (new Hash_Reference(), w, 100);
+    measure (w.getClass ());
+}
 {% endhighlight %}
 
 The Life implementation was passed as a class object rather than the instance object because we wanted clean fresh
@@ -613,9 +613,9 @@ In our first version, which we'll call "`Neighbours`" we'll have a virtual call 
 This is what we add to [`LongPoint`]({{ site.REPO-LIFE }}/blob/eb8bf3bf9809f6761eba891c0bea01b804ceb49c/LongPoint.java):
 
 {% highlight Java %}
-    public LongPoint[] neighbours ()
-    {
-        return new LongPoint[] {
+public LongPoint[] neighbours ()
+{
+    return new LongPoint[] {
                             new LongPoint (v-DX-DY),
                             new LongPoint (v-DX),
                             new LongPoint (v-DX+DY),
@@ -624,17 +624,17 @@ This is what we add to [`LongPoint`]({{ site.REPO-LIFE }}/blob/eb8bf3bf9809f6761
                             new LongPoint (v+DX-DY),
                             new LongPoint (v+DX),
                             new LongPoint (v+DX+DY)
-        };
-    }
+    };
+}
 {% endhighlight %}
 
 We'll override this method in all the other `LongPoint` classes. Here is the code from [`LongPoint3`]({{ site.REPO-LIFE }}/blob/eb8bf3bf9809f6761eba891c0bea01b804ceb49c/LongPoint3.java):
 
 {% highlight Java %}
-    @Override
-    public LongPoint[] neighbours ()
-    {
-        return new LongPoint[] {
+@Override
+public LongPoint[] neighbours ()
+{
+    return new LongPoint[] {
                             new LongPoint3 (v-DX-DY),
                             new LongPoint3 (v-DX),
                             new LongPoint3 (v-DX+DY),
@@ -643,8 +643,8 @@ We'll override this method in all the other `LongPoint` classes. Here is the cod
                             new LongPoint3 (v+DX-DY),
                             new LongPoint3 (v+DX),
                             new LongPoint3 (v+DX+DY)
-        };
-    }
+    };
+}
 {% endhighlight %}
 
 The factory class and `create()` method is still there -- we need it to initialise the field.
@@ -652,37 +652,37 @@ The factory class and `create()` method is still there -- we need it to initiali
 The `set()`, `reset()`, `inc()` and `dec()` methods in [`Hash_LongPoint`]({{ site.REPO-LIFE }}/blob/eb8bf3bf9809f6761eba891c0bea01b804ceb49c/Hash_LongPoint.java) will look like this:
     
 {% highlight Java %}
-    private void inc (LongPoint key)
-    {
-        Integer c = counts.get (key);
-        counts.put (key, c == null ? 1 : c+1);
-    }
+private void inc (LongPoint key)
+{
+    Integer c = counts.get (key);
+    counts.put (key, c == null ? 1 : c+1);
+}
 
-    private void dec (LongPoint key)
-    {
-        int c = counts.get (key)-1;
-        if (c != 0) {
-            counts.put (key, c);
-        } else {
-            counts.remove (key);
-        }
+private void dec (LongPoint key)
+{
+    int c = counts.get (key)-1;
+    if (c != 0) {
+        counts.put (key, c);
+    } else {
+        counts.remove (key);
     }
+}
     
-    void set (LongPoint k)
-    {
-        for (LongPoint p : k.neighbours ()) {
-            inc (p);
-        }
-        field.add (k);
+void set (LongPoint k)
+{
+    for (LongPoint p : k.neighbours ()) {
+        inc (p);
     }
+    field.add (k);
+}
     
-    void reset (LongPoint k)
-    {
-        for (LongPoint p : k.neighbours ()) {
-            dec (p);
-        }
-        field.remove (k);
+void reset (LongPoint k)
+{
+    for (LongPoint p : k.neighbours ()) {
+        dec (p);
     }
+    field.remove (k);
+}
 {% endhighlight %}
 
 Since we don't allocate objects in `inc()` and `dec()` anymore, we had to change their signatures to accept `LongPoint` rather than `long`.
@@ -691,45 +691,45 @@ Another alternative version (called `SetReset` and stored in [its own branch]({{
 fill and iterate a neighbour array. This is what [`LongPoint`]({{ site.REPO-LIFE }}/38382eebc6528a480391ea1cfe110edad5464567/LongPoint.java) looks like in this version:
 
 {% highlight Java %}
-    protected void inc (HashMap<LongPoint, Integer> counts, LongPoint key)
-    {
-        Integer c = counts.get (key);
-        counts.put (key, c == null ? 1 : c+1);
-    }
+protected void inc (HashMap<LongPoint, Integer> counts, LongPoint key)
+{
+    Integer c = counts.get (key);
+    counts.put (key, c == null ? 1 : c+1);
+}
 
-    protected void dec (HashMap<LongPoint, Integer> counts, LongPoint key)
-    {
-        int c = counts.get (key)-1;
-        if (c != 0) {
-            counts.put (key, c);
-        } else {
-            counts.remove (key);
-        }
+protected void dec (HashMap<LongPoint, Integer> counts, LongPoint key)
+{
+    int c = counts.get (key)-1;
+    if (c != 0) {
+        counts.put (key, c);
+    } else {
+        counts.remove (key);
     }
+}
 
-    public void inc (HashMap<LongPoint, Integer> counts)
-    {
-        inc (counts, new LongPoint (v-DX-DY));
-        inc (counts, new LongPoint (v-DX));
-        inc (counts, new LongPoint (v-DX+DY));
-        inc (counts, new LongPoint (v-DY));
-        inc (counts, new LongPoint (v+DY));
-        inc (counts, new LongPoint (v+DX-DY));
-        inc (counts, new LongPoint (v+DX));
-        inc (counts, new LongPoint (v+DX+DY));
-    }
+public void inc (HashMap<LongPoint, Integer> counts)
+{
+    inc (counts, new LongPoint (v-DX-DY));
+    inc (counts, new LongPoint (v-DX));
+    inc (counts, new LongPoint (v-DX+DY));
+    inc (counts, new LongPoint (v-DY));
+    inc (counts, new LongPoint (v+DY));
+    inc (counts, new LongPoint (v+DX-DY));
+    inc (counts, new LongPoint (v+DX));
+    inc (counts, new LongPoint (v+DX+DY));
+}
 
-    public void dec (HashMap<LongPoint, Integer> counts)
-    {
-        dec (counts, new LongPoint (v-DX-DY));
-        dec (counts, new LongPoint (v-DX));
-        dec (counts, new LongPoint (v-DX+DY));
-        dec (counts, new LongPoint (v-DY));
-        dec (counts, new LongPoint (v+DY));
-        dec (counts, new LongPoint (v+DX-DY));
-        dec (counts, new LongPoint (v+DX));
-        dec (counts, new LongPoint (v+DX+DY));
-    }
+public void dec (HashMap<LongPoint, Integer> counts)
+{
+    dec (counts, new LongPoint (v-DX-DY));
+    dec (counts, new LongPoint (v-DX));
+    dec (counts, new LongPoint (v-DX+DY));
+    dec (counts, new LongPoint (v-DY));
+    dec (counts, new LongPoint (v+DY));
+    dec (counts, new LongPoint (v+DX-DY));
+    dec (counts, new LongPoint (v+DX));
+    dec (counts, new LongPoint (v+DX+DY));
+}
 {% endhighlight %}
 
 Two `protected` methods are identical for all `LongPoint` classes and can be re-used; the other two must be overridden in all derived
@@ -738,17 +738,17 @@ classes.
 The appropriate place from [`Hash_LongPoint`](({{ site.REPO-LIFE }}/38382eebc6528a480391ea1cfe110edad5464567/Hash_LongPoint.java)) will look like this:
 
 {% highlight Java %}
-    void set (LongPoint k)
-    {
-        k.inc (counts);
-        field.add (k);
-    }
+void set (LongPoint k)
+{
+    k.inc (counts);
+    field.add (k);
+}
     
-    void reset (LongPoint k)
-    {
-        k.dec (counts);
-        field.remove (k);
-    }
+void reset (LongPoint k)
+{
+    k.dec (counts);
+    field.remove (k);
+}
 {% endhighlight %}
 
 I'll only run these versions for two of the versions -- say, `LongPoint4` (multiply by two big primes) and `LongPoint6` (modulo big prime).
@@ -823,20 +823,20 @@ so the best form of a factory is a singleton -- the class with exactly one insta
 (in `LongPoint3`):
 
 {% highlight Java %}
-    public static final LongPoint.Factory factory = new LongPoint.Factory ()
+public static final LongPoint.Factory factory = new LongPoint.Factory ()
+{
+    @Override
+    public LongPoint3 create (long v)
     {
-        @Override
-        public LongPoint3 create (long v)
-        {
-            return new LongPoint3 (v);
-        }
-    };
+        return new LongPoint3 (v);
+    }
+};
 {% endhighlight %}
 
 The code in the main class must then be changed accordingly:
 
 {% highlight Java %}
-        test (new Hash_LongPoint (LongPoint6.factory));
+test (new Hash_LongPoint (LongPoint6.factory));
 {% endhighlight %}
 
 The new code is [here]({{ site.REPO-LIFE }}/tree/d453e6ce16f603fa9c154102ff772285e26e974c). Again, the performance stays the same.

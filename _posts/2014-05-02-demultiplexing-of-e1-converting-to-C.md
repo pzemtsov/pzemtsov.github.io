@@ -186,13 +186,13 @@ Here I feel necessary to include some practical points on macro usage. Readers w
   invoked like this:
 
 {% highlight C++ %}
-    MOVE_BYTE (x+1, y);
+MOVE_BYTE (x+1, y);
 {% endhighlight %}
 
 It would have been expanded as
 
 {% highlight C++ %}
-    d[x+1] = src[y+x+1*32]
+d[x+1] = src[y+x+1*32]
 {% endhighlight %}
 
 and this is not quite what was intended.
@@ -428,7 +428,7 @@ macros must be created. I called them `DUP2_xx`.
 Using this macros, for instance, the sequence of `CALL_DEMUX` in the previous example (`Unrolled_3`) will become just
 
 {% highlight C++ %}
-    DUP_32 (CALL_DEMUX)
+DUP_32 (CALL_DEMUX)
 {% endhighlight %}
 
 Partially unrolled methods require service macro that relies on the name of the loop variable (`j`) and adds it to the

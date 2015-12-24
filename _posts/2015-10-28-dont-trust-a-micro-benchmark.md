@@ -14,21 +14,21 @@ we found why. **Java 7** optimised a constant division by replacing it with a mu
 The original hash function:
 
 {% highlight java %}
-    public int hashCode ()
-    {
-        return (int) (v % 946840871);
-    }
+public int hashCode ()
+{
+    return (int) (v % 946840871);
+}
 {% endhighlight %}
 
 The optimised hash function:
 
 {% highlight java %}
-    public int hashCode ()
-    {
-        long sign = v >> 63;
-        long div = ((v ** 2614885092524444427L) >> 91) - sign;
-        return (int) (v - div * 946840871);
-    }
+public int hashCode ()
+{
+    long sign = v >> 63;
+    long div = ((v ** 2614885092524444427L) >> 91) - sign;
+    return (int) (v - div * 946840871);
+}
 {% endhighlight %}
 
 **Java** does not support the operation that we indicated with `**`, which multiplies two 64-bit numbers and produces a 128-bit result.
@@ -122,17 +122,17 @@ Let's start with `LongPoint6.hashCode()`.
 The main part of [the code]({{ site.REPO-LIFE }}/blob/1739c873a562e8ecfc9d58979c2db5f95e10fa81/hashCode.asm) looks familiar -- we saw it when first analysing division-based hash in **Java 8**:
 
 {% highlight c-objdump %}
-  0x00007f49692c150c: mov    rdi,QWORD PTR [rsi+0x10]  ;*getfield v
-                                                ; - LongPoint6::hashCode@1 (line 21)
-  0x00007f49692c1510: mov    rsi,rdi
-  0x00007f49692c1513: mov    rdi,0x386fa527
-  0x00007f49692c151d: mov    rbx,rdi
-  0x00007f49692c1520: mov    rdi,rbx
-  0x00007f49692c1523: cmp    rbx,0x0
-  0x00007f49692c1527: je     0x00007f49692c1540
-  0x00007f49692c152d: call   0x00007f497e8e9960  ;*lrem
-                                                ; - LongPoint6::hashCode@7 (line 21)
-                                                ;   {runtime_call}
+0x00007f49692c150c: mov    rdi,QWORD PTR [rsi+0x10]  ;*getfield v
+                                              ; - LongPoint6::hashCode@1 (line 21)
+0x00007f49692c1510: mov    rsi,rdi
+0x00007f49692c1513: mov    rdi,0x386fa527
+0x00007f49692c151d: mov    rbx,rdi
+0x00007f49692c1520: mov    rdi,rbx
+0x00007f49692c1523: cmp    rbx,0x0
+0x00007f49692c1527: je     0x00007f49692c1540
+0x00007f49692c152d: call   0x00007f497e8e9960  ;*lrem
+                                              ; - LongPoint6::hashCode@7 (line 21)
+                                              ;   {runtime_call}
 {% endhighlight %}
 
 The remainder is calculated by calling a runtime routine, and the divisor is first compared with zero, which is completely unnecessary, as it is a freshly loaded known constant.
@@ -141,26 +141,26 @@ However, this method isn't really called -- or, rather, it stops being called as
 Let's look at this method. Here is the **Java** code:
 
 {% highlight java %}
-    private void inc (long w)
-    {
-        LongPoint key = factory.create (w);
-        Integer c = counts.get (key);
-        counts.put (key, c == null ? 1 : c+1);
-    }
+private void inc (long w)
+{
+    LongPoint key = factory.create (w);
+    Integer c = counts.get (key);
+    counts.put (key, c == null ? 1 : c+1);
+}
 {% endhighlight %}
 
 [The assembly code]({{ site.REPO-LIFE }}/blob/1739c873a562e8ecfc9d58979c2db5f95e10fa81/inc.asm) is quite long (1250 lines, 3487 bytes), and it contains a piece that also looks familiar:
 
 {% highlight c-objdump %}
-  0x00007f9d85334035: mov    r11,r9
-  0x00007f9d85334038: sar    r11,0x3f
-  0x00007f9d8533403c: mov    rax,0x2449f0232c624b0b
-  0x00007f9d85334046: imul   r9
-  0x00007f9d85334049: sar    rdx,0x1b
-  0x00007f9d8533404d: sub    rdx,r11
-  0x00007f9d85334050: imul   r11,rdx,0x386fa527
-  0x00007f9d85334057: mov    r8,r9
-  0x00007f9d8533405a: sub    r8,r11
+0x00007f9d85334035: mov    r11,r9
+0x00007f9d85334038: sar    r11,0x3f
+0x00007f9d8533403c: mov    rax,0x2449f0232c624b0b
+0x00007f9d85334046: imul   r9
+0x00007f9d85334049: sar    rdx,0x1b
+0x00007f9d8533404d: sub    rdx,r11
+0x00007f9d85334050: imul   r11,rdx,0x386fa527
+0x00007f9d85334057: mov    r8,r9
+0x00007f9d8533405a: sub    r8,r11
 {% endhighlight %}
 
 This is the optimised version of calculating a remainder, which we until now only saw in the code produced by **Java 7**. The conclusion we made previously that this optimisation had been
@@ -178,17 +178,17 @@ is no virtual call to `equals()` -- this operation is fully inlined and replaced
 `HashMap` helped there, too. The main loop of `HashMap.getNode()` looks like this:
 
 {% highlight java %}
-        do {
-            if (e.hash == hash &&
-                ((k = e.key) == key || (key != null && key.equals(k))))
-                return e;
-        } while ((e = e.next) != null);
+do {
+    if (e.hash == hash &&
+        ((k = e.key) == key || (key != null && key.equals(k))))
+        return e;
+} while ((e = e.next) != null);
 {% endhighlight %}
 
 The type detection and call de-virtualisation and inlining wouldn't have happened if the `equals()` call looked the other way around:
 
 {% highlight java %}
-                ((k = e.key) == key || && k.equals(key)))
+((k = e.key) == key || && k.equals(key)))
 {% endhighlight %}
 
 because we can't make any assumptions about the type of the object that's just been extracted from a data structure. The missing null check is hardly a compensation for that.
@@ -202,54 +202,54 @@ Similar work is done for `counts.put()` -- all relevant methods are inlined.
 By the way, a rather long piece of code is generated for `c+1`, because both `c` and the result are `Integer`, not `int`:
 
 {% highlight c-objdump %}
-  0x00007f9d85334105: mov    r10d,DWORD PTR [r10+0xc]
-  0x00007f9d85334109: inc    r10d               ;*invokestatic valueOf
-                                                ; - Hash_LongPoint::inc@43 (line 49)
+0x00007f9d85334105: mov    r10d,DWORD PTR [r10+0xc]
+0x00007f9d85334109: inc    r10d               ;*invokestatic valueOf
+                                              ; - Hash_LongPoint::inc@43 (line 49)
 
-  0x00007f9d8533410c: cmp    r10d,0xffffffffffffff80
-  0x00007f9d85334110: jl     0x00007f9d8533481d  ;*if_icmplt
-                                                ; - java.lang.Integer::valueOf@3 (line 830)
-                                                ; - Hash_LongPoint::inc@43 (line 49)
+0x00007f9d8533410c: cmp    r10d,0xffffffffffffff80
+0x00007f9d85334110: jl     0x00007f9d8533481d  ;*if_icmplt
+                                              ; - java.lang.Integer::valueOf@3 (line 830)
+                                              ; - Hash_LongPoint::inc@43 (line 49)
 
-  0x00007f9d85334116: cmp    r10d,0x7f
-  0x00007f9d8533411a: jg     0x00007f9d853346a9  ;*if_icmpgt
-                                                ; - java.lang.Integer::valueOf@10 (line 830)
-                                                ; - Hash_LongPoint::inc@43 (line 49)
+0x00007f9d85334116: cmp    r10d,0x7f
+0x00007f9d8533411a: jg     0x00007f9d853346a9  ;*if_icmpgt
+                                              ; - java.lang.Integer::valueOf@10 (line 830)
+                                              ; - Hash_LongPoint::inc@43 (line 49)
 
-  0x00007f9d85334120: mov    r8d,r10d
-  0x00007f9d85334123: add    r8d,0x80           ;*iadd
-                                                ; - java.lang.Integer::valueOf@20 (line 831)
-                                                ; - Hash_LongPoint::inc@43 (line 49)
+0x00007f9d85334120: mov    r8d,r10d
+0x00007f9d85334123: add    r8d,0x80           ;*iadd
+                                              ; - java.lang.Integer::valueOf@20 (line 831)
+                                              ; - Hash_LongPoint::inc@43 (line 49)
 
-  0x00007f9d8533412a: cmp    r8d,0x100
-  0x00007f9d85334131: jae    0x00007f9d853347c5
-  0x00007f9d85334137: movsxd r10,r10d
-  0x00007f9d8533413a: mov    r11,0x67092cd58    ;   {oop(a 'java/lang/Integer'[256] )}
-  0x00007f9d85334144: mov    r10d,DWORD PTR [r11+r10*4+0x210]
+0x00007f9d8533412a: cmp    r8d,0x100
+0x00007f9d85334131: jae    0x00007f9d853347c5
+0x00007f9d85334137: movsxd r10,r10d
+0x00007f9d8533413a: mov    r11,0x67092cd58    ;   {oop(a 'java/lang/Integer'[256] )}
+0x00007f9d85334144: mov    r10d,DWORD PTR [r11+r10*4+0x210]
 {% endhighlight %}
 
 The first instruction in this listing is unboxing (a field is read from the `Integer` object), the rest is boxing (or, rather, the main path of boxing).
 The reason the code is so long is that boxing isn't implemented as just `new Integer(i)`. Instead, `Integer.valueOf(i)` is called, which is optimised by using a cache:
 
 {% highlight c-objdump %}
-    public static Integer valueOf(int i) {
-        if (i >= IntegerCache.low && i <= IntegerCache.high)
-            return IntegerCache.cache[i + (-IntegerCache.low)];
-        return new Integer(i);
-    }
+public static Integer valueOf(int i) {
+    if (i >= IntegerCache.low && i <= IntegerCache.high)
+        return IntegerCache.cache[i + (-IntegerCache.low)];
+    return new Integer(i);
+}
 {% endhighlight %}
 
 Usually `IntegerCache.low` is &minus;128 and `IntegerCache.high` is 127 (there is a way to change the high value, but not the low one). This is where comparisons with 0x7f and 0x80
 come from. The next four lines perform the array index check:
 
 {% highlight c-objdump %}
-  0x00007f9d85334120: mov    r8d,r10d
-  0x00007f9d85334123: add    r8d,0x80           ;*iadd
-                                                ; - java.lang.Integer::valueOf@20 (line 831)
-                                                ; - Hash_LongPoint::inc@43 (line 49)
+0x00007f9d85334120: mov    r8d,r10d
+0x00007f9d85334123: add    r8d,0x80           ;*iadd
+                                              ; - java.lang.Integer::valueOf@20 (line 831)
+                                              ; - Hash_LongPoint::inc@43 (line 49)
 
-  0x00007f9d8533412a: cmp    r8d,0x100
-  0x00007f9d85334131: jae    0x00007f9d853347c5
+0x00007f9d8533412a: cmp    r8d,0x100
+0x00007f9d85334131: jae    0x00007f9d853347c5
 {% endhighlight %}
 
 Note how clever the compiler is to check both array boundaries using just one comparison -- the trick is to use the unsigned branch instruction `jae`, which
@@ -259,16 +259,16 @@ checks have already done the job. Even adding 0x80 is unnecessary, since this op
 The `Hash_LongPoint.dec()` looks very similar to `inc()` in **Java**:
 
 {% highlight java %}
-    private void dec (long w)
-    {
-        LongPoint key = factory.create (w);
-        int c = counts.get (key)-1;
-        if (c != 0) {
-            counts.put (key, c);
-        } else {
-            counts.remove (key);
-        }
+private void dec (long w)
+{
+    LongPoint key = factory.create (w);
+    int c = counts.get (key)-1;
+    if (c != 0) {
+        counts.put (key, c);
+    } else {
+        counts.remove (key);
     }
+}
 {% endhighlight %}
 
 and [is compiled in a similar way]({{ site.REPO-LIFE }}/blob/1739c873a562e8ecfc9d58979c2db5f95e10fa81/dec.asm), too. The assembly contains three occurrences of multiplication by 0x2449f0232c624b0b -- one for each `HashMap` operation.
@@ -278,33 +278,33 @@ Again, boxing required some extra code.
 The `Hash_LongPoint.set()` and `Hash_LongPoint.reset()` also demonstrate some degree of inlining. This is what they look like in **Java**:
 
 {% highlight java %}
-    void set (LongPoint k)
-    {
-        long w = k.v;
-        inc (w-DX-DY);
-        inc (w-DX);
-        inc (w-DX+DY);
-        inc (w-DY);
-        inc (w+DY);
-        inc (w+DX-DY);
-        inc (w+DX);
-        inc (w+DX+DY);
-        field.add (k);
-    }
+void set (LongPoint k)
+{
+    long w = k.v;
+    inc (w-DX-DY);
+    inc (w-DX);
+    inc (w-DX+DY);
+    inc (w-DY);
+    inc (w+DY);
+    inc (w+DX-DY);
+    inc (w+DX);
+    inc (w+DX+DY);
+    field.add (k);
+}
     
-    void reset (LongPoint k)
-    {
-        long w = k.v;
-        dec (w-DX-DY);
-        dec (w-DX);
-        dec (w-DX+DY);
-        dec (w-DY);
-        dec (w+DY);
-        dec (w+DX-DY);
-        dec (w+DX);
-        dec (w+DX+DY);
-        field.remove (k);
-    }
+void reset (LongPoint k)
+{
+    long w = k.v;
+    dec (w-DX-DY);
+    dec (w-DX);
+    dec (w-DX+DY);
+    dec (w-DY);
+    dec (w+DY);
+    dec (w+DX-DY);
+    dec (w+DX);
+    dec (w+DX+DY);
+    field.remove (k);
+}
 {% endhighlight %}
 
 They look very similar to each other in assembly, too (see [here]({{ site.REPO-LIFE }}/blob/1739c873a562e8ecfc9d58979c2db5f95e10fa81/set.asm)
@@ -315,25 +315,25 @@ hash map operation is inlined and produces one multiplication by 0x2449f0232c624
 Finally, there is `Hash_LongPoint.step()`:
 
 {% highlight java %}
-    @Override
-    public void step ()
-    {
-        ArrayList<LongPoint> toReset = new ArrayList<LongPoint> ();
-        ArrayList<LongPoint> toSet = new ArrayList<LongPoint> ();
-        for (LongPoint w : field) {
-            Integer c = counts.get (w);
-            if (c == null || c < 2 || c > 3) toReset.add (w);
-        }
-        for (LongPoint w : counts.keySet ()) {
-            if (counts.get (w) == 3 && ! field.contains (w)) toSet.add (w);
-        }
-        for (LongPoint w : toSet) {
-            set (w);
-        }
-        for (LongPoint w : toReset) {
-            reset (w);
-        }
+@Override
+public void step ()
+{
+    ArrayList<LongPoint> toReset = new ArrayList<LongPoint> ();
+    ArrayList<LongPoint> toSet = new ArrayList<LongPoint> ();
+    for (LongPoint w : field) {
+        Integer c = counts.get (w);
+        if (c == null || c < 2 || c > 3) toReset.add (w);
     }
+    for (LongPoint w : counts.keySet ()) {
+        if (counts.get (w) == 3 && ! field.contains (w)) toSet.add (w);
+    }
+    for (LongPoint w : toSet) {
+        set (w);
+    }
+    for (LongPoint w : toReset) {
+        reset (w);
+    }
+}
 {% endhighlight %}
 
 [The assembly output]({{ site.REPO-LIFE }}/blob/1739c873a562e8ecfc9d58979c2db5f95e10fa81/step.asm) for this method is very long (more than 5000 assembly lines). It contains three inlined hash map operations, each with inlined and optimised `hashCode()`.

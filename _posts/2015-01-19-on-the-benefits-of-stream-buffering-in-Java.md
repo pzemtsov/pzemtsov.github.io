@@ -100,7 +100,7 @@ After all, this is about `80` CPU cycles for each incoming byte. We should be ab
 One trivial line of code changes things dramatically:
 
 {% highlight Java %}
-        in = new BufferedInputStream (in);
+in = new BufferedInputStream (in);
 {% endhighlight %}
 
 (full source is [here]({{ page.REPO-BUFFER }}/commit/259397e2f89ab5cad35f2200871000abbf4e265e))
@@ -116,11 +116,11 @@ Each `read()` causes a system call, which involves a context switch. If we can a
 Of course, those four times for the length could be reduced to one by reading all four bytes at once:
 
 {% highlight Java %}
-    private static final int readInt (InputStream in) throws IOException
-    {
-        byte [] b = readBytes (in, 4);
-        return (((b[0] & 0xFF) << 24) + ((b[1] & 0xFF) << 16) + ((b[2] & 0xFF) << 8) + ((b[3] & 0xFF) << 0));
-    }
+private static final int readInt (InputStream in) throws IOException
+{
+    byte [] b = readBytes (in, 4);
+    return (((b[0] & 0xFF) << 24) + ((b[1] & 0xFF) << 16) + ((b[2] & 0xFF) << 8) + ((b[3] & 0xFF) << 0));
+}
 {% endhighlight %}
 
 (the code is [here]({{ page.REPO-BUFFER }}/commit/729c023f17947f92c2be2cb9edb5b3e8dc6f2130)).
@@ -180,7 +180,7 @@ array in `readInt`. To remove other memory allocations, we must modify the inter
 It will now receive a byte array and a length:
 
 {% highlight Java %}
-    private static void processMessage (byte [] type, byte [] msg, int len)
+private static void processMessage (byte [] type, byte [] msg, int len)
 {% endhighlight %}
 
 Note that this isn't just a change in method signature: it is also a change in its contract. Previously the
@@ -198,14 +198,14 @@ It allocates arrays for types and  messages, as well as the temporary array for
 `readInt()`. This is what the latter looks like:
 
 {% highlight Java %}
-    private static byte [] tmpBuf = new byte[4];
+private static byte [] tmpBuf = new byte[4];
     
-    private static final int readInt (InputStream in) throws IOException
-    {
-        byte[] b = tmpBuf;
-        readBytes (in, b, 4);
-        return (((b[0] & 0xFF) << 24) + ((b[1] & 0xFF) << 16) + ((b[2] & 0xFF) << 8) + ((b[3] & 0xFF) << 0));
-    }
+private static final int readInt (InputStream in) throws IOException
+{
+    byte[] b = tmpBuf;
+    readBytes (in, b, 4);
+    return (((b[0] & 0xFF) << 24) + ((b[1] & 0xFF) << 16) + ((b[2] & 0xFF) << 8) + ((b[3] & 0xFF) << 0));
+}
 {% endhighlight %}
 
 And this is the speed:
@@ -220,7 +220,7 @@ the compiler doesn't know that; it has to generate `null` and index check code. 
 of this theory is that if we replace the entire `return` statement in `readInt` with
 
 {% highlight Java %}
-        return 100;
+return 100;
 {% endhighlight %}
 
 the speed immediately becomes `602 MB/s`.
@@ -359,19 +359,19 @@ There is a simpler approach: we copy the leftover to the beginning of the buffer
 looks like [this]({{ page.REPO-BUFFER }}/commit/a450d5246931a351769d2e70bbdfdb991adc80b7):
 
 {% highlight Java %}
-    private static void ensure (int len, ByteChannel chan) throws IOException
-    {
-        if (buf.remaining () < len) {
-            buf.compact ();
+private static void ensure (int len, ByteChannel chan) throws IOException
+{
+    if (buf.remaining () < len) {
+        buf.compact ();
+        buf.flip ();
+        do {
+            buf.position (buf.limit ());
+            buf.limit (buf.capacity ());
+            chan.read (buf);
             buf.flip ();
-            do {
-                buf.position (buf.limit ());
-                buf.limit (buf.capacity ());
-                chan.read (buf);
-                buf.flip ();
-            } while (buf.remaining () < len);
-        }
+        } while (buf.remaining () < len);
     }
+}
 {% endhighlight %}
 
 I first wrote this version for simplicity -- the code looks easier to read than the original one. I expected lower performance due to more copying of
@@ -398,15 +398,15 @@ in byte buffers is ideal for clients that don't just accept byte blob as a messa
 for such operations. This is what the new inner loop of our test looks like:
 
 {% highlight Java %}
-        ByteBuffer msgBuf = buf.duplicate ();
+ByteBuffer msgBuf = buf.duplicate ();
 {% endhighlight %}
         
 {% highlight Java %}
-                ensure (len, chan);
-                msgBuf.limit (buf.position () + len);
-                msgBuf.position (buf.position ());
-                buf.position (buf.position () + len);
-                processMessage (type, msgBuf);
+ensure (len, chan);
+msgBuf.limit (buf.position () + len);
+msgBuf.position (buf.position ());
+buf.position (buf.position () + len);
+processMessage (type, msgBuf);
 {% endhighlight %}
 
 (the full code is [here]({{ page.REPO-BUFFER }}/commit/ece24bd35a5166de53fb83463aa9c191d1dd8585)).

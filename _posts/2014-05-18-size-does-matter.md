@@ -96,21 +96,21 @@ Let's look at the inner loop (the code between `.L29` and `jne .L29`). This loop
 which corresponds to the following transformation of the original code:
 
 {% highlight C++ %}
-        for (unsigned dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-            byte * d = dst [dst_num];
-            unsigned dst_pos_x_32 = 0;
-            for (unsigned dst_pos = 0; dst_pos < DST_SIZE; dst_pos += 8) {
-                d [dst_pos + 0] = src [dst_pos_x_32 +   0 + dst_num];
-                d [dst_pos + 1] = src [dst_pos_x_32 +  32 + dst_num];
-                d [dst_pos + 2] = src [dst_pos_x_32 +  64 + dst_num];
-                d [dst_pos + 3] = src [dst_pos_x_32 +  96 + dst_num];
-                d [dst_pos + 4] = src [dst_pos_x_32 + 128 + dst_num];
-                d [dst_pos + 5] = src [dst_pos_x_32 + 160 + dst_num];
-                d [dst_pos + 6] = src [dst_pos_x_32 + 192 + dst_num];
-                d [dst_pos + 7] = src [dst_pos_x_32 + 224 + dst_num];
-                dst_pos_x_32 += 256;
-            }
-        }
+for (unsigned dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+    byte * d = dst [dst_num];
+    unsigned dst_pos_x_32 = 0;
+    for (unsigned dst_pos = 0; dst_pos < DST_SIZE; dst_pos += 8) {
+        d [dst_pos + 0] = src [dst_pos_x_32 +   0 + dst_num];
+        d [dst_pos + 1] = src [dst_pos_x_32 +  32 + dst_num];
+        d [dst_pos + 2] = src [dst_pos_x_32 +  64 + dst_num];
+        d [dst_pos + 3] = src [dst_pos_x_32 +  96 + dst_num];
+        d [dst_pos + 4] = src [dst_pos_x_32 + 128 + dst_num];
+        d [dst_pos + 5] = src [dst_pos_x_32 + 160 + dst_num];
+        d [dst_pos + 6] = src [dst_pos_x_32 + 192 + dst_num];
+        d [dst_pos + 7] = src [dst_pos_x_32 + 224 + dst_num];
+        dst_pos_x_32 += 256;
+    }
+}
 {% endhighlight %}
 
 You can see that operation strength reduction has also happened: `dst_pos * 32` became a separate variable,
@@ -127,9 +127,9 @@ It is easy to see how registers are allocated:
 Here is the code for one assignment from the inner loop (after sorting out some instruction re-ordering):
 
 {% highlight c-objdump %}
-        leal    32(%rdx), %r10d
-        movzbl  (%rsi,%r10), %r8d
-        movb    %r8b, 1(%rdi,%rax)
+leal    32(%rdx), %r10d
+movzbl  (%rsi,%r10), %r8d
+movb    %r8b, 1(%rdi,%rax)
 {% endhighlight %}
 
 Why is there the `leal` instruction? All it does is that it adds 32 to `%rdx` and writes the result into `%r10d`.
@@ -138,8 +138,8 @@ register is added to it -- `%rsi` (`src`).  But wait, in Intel architecture an a
 two registers (one possibly scaled) and an offset; why is this `32` offset not placed right there, like this?
 
 {% highlight c-objdump %}
-        movzbl  32(%rsi,%rdx), %r8d
-        movb    %r8b, 1(%rdi,%rax)
+movzbl  32(%rsi,%rdx), %r8d
+movb    %r8b, 1(%rdi,%rax)
 {% endhighlight %}
 
 The hint comes from the name of the instruction (`leal`, rather than `leaq`), as well as the name of the result
@@ -171,7 +171,7 @@ In our example the multiplication was replaced with the addition (as a result of
 in 32 bits for numeric safety:
 
 {% highlight c-objdump %}
-        addl    $256, %edx
+addl    $256, %edx
 {% endhighlight %}
 
 The same applies to adding of the offsets (32, 64, etc) to `%edx`: these must also be done in 32 bits.
@@ -446,16 +446,16 @@ _ZNK12Dst_First_3a5demuxEPKhmPPh:
 The code looks much better than before. Each line of the inner loop produces two instructions instead of three now:
 
 {% highlight c-objdump %}
-        movzbl  32(%rdx), %r8d
-        movb    %r8b, 1(%rdi,%rax)
+movzbl  32(%rdx), %r8d
+movb    %r8b, 1(%rdi,%rax)
 {% endhighlight %}
 
 Previously there were these three lines:
 
 {% highlight c-objdump %}
-        leal    32(%rdx), %r10d
-        movzbl  (%rsi,%r10), %r8d
-        movb    %r8b, 1(%rdi,%rax)
+leal    32(%rdx), %r10d
+movzbl  (%rsi,%r10), %r8d
+movb    %r8b, 1(%rdi,%rax)
 {% endhighlight %}
 
 In fact, the code looks close to ideal, To improve the speed even more, something extraordinary must be done.
@@ -464,21 +464,21 @@ By the way, the compiler chose different route from what I suggested before (add
 in the effective address calculation). It employed different transformation of the source program:
 
 {% highlight C++ %}
-        for (unsigned dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-            byte * d = dst [dst_num];
-            byte * s = src + dst_num;
-            for (unsigned dst_pos = 0; dst_pos < DST_SIZE; dst_pos += 8) {
-                d [dst_pos + 0] = s [  0];
-                d [dst_pos + 1] = s [ 32];
-                d [dst_pos + 2] = s [ 64];
-                d [dst_pos + 3] = s [ 96];
-                d [dst_pos + 4] = s [128];
-                d [dst_pos + 5] = s [160];
-                d [dst_pos + 6] = s [192];
-                d [dst_pos + 7] = s [224];
-                s += 256;
-            }
-        }
+for (unsigned dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
+    byte * d = dst [dst_num];
+    byte * s = src + dst_num;
+    for (unsigned dst_pos = 0; dst_pos < DST_SIZE; dst_pos += 8) {
+        d [dst_pos + 0] = s [  0];
+        d [dst_pos + 1] = s [ 32];
+        d [dst_pos + 2] = s [ 64];
+        d [dst_pos + 3] = s [ 96];
+        d [dst_pos + 4] = s [128];
+        d [dst_pos + 5] = s [160];
+        d [dst_pos + 6] = s [192];
+        d [dst_pos + 7] = s [224];
+        s += 256;
+    }
+}
 {% endhighlight %}
 
 I don't think this new way is any faster (after all, address modes are free), but it looks neater.

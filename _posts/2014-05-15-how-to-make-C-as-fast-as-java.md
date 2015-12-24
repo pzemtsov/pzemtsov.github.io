@@ -145,6 +145,7 @@ _ZNK11Dst_First_15demuxEPKhjPPh:
 A quick look at the inner loop (the code between `.L52` and `.L50`) reveals that there is something that can be optimised there:
 
 {% highlight c-objdump %}
+
         movzbl  (%rsi,%r8), %r9d
         movq    (%rcx,%r10,8), %r8
         movb    %r9b, (%r8,%rax)

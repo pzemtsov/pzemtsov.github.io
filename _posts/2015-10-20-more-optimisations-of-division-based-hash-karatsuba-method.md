@@ -11,47 +11,47 @@ In ["{{ site.TITLE-DIVISION-HASH }}"]({{ site.ART-DIVISION-HASH }}) we optimised
 The idea was to replace a division operation with a multiplication by a reciprocal. In pseudo-code this replacement looked like this. The original hash function:
 
 {% highlight java %}
-    public int hashCode ()
-    {
-        return (int) (v % 946840871);
-    }
+public int hashCode ()
+{
+    return (int) (v % 946840871);
+}
 {% endhighlight %}
 
 The optimised hash function (for simplicity, we'll limit today's consideration to an unsigned version):
 
 {% highlight java %}
-    public int hashCode ()
-    {
-        long div = (v ** 2614885092524444427L) >> 91;
-        return (int) (v - div * 946840871);
-    }
+public int hashCode ()
+{
+    long div = (v ** 2614885092524444427L) >> 91;
+    return (int) (v - div * 946840871);
+}
 {% endhighlight %}
 
 This is a pseudo-code and not regular **Java**, because **Java** does not have operation `**`, which multiplies two 64-bit numbers and produces a 128-bit result.
 We've emulated this operation using the following code:
 
 {% highlight java %}
-    static long mult_unsigned_hipart (long x, long y)
-    {
-        long A = uhi (x);
-        long B = ulo (x);
-        long C = uhi (y);
-        long D = ulo (y);
+static long mult_unsigned_hipart (long x, long y)
+{
+    long A = uhi (x);
+    long B = ulo (x);
+    long C = uhi (y);
+    long D = ulo (y);
 
-        long AC = A * C;
-        long AD = A * D;
-        long BC = B * C;
-        long BD = B * D;
+    long AC = A * C;
+    long AD = A * D;
+    long BC = B * C;
+    long BD = B * D;
 
-        long ADl_BCl_BDh = ulo (AD) + ulo (BC) + uhi (BD);
-        return AC + uhi (AD) + uhi (BC) + uhi (ADl_BCl_BDh);
-    }
+    long ADl_BCl_BDh = ulo (AD) + ulo (BC) + uhi (BD);
+    return AC + uhi (AD) + uhi (BC) + uhi (ADl_BCl_BDh);
+}
 
-    public int hashCode ()
-    {
-        long div = mult_unsigned_hipart (v, 2614885092524444427L) >>> 27;
-        return (int) (v - div * 946840871);
-    }
+public int hashCode ()
+{
+    long div = mult_unsigned_hipart (v, 2614885092524444427L) >>> 27;
+    return (int) (v - div * 946840871);
+}
 {% endhighlight %}
 
 This implementation  uses five multiplications: four for a 64-bit multiplication, and one for computing a remainder. It also uses several additions.
@@ -105,15 +105,15 @@ In short, the sum of two 62-bit numbers and a high part of a 62-bit number is at
 to worry about. As a result, the multiplication routine can be simplified like this:
 
 {% highlight java %}
-    static long mult_unsigned_hipart_special (long x, long y)
-    {
-        long A = uhi (x);
-        long B = ulo (x);
-        long C = uhi (y);
-        long D = ulo (y);
+static long mult_unsigned_hipart_special (long x, long y)
+{
+    long A = uhi (x);
+    long B = ulo (x);
+    long C = uhi (y);
+    long D = ulo (y);
                    
-        return A*C + uhi (A*D + B*C + uhi (B*D));
-    }
+    return A*C + uhi (A*D + B*C + uhi (B*D));
+}
 {% endhighlight %}
 
 Note that we can't ignore the term `uhi (B*D)`. It may cause carry when added to the lower part of `A*D + B*C`. Let's assume
@@ -216,18 +216,18 @@ This means that (A + B) (C + D) is at most a 64-bit number, and the multiplicati
 AD + BC is at most a 63-bit number, and it won't cause an overflow when added to the high part of BD. Here is the code:
 
 {% highlight java %}
-    static long mult_unsigned_hipart_special (long x, long y)
-    {
-        long A = uhi (x);
-        long B = ulo (x);
-        long C = uhi (y);
-        long D = ulo (y);
+static long mult_unsigned_hipart_special (long x, long y)
+{
+    long A = uhi (x);
+    long B = ulo (x);
+    long C = uhi (y);
+    long D = ulo (y);
         
-        long AC = A * C;
-        long BD = B * D;
-        long AD_BC = (A+B) * (C+D) - (AC + BD);
-        return AC + uhi (AD_BC + uhi (BD));
-    }
+    long AC = A * C;
+    long BD = B * D;
+    long AD_BC = (A+B) * (C+D) - (AC + BD);
+    return AC + uhi (AD_BC + uhi (BD));
+}
 {% endhighlight %}
 
 Giving it a try
@@ -254,46 +254,46 @@ at all costs, this is nonsense. Let's look at the assembly outputs. This is the 
 
 
 {% highlight c-objdump %}
-  0x00007f101930c610: mov    r11,r10
-  0x00007f101930c613: shr    r11,0x20
-  0x00007f101930c617: mov    r8d,r10d
-  0x00007f101930c61a: imul   r9,r11,0x2449f023    ; C = 608825379
-  0x00007f101930c621: imul   rcx,r8,0x2c624b0b    ; D = 744639243
-  0x00007f101930c628: imul   r8,r8,0x2449f023     ; C = 608825379
-  0x00007f101930c62f: shr    rcx,0x20
-  0x00007f101930c633: imul   r11,r11,0x2c624b0b   ; D = 744639243
-  0x00007f101930c63a: add    r11,r8
-  0x00007f101930c63d: add    r11,rcx
-  0x00007f101930c640: shr    r11,0x20
-  0x00007f101930c644: add    r9,r11
-  0x00007f101930c647: sar    r9,0x1b
-  0x00007f101930c64b: imul   r11,r9,0x386fa527    ; 946840871
-  0x00007f101930c652: sub    r10,r11
-  0x00007f101930c655: mov    eax,r10d
+0x00007f101930c610: mov    r11,r10
+0x00007f101930c613: shr    r11,0x20
+0x00007f101930c617: mov    r8d,r10d
+0x00007f101930c61a: imul   r9,r11,0x2449f023    ; C = 608825379
+0x00007f101930c621: imul   rcx,r8,0x2c624b0b    ; D = 744639243
+0x00007f101930c628: imul   r8,r8,0x2449f023     ; C = 608825379
+0x00007f101930c62f: shr    rcx,0x20
+0x00007f101930c633: imul   r11,r11,0x2c624b0b   ; D = 744639243
+0x00007f101930c63a: add    r11,r8
+0x00007f101930c63d: add    r11,rcx
+0x00007f101930c640: shr    r11,0x20
+0x00007f101930c644: add    r9,r11
+0x00007f101930c647: sar    r9,0x1b
+0x00007f101930c64b: imul   r11,r9,0x386fa527    ; 946840871
+0x00007f101930c652: sub    r10,r11
+0x00007f101930c655: mov    eax,r10d
 {% endhighlight %}
  
 And this is the code for `LongPoint63`:
 
 {% highlight c-objdump %}
-  0x00007fac89309750: mov    r11,r10
-  0x00007fac89309753: shr    r11,0x20
-  0x00007fac89309757: mov    r8d,r10d
-  0x00007fac8930975a: mov    r9,r11
-  0x00007fac8930975d: add    r9,r8
-  0x00007fac89309760: imul   r11,r11,0x2449f023   ; C = 608825379
-  0x00007fac89309767: imul   r9,r9,0x50ac3b2e     ; C + D
-  0x00007fac8930976e: imul   r8,r8,0x2c624b0b     ; D = 744639243
-  0x00007fac89309775: mov    rcx,r11
-  0x00007fac89309778: add    rcx,r8
-  0x00007fac8930977b: sub    r9,rcx
-  0x00007fac8930977e: shr    r8,0x20
-  0x00007fac89309782: add    r9,r8
-  0x00007fac89309785: shr    r9,0x20
-  0x00007fac89309789: add    r9,r11
-  0x00007fac8930978c: shr    r9,0x1b
-  0x00007fac89309790: imul   r11,r9,0x386fa527    ; 946840871
-  0x00007fac89309797: sub    r10,r11
-  0x00007fac8930979a: mov    eax,r10d
+0x00007fac89309750: mov    r11,r10
+0x00007fac89309753: shr    r11,0x20
+0x00007fac89309757: mov    r8d,r10d
+0x00007fac8930975a: mov    r9,r11
+0x00007fac8930975d: add    r9,r8
+0x00007fac89309760: imul   r11,r11,0x2449f023   ; C = 608825379
+0x00007fac89309767: imul   r9,r9,0x50ac3b2e     ; C + D
+0x00007fac8930976e: imul   r8,r8,0x2c624b0b     ; D = 744639243
+0x00007fac89309775: mov    rcx,r11
+0x00007fac89309778: add    rcx,r8
+0x00007fac8930977b: sub    r9,rcx
+0x00007fac8930977e: shr    r8,0x20
+0x00007fac89309782: add    r9,r8
+0x00007fac89309785: shr    r9,0x20
+0x00007fac89309789: add    r9,r11
+0x00007fac8930978c: shr    r9,0x1b
+0x00007fac89309790: imul   r11,r9,0x386fa527    ; 946840871
+0x00007fac89309797: sub    r10,r11
+0x00007fac8930979a: mov    eax,r10d
 {% endhighlight %}
 
 The first code has more multiplications (five instead of four), but less instructions in total (16 vs 19). Three ordinary instructions can't compensate for one multiplication,

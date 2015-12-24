@@ -21,10 +21,10 @@ The function in question
 Let's repeat the [source code]({{ site.REPO-LIFE }}/blob/28d4e13343b954bdaa4eab3ab27693debd8ce348/LongPoint6.java) of `LongPoint6.hashCode()`:
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        return (int) (v % 946840871);
-    }
+public int hashCode ()
+{
+    return (int) (v % 946840871);
+}
 {% endhighlight %}
 
 The constant 946840871 was a completely arbitrary choice of a divisor. It's a prime number and it is relatively big
@@ -38,36 +38,36 @@ by looking at the generated code (see the [previous article]({{ site.ART-MEASURI
 Let's start with the **Java 7**:
 
 {% highlight c-objdump %}
-  0x00007f88e10684a0: sub    rsp,0x18
-  0x00007f88e10684a7: mov    QWORD PTR [rsp+0x10],rbp  ;*synchronization entry
-                                                ; - LongPoint6::hashCode@-1 (line 30)
-  0x00007f88e10684ac: mov    r10,QWORD PTR [rsi+0x10]  ;*getfield v
-                                                ; - LongPoint6::hashCode@1 (line 30)
-  0x00007f88e10684b0: mov    r11,r10
-  0x00007f88e10684b3: sar    r11,0x3f
-  0x00007f88e10684b7: mov    rax,0x2449f0232c624b0b
-  0x00007f88e10684c1: imul   r10
-  0x00007f88e10684c4: sar    rdx,0x1b
-  0x00007f88e10684c8: sub    rdx,r11
-  0x00007f88e10684cb: imul   r11,rdx,0x386fa527
-  0x00007f88e10684d2: sub    r10,r11
-  0x00007f88e10684d5: mov    eax,r10d           ;*l2i  ; - LongPoint6::hashCode@8 (line 30)
-  0x00007f88e10684d8: add    rsp,0x10
-  0x00007f88e10684dc: pop    rbp
-  0x00007f88e10684dd: test   DWORD PTR [rip+0xb74fb1d],eax        # 0x00007f88ec7b8000
-                                                ;   {poll_return}
-  0x00007f88e10684e3: ret    
+0x00007f88e10684a0: sub    rsp,0x18
+0x00007f88e10684a7: mov    QWORD PTR [rsp+0x10],rbp  ;*synchronization entry
+                                              ; - LongPoint6::hashCode@-1 (line 30)
+0x00007f88e10684ac: mov    r10,QWORD PTR [rsi+0x10]  ;*getfield v
+                                              ; - LongPoint6::hashCode@1 (line 30)
+0x00007f88e10684b0: mov    r11,r10
+0x00007f88e10684b3: sar    r11,0x3f
+0x00007f88e10684b7: mov    rax,0x2449f0232c624b0b
+0x00007f88e10684c1: imul   r10
+0x00007f88e10684c4: sar    rdx,0x1b
+0x00007f88e10684c8: sub    rdx,r11
+0x00007f88e10684cb: imul   r11,rdx,0x386fa527
+0x00007f88e10684d2: sub    r10,r11
+0x00007f88e10684d5: mov    eax,r10d           ;*l2i  ; - LongPoint6::hashCode@8 (line 30)
+0x00007f88e10684d8: add    rsp,0x10
+0x00007f88e10684dc: pop    rbp
+0x00007f88e10684dd: test   DWORD PTR [rip+0xb74fb1d],eax        # 0x00007f88ec7b8000
+                                              ;   {poll_return}
+0x00007f88e10684e3: ret    
 {% endhighlight %}
  
 There aren't any division instructions in the code. The pseudo-code looks like this:
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        long sign = v >> 63;
-        long div = ((v ** 2614885092524444427L) >> 91) - sign;
-        return (int) (v - div * 946840871);
-    }
+public int hashCode ()
+{
+    long sign = v >> 63;
+    long div = ((v ** 2614885092524444427L) >> 91) - sign;
+    return (int) (v - div * 946840871);
+}
 {% endhighlight %}
  
 I call this pseudo-code rather than just code because it contains an operation that is not accessible in **Java**:
@@ -84,33 +84,33 @@ for unsigned numbers, it could save three instructions here.
 The **Java 8** code looks like this:
 
 {% highlight c-objdump %}
-  0x0000000002989a00: mov    DWORD PTR [rsp-0x6000],eax
-  0x0000000002989a07: push   rbp
-  0x0000000002989a08: sub    rsp,0x50           ;*aload_0
-                                                ; - LongPoint6::hashCode@0 (line 30)
+0x0000000002989a00: mov    DWORD PTR [rsp-0x6000],eax
+0x0000000002989a07: push   rbp
+0x0000000002989a08: sub    rsp,0x50           ;*aload_0
+                                              ; - LongPoint6::hashCode@0 (line 30)
 
-  0x0000000002989a0c: mov    rcx,QWORD PTR [rdx+0x10]  ;*getfield v
-                                                ; - LongPoint6::hashCode@1 (line 30)
+0x0000000002989a0c: mov    rcx,QWORD PTR [rdx+0x10]  ;*getfield v
+                                              ; - LongPoint6::hashCode@1 (line 30)
 
-  0x0000000002989a10: mov    rdx,rcx
-  0x0000000002989a13: movabs rcx,0x386fa527
-  0x0000000002989a1d: mov    rsi,rcx
-  0x0000000002989a20: mov    rcx,rsi
-  0x0000000002989a23: cmp    rsi,0x0
-  0x0000000002989a27: je     0x0000000002989a40
-  0x0000000002989a2d: call   0x000000006fe379a0  ;*lrem
-                                                ; - LongPoint6::hashCode@7 (line 30)
-                                                ;   {runtime_call}
-  0x0000000002989a32: mov    eax,eax
-  0x0000000002989a34: add    rsp,0x50
-  0x0000000002989a38: pop    rbp
-  0x0000000002989a39: test   DWORD PTR [rip+0xfffffffffd7a66c1],eax        # 0x0000000000130100
-                                                ;   {poll_return}
-  0x0000000002989a3f: ret
-  0x0000000002989a40: call   0x0000000002959c80  ; OopMap{off=101}
-                                                ;*lrem
-                                                ; - LongPoint6::hashCode@7 (line 30)
-                                                ;   {runtime_call}
+0x0000000002989a10: mov    rdx,rcx
+0x0000000002989a13: movabs rcx,0x386fa527
+0x0000000002989a1d: mov    rsi,rcx
+0x0000000002989a20: mov    rcx,rsi
+0x0000000002989a23: cmp    rsi,0x0
+0x0000000002989a27: je     0x0000000002989a40
+0x0000000002989a2d: call   0x000000006fe379a0  ;*lrem
+                                              ; - LongPoint6::hashCode@7 (line 30)
+                                              ;   {runtime_call}
+0x0000000002989a32: mov    eax,eax
+0x0000000002989a34: add    rsp,0x50
+0x0000000002989a38: pop    rbp
+0x0000000002989a39: test   DWORD PTR [rip+0xfffffffffd7a66c1],eax        # 0x0000000000130100
+                                              ;   {poll_return}
+0x0000000002989a3f: ret
+0x0000000002989a40: call   0x0000000002959c80  ; OopMap{off=101}
+                                              ;*lrem
+                                              ; - LongPoint6::hashCode@7 (line 30)
+                                              ;   {runtime_call}
 {% endhighlight %}
 
 This code does not employ any optimisations. It does not even compile the remainder operation into `DIV` or `IDIV`
@@ -164,24 +164,24 @@ Both will be interpreted as unsigned 64-bit values. Each of the terms `AC`, `AD`
 The low part of the result can be calculated by the obvious code:
 
 {% highlight Java %}
-    long mult_unsigned_lopart (long x, long y)
-    {
-        long A = uhi (x);
-        long B = ulo (x);
-        long C = uhi (y);
-        long D = ulo (y);
-        return B*D + ((A*D + B*C) << 32);
-    }
+long mult_unsigned_lopart (long x, long y)
+{
+    long A = uhi (x);
+    long B = ulo (x);
+    long C = uhi (y);
+    long D = ulo (y);
+    return B*D + ((A*D + B*C) << 32);
+}
 
-    long uhi (long x)
-    {
-        return hi (x) & 0xFFFFFFFFL;
-    }
+long uhi (long x)
+{
+    return hi (x) & 0xFFFFFFFFL;
+}
 
-    long ulo (long x)
-    {
-        return lo (x) & 0xFFFFFFFFL;
-    }
+long ulo (long x)
+{
+    return lo (x) & 0xFFFFFFFFL;
+}
 
 {% endhighlight %}
 
@@ -189,15 +189,15 @@ Note the `uhi` and `ulo` functions ("unsigned `hi`" and "unsigned `lo`") and the
 we used to extract integer parts of a value stored as `long`:
 
 {% highlight Java %}
-    public static int hi (long w)
-    {
-        return (int) (w >>> 32);
-    }
+public static int hi (long w)
+{
+    return (int) (w >>> 32);
+}
 
-    public static int lo (long w)
-    {
-        return (int) w;
-    }
+public static int lo (long w)
+{
+    return (int) w;
+}
 {% endhighlight %}
 
 These functions return `int`, which, if directly converted to `long`, will be sign-extended, which will corrupt the results.
@@ -236,14 +236,14 @@ the multiplication result by 91, which totally ignores the low part of the produ
 It may seem that the following code will calculate the high part:
 
 {% highlight Java %}
-    static long mult_unsigned_hipart (long x, long y)
-    {
-        long A = uhi (x);
-        long B = ulo (x);
-        long C = uhi (y);
-        long D = ulo (y);
-        return A*C + ((A*D + B*C) >>> 32);
-    }
+static long mult_unsigned_hipart (long x, long y)
+{
+    long A = uhi (x);
+    long B = ulo (x);
+    long C = uhi (y);
+    long D = ulo (y);
+    return A*C + ((A*D + B*C) >>> 32);
+}
 {% endhighlight %}
 
 This, however, does not work --  for two reasons. One is that `(A*D + B*C)` can occupy 65 bits (a carry bit may be produced
@@ -252,31 +252,31 @@ produce carry when its high part is added to the low part of `A*D + B*C`. We hav
 and add all the carry bits manually, according to the picture above:
 
 {% highlight Java %}
-    static long mult_unsigned_hipart (long x, long y)
-    {
-        long A = uhi (x);
-        long B = ulo (x);
-        long C = uhi (y);
-        long D = ulo (y);
+static long mult_unsigned_hipart (long x, long y)
+{
+    long A = uhi (x);
+    long B = ulo (x);
+    long C = uhi (y);
+    long D = ulo (y);
 
-        long AC = A * C;
-        long AD = A * D;
-        long BC = B * C;
-        long BD = B * D;
+    long AC = A * C;
+    long AD = A * D;
+    long BC = B * C;
+    long BD = B * D;
 
-        long ADl_BCl_BDh = ulo (AD) + ulo (BC) + uhi (BD);
-        return AC + uhi (AD) + uhi (BC) + uhi (ADl_BCl_BDh);
-    }
+    long ADl_BCl_BDh = ulo (AD) + ulo (BC) + uhi (BD);
+    return AC + uhi (AD) + uhi (BC) + uhi (ADl_BCl_BDh);
+}
 {% endhighlight %}
 
 Now it is very easy to program the hash function:
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        long div = mult_unsigned_hipart (v, 2614885092524444427L) >> 27;
-        return (int) (v - div * 946840871);
-    }
+public int hashCode ()
+{
+    long div = mult_unsigned_hipart (v, 2614885092524444427L) >> 27;
+    return (int) (v - div * 946840871);
+}
 {% endhighlight %}
 
 It seems very unlikely that this monster will work faster than the original code. It contains five multiplications, one
@@ -309,13 +309,13 @@ remainder. Since the remainder was zero or negative before, it won't exceed the 
 in which case we need to add a divisor again:
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        int r = (int) (v % 946840871);
-        if (v < 0) r += 518863773;
-        if (r < 0) r += 946840871;
-        return r;
-    }
+public int hashCode ()
+{
+    int r = (int) (v % 946840871);
+    if (v < 0) r += 518863773;
+    if (r < 0) r += 946840871;
+    return r;
+}
 {% endhighlight %}
 
 Here are the slot counts we got with signed division (see [here]({{ site.ART-LIFE }})):
@@ -372,32 +372,32 @@ Here sign(v) is a 32-bit sign extension of v. Note that BD must not be sign-exte
 These sign manipulations can be implemented very easily by using `hi` and `lo` instead of `uhi` and `ulo` where appropriate:
 
 {% highlight Java %}
-    static long mult_signed_hipart (long x, long y)
-    {
-        long A = hi (x);
-        long B = ulo (x);
-        long C = hi (y);
-        long D = ulo (y);
+static long mult_signed_hipart (long x, long y)
+{
+    long A = hi (x);
+    long B = ulo (x);
+    long C = hi (y);
+    long D = ulo (y);
                    
-        long AC = A * C;
-        long AD = A * D;
-        long BC = B * C;
-        long BD = B * D;
+    long AC = A * C;
+    long AD = A * D;
+    long BC = B * C;
+    long BD = B * D;
         
-        long ADl_BCl_BDh = ulo (AD) + ulo (BC) + uhi (BD);
-        return AC + hi (AD) + hi (BC) + uhi (ADl_BCl_BDh);
-    }
+    long ADl_BCl_BDh = ulo (AD) + ulo (BC) + uhi (BD);
+    return AC + hi (AD) + hi (BC) + uhi (ADl_BCl_BDh);
+}
 {% endhighlight %}
 
 Finally, the signed version of the hash function:
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        long sign = v >> 63;
-        long div = (mult_signed_hipart (v, 2614885092524444427L) >> 27) - sign;
-        return (int) (v - div * 946840871);
-    }
+public int hashCode ()
+{
+    long sign = v >> 63;
+    long div = (mult_signed_hipart (v, 2614885092524444427L) >> 27) - sign;
+    return (int) (v - div * 946840871);
+}
 {% endhighlight %}
 
 Performance measurements

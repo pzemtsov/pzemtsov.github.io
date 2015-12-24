@@ -38,29 +38,29 @@ the others pack them into a `long`, high 32 bits being used for `x` and low ones
 <p></p>
 
 {% highlight Java %}
-    public final int hashCode ()
-    {
-        return x * 3 + y * 5;
-    }
+public final int hashCode ()
+{
+    return x * 3 + y * 5;
+}
 {% endhighlight %}
 
 - `java.lang.Long`
 <p></p>
 
 {% highlight Java %}
-    public int hashCode() {
-        return (int)(value ^ (value >>> 32));
-    }
+public int hashCode() {
+    return (int)(value ^ (value >>> 32));
+}
 {% endhighlight %}
 
 - `LongPoint`
 <p></p>
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        return hi(v) * 3 + lo(v) * 5;
-    }
+public int hashCode ()
+{
+    return hi(v) * 3 + lo(v) * 5;
+}
 {% endhighlight %}
 
 (with the obvious definitions of `hi()` and `lo()`)
@@ -69,60 +69,60 @@ the others pack them into a `long`, high 32 bits being used for `x` and low ones
 <p></p>
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        return hi(v) * 11 + lo(v) * 17;
-    }
+public int hashCode ()
+{
+    return hi(v) * 11 + lo(v) * 17;
+}
 {% endhighlight %}
 
 - `LongPoint4`
 <p></p>
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        return hi(v) * 1735499 + lo(v) * 7436369;
-    }
+public int hashCode ()
+{
+    return hi(v) * 1735499 + lo(v) * 7436369;
+}
 {% endhighlight %}
 
 - `LongPoint5`
 <p></p>
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        long x = v * 541725397157L;
-        return lo(x) ^ hi(x);
-    }
+public int hashCode ()
+{
+    long x = v * 541725397157L;
+    return lo(x) ^ hi(x);
+}
 {% endhighlight %}
 
 - `LongPoint6`
 <p></p>
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        return (int) (v % 946840871);
-    }
+public int hashCode ()
+{
+    return (int) (v % 946840871);
+}
 {% endhighlight %}
 
 - `LongPoint7`
 <p></p>
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        java.util.zip.CRC32 crc = new java.util.zip.CRC32 ();
-        crc.update ((int)(v>>> 0) & 0xFF);
-        crc.update ((int)(v >>> 8) & 0xFF);
-        crc.update ((int)(v >>> 16) & 0xFF);
-        crc.update ((int)(v >>> 24) & 0xFF);
-        crc.update ((int)(v >>> 32) & 0xFF);
-        crc.update ((int)(v >>> 40) & 0xFF);
-        crc.update ((int)(v >>> 48) & 0xFF);
-        crc.update ((int)(v >>> 56) & 0xFF);
-        return (int) crc.getValue ();
-    }
+public int hashCode ()
+{
+    java.util.zip.CRC32 crc = new java.util.zip.CRC32 ();
+    crc.update ((int)(v>>> 0) & 0xFF);
+    crc.update ((int)(v >>> 8) & 0xFF);
+    crc.update ((int)(v >>> 16) & 0xFF);
+    crc.update ((int)(v >>> 24) & 0xFF);
+    crc.update ((int)(v >>> 32) & 0xFF);
+    crc.update ((int)(v >>> 40) & 0xFF);
+    crc.update ((int)(v >>> 48) & 0xFF);
+    crc.update ((int)(v >>> 56) & 0xFF);
+    return (int) crc.getValue ();
+}
 {% endhighlight %}
 
 
@@ -130,10 +130,10 @@ Let's add another one, `NullPoint`:
 <p></p>
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        return 0;
-    }
+public int hashCode ()
+{
+    return 0;
+}
 {% endhighlight %}
 
 
@@ -293,50 +293,50 @@ is interesting because it gives unforeseen insight into the default implementati
 I'm only showing the main loop here. I've also replaced jump targets with labels:
 
 {% highlight c-objdump %}
-  VIRTUAL_CALL:
-  0x00007f592cc39257: mov    QWORD PTR [rsp+0x8],r13
-  0x00007f592cc3925c: mov    DWORD PTR [rsp],ebx
-  0x00007f592cc3925f: mov    rsi,r13
-  0x00007f592cc39262: xchg   ax,ax
-  0x00007f592cc39265: mov    rax,0xffffffffffffffff  ;   {oop(NULL)}
-  0x00007f592cc3926f: call   0x00007f592cc0fd60  ; OopMap{[8]=Oop off=84}
-                                                ;*invokevirtual hashCode
-                                                ; - HashTime::iterate@8 (line 8)
-                                                ;   {virtual_call}
-  0x00007f592cc39274: mov    ebx,DWORD PTR [rsp]
-  0x00007f592cc39277: mov    r13,QWORD PTR [rsp+0x8]
-  0x00007f592cc3927c: nop    DWORD PTR [rax+0x0]  ;*invokevirtual hashCode
-                                                ; - HashTime::iterate@8 (line 8)
-  MAIN_LOOP:
-  0x00007f592cc39280: inc    ebp                ; OopMap{r13=Oop off=98}
-                                                ;*goto
-                                                ; - HashTime::iterate@15 (line 7)
-  0x00007f592cc39282: test   DWORD PTR [rip+0x8b13d78],eax        # 0x00007f593574d000
-                                                ;*iload_3
-                                                ; - HashTime::iterate@2 (line 7)
-                                                ;   {poll}
-  0x00007f592cc39288: cmp    ebp,ebx
-  0x00007f592cc3928a: jge    END_OF_LOOP        ;*if_icmpge
-                                                ; - HashTime::iterate@4 (line 7)
-  L1:
-  0x00007f592cc3928c: mov    r11d,DWORD PTR [r13+0x8]  ; implicit exception: dispatches to 0x00007f592cc392d6
-  0x00007f592cc39290: mov    r10,QWORD PTR [r12+r11*8+0x208]
-  0x00007f592cc39298: mov    r11,0x40c802248    ;   {oop({method} 'hashCode' '()I' in 'java/lang/Object')}
-  0x00007f592cc392a2: cmp    r10,r11
-  0x00007f592cc392a5: jne    VIRTUAL_CALL
-  L2:
-  0x00007f592cc392a7: mov    r10,QWORD PTR [r13+0x0]
-  0x00007f592cc392ab: mov    r11,r10
-  0x00007f592cc392ae: and    r11,0x7
-  0x00007f592cc392b2: cmp    r11,0x1
-  0x00007f592cc392b6: jne    VIRTUAL_CALL
-  0x00007f592cc392b8: shr    r10,0x8
-  0x00007f592cc392bc: mov    r10d,r10d
-  0x00007f592cc392bf: test   r10d,0x7fffffff
-  L3:
-  0x00007f592cc392c6: jne    MAIN_LOOP
-  0x00007f592cc392c8: jmp    VIRTUAL_CALL
-  END_OF_LOOP:
+VIRTUAL_CALL:
+0x00007f592cc39257: mov    QWORD PTR [rsp+0x8],r13
+0x00007f592cc3925c: mov    DWORD PTR [rsp],ebx
+0x00007f592cc3925f: mov    rsi,r13
+0x00007f592cc39262: xchg   ax,ax
+0x00007f592cc39265: mov    rax,0xffffffffffffffff  ;   {oop(NULL)}
+0x00007f592cc3926f: call   0x00007f592cc0fd60  ; OopMap{[8]=Oop off=84}
+                                              ;*invokevirtual hashCode
+                                              ; - HashTime::iterate@8 (line 8)
+                                              ;   {virtual_call}
+0x00007f592cc39274: mov    ebx,DWORD PTR [rsp]
+0x00007f592cc39277: mov    r13,QWORD PTR [rsp+0x8]
+0x00007f592cc3927c: nop    DWORD PTR [rax+0x0]  ;*invokevirtual hashCode
+                                              ; - HashTime::iterate@8 (line 8)
+MAIN_LOOP:
+0x00007f592cc39280: inc    ebp                ; OopMap{r13=Oop off=98}
+                                              ;*goto
+                                              ; - HashTime::iterate@15 (line 7)
+0x00007f592cc39282: test   DWORD PTR [rip+0x8b13d78],eax        # 0x00007f593574d000
+                                              ;*iload_3
+                                              ; - HashTime::iterate@2 (line 7)
+                                              ;   {poll}
+0x00007f592cc39288: cmp    ebp,ebx
+0x00007f592cc3928a: jge    END_OF_LOOP        ;*if_icmpge
+                                              ; - HashTime::iterate@4 (line 7)
+L1:
+0x00007f592cc3928c: mov    r11d,DWORD PTR [r13+0x8]  ; implicit exception: dispatches to 0x00007f592cc392d6
+0x00007f592cc39290: mov    r10,QWORD PTR [r12+r11*8+0x208]
+0x00007f592cc39298: mov    r11,0x40c802248    ;   {oop({method} 'hashCode' '()I' in 'java/lang/Object')}
+0x00007f592cc392a2: cmp    r10,r11
+0x00007f592cc392a5: jne    VIRTUAL_CALL
+L2:
+0x00007f592cc392a7: mov    r10,QWORD PTR [r13+0x0]
+0x00007f592cc392ab: mov    r11,r10
+0x00007f592cc392ae: and    r11,0x7
+0x00007f592cc392b2: cmp    r11,0x1
+0x00007f592cc392b6: jne    VIRTUAL_CALL
+0x00007f592cc392b8: shr    r10,0x8
+0x00007f592cc392bc: mov    r10d,r10d
+0x00007f592cc392bf: test   r10d,0x7fffffff
+L3:
+0x00007f592cc392c6: jne    MAIN_LOOP
+0x00007f592cc392c8: jmp    VIRTUAL_CALL
+END_OF_LOOP:
 {% endhighlight %}
 
 Some comments:
@@ -357,19 +357,19 @@ which is called a mark word. In particular, it checks if the three least signifi
 the bits 8 to 38 contain non-zero value. In pseudo-code this can be represented like this:
 
 {% highlight Java %}
-    static void iterate (int N, Object x)
-    {
-        for (int i = 0; i < N; i++) {
-            long markWord;
-            if (x.virtualTable.hashCode == Object.hashCode
-                && ((markWord = x.markWord) & 7) == 1
-                && ((markWord >> 8) & 0x7FFFFFFF) != 0
-               )
-                ; // do nothing
-            else
-                vm.callVirtual (x, hashCode);
-        }
+static void iterate (int N, Object x)
+{
+    for (int i = 0; i < N; i++) {
+        long markWord;
+        if (x.virtualTable.hashCode == Object.hashCode
+            && ((markWord = x.markWord) & 7) == 1
+            && ((markWord >> 8) & 0x7FFFFFFF) != 0
+           )
+            ; // do nothing
+        else
+            vm.callVirtual (x, hashCode);
     }
+}
 {% endhighlight %}
 
 These checks are not part of a general-purpose method dispatch; for instance, they are not present in the examples
@@ -418,57 +418,53 @@ five attempts to compile the `HashTime.iterate()` method, the Hotspot compiler g
 code of the method):
 
 {% highlight c-objdump %}
-  0x00007fbff92b7e00: mov    DWORD PTR [rsp-0x14000],eax
-  0x00007fbff92b7e07: push   rbp
-  0x00007fbff92b7e08: sub    rsp,0x20           ;*synchronization entry
-                                                ; - HashTime::iterate@-1 (line 7)
+0x00007fbff92b7e00: mov    DWORD PTR [rsp-0x14000],eax
+0x00007fbff92b7e07: push   rbp
+0x00007fbff92b7e08: sub    rsp,0x20           ;*synchronization entry
+                                              ; - HashTime::iterate@-1 (line 7)
 
-  0x00007fbff92b7e0c: test   edx,edx
-  0x00007fbff92b7e0e: jle    RETURN             ;*if_icmpge
-                                                ; - HashTime::iterate@4 (line 7)
+0x00007fbff92b7e0c: test   edx,edx
+0x00007fbff92b7e0e: jle    RETURN             ;*if_icmpge
+                                              ; - HashTime::iterate@4 (line 7)
 
-  0x00007fbff92b7e10: mov    r10d,DWORD PTR [rcx+0x8]  ; implicit exception: dispatches to 0x00007fbff92b7e29
-  0x00007fbff92b7e14: cmp    r10d,0xf800c105    ;   {metadata('Point')}
-  0x00007fbff92b7e1b: jne    BAIL_OUT           ;*return
-                                                ; - HashTime::iterate@18 (line 9)
+0x00007fbff92b7e10: mov    r10d,DWORD PTR [rcx+0x8]  ; implicit exception: dispatches to 0x00007fbff92b7e29
+0x00007fbff92b7e14: cmp    r10d,0xf800c105    ;   {metadata('Point')}
+0x00007fbff92b7e1b: jne    BAIL_OUT           ;*return
+                                              ; - HashTime::iterate@18 (line 9)
 
-  RETURN:
-  0x00007fbff92b7e1d: add    rsp,0x20
-  0x00007fbff92b7e21: pop    rbp
-  0x00007fbff92b7e22: test   DWORD PTR [rip+0x16c151d8],eax        # 0x00007fc00fecd000
-                                                ;   {poll_return}
-  0x00007fbff92b7e28: ret    
-  BAIL_OUT:
-  0x00007fbff92b7e29: mov    esi,0xffffff86
-  0x00007fbff92b7e2e: mov    ebp,edx
-  0x00007fbff92b7e30: mov    QWORD PTR [rsp],rcx
-  0x00007fbff92b7e34: xchg   ax,ax
-  0x00007fbff92b7e37: call   0x00007fbff90051a0  ; OopMap{[0]=Oop off=92}
-                                                ;*aload_2
-                                                ; - HashTime::iterate@7 (line 8)
-                                                ;   {runtime_call}
-  0x00007fbff92b7e3c: call   0x00007fc00f5d6320  ;*aload_2
-                                                ; - HashTime::iterate@7 (line 8)
-                                                ;   {runtime_call}
- 
-
-
-
+RETURN:
+0x00007fbff92b7e1d: add    rsp,0x20
+0x00007fbff92b7e21: pop    rbp
+0x00007fbff92b7e22: test   DWORD PTR [rip+0x16c151d8],eax        # 0x00007fc00fecd000
+                                              ;   {poll_return}
+0x00007fbff92b7e28: ret    
+BAIL_OUT:
+0x00007fbff92b7e29: mov    esi,0xffffff86
+0x00007fbff92b7e2e: mov    ebp,edx
+0x00007fbff92b7e30: mov    QWORD PTR [rsp],rcx
+0x00007fbff92b7e34: xchg   ax,ax
+0x00007fbff92b7e37: call   0x00007fbff90051a0  ; OopMap{[0]=Oop off=92}
+                                              ;*aload_2
+                                              ; - HashTime::iterate@7 (line 8)
+                                              ;   {runtime_call}
+0x00007fbff92b7e3c: call   0x00007fc00f5d6320  ;*aload_2
+                                              ; - HashTime::iterate@7 (line 8)
+                                              ;   {runtime_call}
 {% endhighlight %}
 
 This is much smaller than the code in **Java 7**. The checks of the mark word bits are gone. And, most importantly,
 the loop is gone (the only thing that's left is the upper boundary check). I believe that the pseudo-code now looks like this:
 
 {% highlight Java %}
-    static void iterate (int N, Object x)
-    {
-        if (N > 0) {
-            if (x.getClass() == Point.class)
-                ; // do nothing
-            else
-                vm.returnToInterpretingMode();
-        }
+static void iterate (int N, Object x)
+{
+    if (N > 0) {
+        if (x.getClass() == Point.class)
+            ; // do nothing
+        else
+            vm.returnToInterpretingMode();
     }
+}
 {% endhighlight %}
 
 Some comments:
@@ -495,31 +491,31 @@ it so big is that it checks for two possible classes of `x` (`Point` and `Long`)
 removing it. There is no way to write it down exactly as a pseudo-code, the closest I can come with is something like this:
 
 {% highlight Java %}
-    static void iterate (int N, Object x)
-    {
-        int i;
-        for (i = 0; i < N-16; i+=16) {
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) {          vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  1; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  2; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  3; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  4; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  5; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  6; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  7; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  8; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  9; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 10; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 11; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 12; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 13; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 14; vm.returnToInterpretingMode (); }
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 15; vm.returnToInterpretingMode (); }
-        }
-        for (; i < N; i++) {
-            if (x.getClass() != Point.class && x.getClass() != Long.getClass()) vm.returnToInterpretingMode ();
-        }
+static void iterate (int N, Object x)
+{
+    int i;
+    for (i = 0; i < N-16; i+=16) {
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) {          vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  1; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  2; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  3; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  4; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  5; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  6; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  7; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  8; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i +=  9; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 10; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 11; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 12; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 13; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 14; vm.returnToInterpretingMode (); }
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) { i += 15; vm.returnToInterpretingMode (); }
     }
+    for (; i < N; i++) {
+        if (x.getClass() != Point.class && x.getClass() != Long.getClass()) vm.returnToInterpretingMode ();
+    }
+}
 {% endhighlight %}
 
 This is why this code is slower than the one specialised for `Point` but still faster than the general-purpose code
@@ -534,34 +530,33 @@ One of the reasons why in some cases the entire method was optimised out is that
 not used. We can modify the code to use the results -- for instance, to add them all together:
 
 {% highlight Java %}
-    int sum (int N, Object x)
-    {
-        int s = 0;
-        for (int i = 0; i < N; i++)
-            s += x.hashCode ();
-        return s;
-    }
+int sum (int N, Object x)
+{
+    int s = 0;
+    for (int i = 0; i < N; i++)
+        s += x.hashCode ();
+    return s;
+}
 {% endhighlight %}
 
 Obviously, the `test ()` must be modified accordingly:
 
 {% highlight Java %}
-    void test (Object x)
-    {
-
-        System.out.printf ("%20s: ", x.getClass ().getName ());
-        int N = 100000000;
-        int s = 0;
+void test (Object x)
+{
+    System.out.printf ("%20s: ", x.getClass ().getName ());
+    int N = 100000000;
+    int s = 0;
         
-        for (int iter = 0; iter < 3; iter ++) {
-            long t1 = System.currentTimeMillis ();
-            s += sum (N, x);
-            long t2 = System.currentTimeMillis ();
-            long t = t2-t1;
-            System.out.printf (" %5d", t);
-        }
-        System.out.println ("; sum=" + s);
+    for (int iter = 0; iter < 3; iter ++) {
+        long t1 = System.currentTimeMillis ();
+        s += sum (N, x);
+        long t2 = System.currentTimeMillis ();
+        long t = t2-t1;
+        System.out.printf (" %5d", t);
     }
+    System.out.println ("; sum=" + s);
+}
 {% endhighlight %}
 
 Note that we make sure we use the results of calls to `sum()` by adding them together and printing the result. This is
@@ -602,22 +597,22 @@ The **Java 7** code of `sum` isn't much different from that of `iterate`. The id
 the mark word is now added to `s` (I'll only show the pseudo-code):
 	
 {% highlight Java %}
-    static int sum (int N, Object x)
-    {
-        int s = 0;
-        int hash;
-        long markword;
-        for (int i = 0; i < N; i++) {
-            if (x.virtualTable.hashCode == Object.hashCode
-                && ((markWord = x.markWord) & 7) == 1
-                && (hash = (markWord >> 8) & 0x7FFFFFFF) != 0
-               )
-                s += hash;
-            else
-                s += vm.callVirtual (x, x.hashCode);
-        }
-        return s;
+static int sum (int N, Object x)
+{
+    int s = 0;
+    int hash;
+    long markword;
+    for (int i = 0; i < N; i++) {
+        if (x.virtualTable.hashCode == Object.hashCode
+            && ((markWord = x.markWord) & 7) == 1
+            && (hash = (markWord >> 8) & 0x7FFFFFFF) != 0
+           )
+            s += hash;
+        else
+            s += vm.callVirtual (x, x.hashCode);
     }
+    return s;
+}
 {% endhighlight %}
 
 The last **Java 8** code produced while running with `Point` class is quite long and esoteric
@@ -751,51 +746,51 @@ causing the compiler to avoid making any assumptions about the classes. I tried 
 of the new class [`HashTime1`]({{ site.REPO-LIFE }}/blob/ecd5358a738a13a6de44db7d8bf7437793136018/HashTime1.java):
 
 {% highlight Java %}
-    static int sumArray (ArrayList<Object> a)
-    {
-        int sum = 0;
-        for (int i = 0; i < a.size (); i++) {
-            sum += sum (1, a.get(i));
-        }
-        return sum;
+static int sumArray (ArrayList<Object> a)
+{
+    int sum = 0;
+    for (int i = 0; i < a.size (); i++) {
+        sum += sum (1, a.get(i));
     }
+    return sum;
+}
  
-    public static void main (String argv[])
-    {
-        int x = 531;
-        int y = -295;
-        ArrayList<Object> a = new ArrayList<Object> ();
-        int sum = 0;
+public static void main (String argv[])
+{
+    int x = 531;
+    int y = -295;
+    ArrayList<Object> a = new ArrayList<Object> ();
+    int sum = 0;
 
-        for (int i = 0; i < 100000; i++) {
-            a.add (new Point (x, y));
-            a.add (LongUtil.fromPoint (x, y));
-            a.add (new LongPoint (x, y));
-            a.add (new LongPoint3 (x, y));
-            a.add (new LongPoint4 (x, y));
-            a.add (new LongPoint5 (x, y));
-            a.add (new LongPoint6 (x, y));
-            a.add (new LongPoint7 (x, y));
-            a.add (new NullPoint (x, y));
-        }
+    for (int i = 0; i < 100000; i++) {
+        a.add (new Point (x, y));
+        a.add (LongUtil.fromPoint (x, y));
+        a.add (new LongPoint (x, y));
+        a.add (new LongPoint3 (x, y));
+        a.add (new LongPoint4 (x, y));
+        a.add (new LongPoint5 (x, y));
+        a.add (new LongPoint6 (x, y));
+        a.add (new LongPoint7 (x, y));
+        a.add (new NullPoint (x, y));
+    }
 
-        for (int j = 0; j < 100; j++) {
-            sum += sumArray (a);
-        }
-        System.out.println (" Sum = " + sum);
+    for (int j = 0; j < 100; j++) {
+        sum += sumArray (a);
+    }
+    System.out.println (" Sum = " + sum);
 
-        for (int i = 0; i < 2; i++) {
-            test (new Point (x, y));
-            test (LongUtil.fromPoint (x, y));
-            test (new LongPoint (x, y));
-            test (new LongPoint3 (x, y));
-            test (new LongPoint4 (x, y));
-            test (new LongPoint5 (x, y));
-            test (new LongPoint6 (x, y));
-            test (new LongPoint7 (x, y));
-            test (new NullPoint (x, y));
-        }
-   }
+    for (int i = 0; i < 2; i++) {
+        test (new Point (x, y));
+        test (LongUtil.fromPoint (x, y));
+        test (new LongPoint (x, y));
+        test (new LongPoint3 (x, y));
+        test (new LongPoint4 (x, y));
+        test (new LongPoint5 (x, y));
+        test (new LongPoint6 (x, y));
+        test (new LongPoint7 (x, y));
+        test (new NullPoint (x, y));
+    }
+}
 {% endhighlight %}
 
 This is the result for **Java 7**:

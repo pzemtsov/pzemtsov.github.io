@@ -365,6 +365,8 @@ s                 { margin-left: -0.25em }
 .formula          { font-family: "Times New Roman", Times, serif; }
 .formula table    { border-spacing: 0; border-style: none; width: auto;}
 .formula table td { text-align: center; vertical-align: middle; border-style: none; border-width: 0;   padding: 0;}
+.formula table td.left { text-align: left; vertical-align: middle; border-style: none; border-width: 0;   padding: 0;}
+.formula table td.space { text-align: left; vertical-align: middle; border-style: none; border-width: 0; padding-right: 2em;}
 
 /*****************************************************************************/
 /*
