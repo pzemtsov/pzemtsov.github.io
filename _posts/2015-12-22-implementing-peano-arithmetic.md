@@ -208,6 +208,7 @@ Here is the output:
 Now we need _D()_:
 
 {% highlight Java %}
+
     public Peano1 D()
     {
         if (isZero ()) throw new IllegalArgumentException ("D called on Zero");
