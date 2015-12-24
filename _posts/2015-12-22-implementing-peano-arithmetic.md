@@ -198,7 +198,7 @@ public class Peano1 extends HashSet<Peano1>
 
 Let's print the number `3`:
 {% highlight Java %}
-    System.out.println (ZERO.S ().S ().S ());
+System.out.println (ZERO.S ().S ().S ());
 {% endhighlight %}
 
 Here is the output:
@@ -208,52 +208,51 @@ Here is the output:
 Now we need _D()_:
 
 {% highlight Java %}
-
-    public Peano1 D()
+public Peano1 D()
+{
+    if (isZero ()) throw new IllegalArgumentException ("D called on Zero");
+    Peano1 max = null;
+    for (Peano1 x : this)
     {
-        if (isZero ()) throw new IllegalArgumentException ("D called on Zero");
-        Peano1 max = null;
-        for (Peano1 x : this)
-        {
-            if (max == null || x.contains (max)) {
-                max = x;
-            }
+        if (max == null || x.contains (max)) {
+            max = x;
         }
-        return max;
     }
+    return max;
+}
 {% endhighlight %}
 
 Now we need comparisons. The equality is already there (standard `equals()` is good enough). The others can be implemented like this:
 
 {% highlight Java %}
-    public boolean lt (Peano1 other)
-    {
-        return other.contains (this);
-    }
+public boolean lt (Peano1 other)
+{
+    return other.contains (this);
+}
 
-    public boolean gt (Peano1 other)
-    {
-        return other.lt (this);
-    }
+public boolean gt (Peano1 other)
+{
+    return other.lt (this);
+}
     
-    public boolean leq (Peano1 other)
-    {
-        return ! gt (other);
-    }
+public boolean leq (Peano1 other)
+{
+    return ! gt (other);
+}
     
-    public boolean geq (Peano1 other)
-    {
-        return ! lt (other);
-    }
+public boolean geq (Peano1 other)
+{
+    return ! lt (other);
+}
 {% endhighlight %}
 
 Note: we also could also have implemented `leq()` like this:
 
 {% highlight Java %}
-    public boolean leq (Peano1 other)
-    {
-        return other.containsAll (this);
-    }
+public boolean leq (Peano1 other)
+{
+    return other.containsAll (this);
+}
 {% endhighlight %}
 
 Now we implement `plus` and `minus`. I'd like to call them `add` and `sub`, but `HashSet` already has `add()` method, which does something else.
@@ -262,141 +261,141 @@ but here we follow the Peano model strictly (a number **is** a set, not just is 
 The implementation follows the formulas exactly:
 
 {% highlight Java %}
-    public Peano1 plus (Peano1 other)
-    {
-        return other.isZero () ? this : plus (other.D ()).S ();
-    }
+public Peano1 plus (Peano1 other)
+{
+    return other.isZero () ? this : plus (other.D ()).S ();
+}
 
-    public Peano1 minus (Peano1 other)
-    {
-        return other.isZero () ? this : minus (other.D ()).D ();
-    }
+public Peano1 minus (Peano1 other)
+{
+    return other.isZero () ? this : minus (other.D ()).D ();
+}
 {% endhighlight %}
 
 The multiplication is done in the same way:
 
 {% highlight Java %}
-    public Peano1 mult (Peano1 other)
-    {
-        return other.isZero () ? ZERO : mult (other.D ()).plus (this);
-    }
+public Peano1 mult (Peano1 other)
+{
+    return other.isZero () ? ZERO : mult (other.D ()).plus (this);
+}
     
-    public Peano1 square ()
-    {
-        return mult (this);
-    }
+public Peano1 square ()
+{
+    return mult (this);
+}
 {% endhighlight %}
 
 Division will be implemented in more traditional iterative way:
 
 {% highlight Java %}
-    public static class DivResult
-    {
-        final Peano1 quotient;
-        final Peano1 remainder;
+public static class DivResult
+{
+    final Peano1 quotient;
+    final Peano1 remainder;
         
-        public DivResult (Peano1 quotient, Peano1 remainder)
-        {
-            this.quotient = quotient;
-            this.remainder = remainder;
-        }
+    public DivResult (Peano1 quotient, Peano1 remainder)
+    {
+        this.quotient = quotient;
+        this.remainder = remainder;
     }
+}
     
-    public DivResult divrem (Peano1 other)
-    {
-        Peano1 div = ZERO;
-        Peano1 rem = this;
-        while (rem.geq (other)) {
-            rem = rem.minus (other);
-            div = div.S ();
-        }
-        return new DivResult (div, rem);
+public DivResult divrem (Peano1 other)
+{
+    Peano1 div = ZERO;
+    Peano1 rem = this;
+    while (rem.geq (other)) {
+        rem = rem.minus (other);
+        div = div.S ();
     }
+    return new DivResult (div, rem);
+}
 
-    public Peano1 div (Peano1 other)
-    {
-        return divrem (other).quotient;
-    }
+public Peano1 div (Peano1 other)
+{
+    return divrem (other).quotient;
+}
 
-    public Peano1 rem (Peano1 other)
-    {
-        return divrem (other).remainder;
-    }
+public Peano1 rem (Peano1 other)
+{
+    return divrem (other).remainder;
+}
 {% endhighlight %}
 
 The natural numbers arithmetic is ready to be used. However, we still need input and output:
 
 {% highlight Java %}
-    public static Peano1 ONE = ZERO.S();
-    public static Peano1 TWO = ONE.S();
-    public static Peano1 THREE = TWO.S();
-    public static Peano1 FOUR = THREE.S();
-    public static Peano1 FIVE = FOUR.S();
-    public static Peano1 SIX = FIVE.S();
-    public static Peano1 SEVEN = SIX.S();
-    public static Peano1 EIGHT = SEVEN.S();
-    public static Peano1 NINE = EIGHT.S();
-    public static Peano1 TEN = NINE.S();
+public static Peano1 ONE = ZERO.S();
+public static Peano1 TWO = ONE.S();
+public static Peano1 THREE = TWO.S();
+public static Peano1 FOUR = THREE.S();
+public static Peano1 FIVE = FOUR.S();
+public static Peano1 SIX = FIVE.S();
+public static Peano1 SEVEN = SIX.S();
+public static Peano1 EIGHT = SEVEN.S();
+public static Peano1 NINE = EIGHT.S();
+public static Peano1 TEN = NINE.S();
 
-    private Peano1 (Peano1 other)
-    {
-        super (other);
-    }
+private Peano1 (Peano1 other)
+{
+    super (other);
+}
     
-    public Peano1 (String str)
-    {
-        this (parseInt (str));
-    }
+public Peano1 (String str)
+{
+    this (parseInt (str));
+}
 
-    private static String digitToString (Peano1 p)
-    {
-        if (p.equals (ZERO))  return "0";
-        if (p.equals (ONE))   return "1";
-        if (p.equals (TWO))   return "2";
-        if (p.equals (THREE)) return "3";
-        if (p.equals (FOUR))  return "4";
-        if (p.equals (FIVE))  return "5";
-        if (p.equals (SIX))   return "6";
-        if (p.equals (SEVEN)) return "7";
-        if (p.equals (EIGHT)) return "8";
-        if (p.equals (NINE))  return "9";
+private static String digitToString (Peano1 p)
+{
+    if (p.equals (ZERO))  return "0";
+    if (p.equals (ONE))   return "1";
+    if (p.equals (TWO))   return "2";
+    if (p.equals (THREE)) return "3";
+    if (p.equals (FOUR))  return "4";
+    if (p.equals (FIVE))  return "5";
+    if (p.equals (SIX))   return "6";
+    if (p.equals (SEVEN)) return "7";
+    if (p.equals (EIGHT)) return "8";
+    if (p.equals (NINE))  return "9";
+    throw new IllegalArgumentException ();
+}
+
+private static Peano1 charToDigit (char c)
+{
+    switch (c) {
+    case '0' : return ZERO;
+    case '1' : return ONE;
+    case '2' : return TWO;
+    case '3' : return THREE;
+    case '4' : return FOUR;
+    case '5' : return FIVE;
+    case '6' : return SIX;
+    case '7' : return SEVEN;
+    case '8' : return EIGHT;
+    case '9' : return NINE;
+    default:
         throw new IllegalArgumentException ();
     }
-
-    private static Peano1 charToDigit (char c)
-    {
-        switch (c) {
-        case '0' : return ZERO;
-        case '1' : return ONE;
-        case '2' : return TWO;
-        case '3' : return THREE;
-        case '4' : return FOUR;
-        case '5' : return FIVE;
-        case '6' : return SIX;
-        case '7' : return SEVEN;
-        case '8' : return EIGHT;
-        case '9' : return NINE;
-        default:
-            throw new IllegalArgumentException ();
-        }
-    }
+}
     
-    @Override
-    public String toString ()
-    {
-        DivResult d = this.divrem (TEN);
-        String digit = digitToString (d.remainder);
-        return d.quotient.isZero () ? digit : d.quotient + digit;
-    }
+@Override
+public String toString ()
+{
+    DivResult d = this.divrem (TEN);
+    String digit = digitToString (d.remainder);
+    return d.quotient.isZero () ? digit : d.quotient + digit;
+}
     
-    private static Peano1 parseInt (String s)
-    {
-        Peano1 result = ZERO;
-        for (char c : s.toCharArray ()) {
-            result = result.mult (TEN).plus (charToDigit (c));
-        }
-        return result;
+private static Peano1 parseInt (String s)
+{
+    Peano1 result = ZERO;
+    for (char c : s.toCharArray ()) {
+        result = result.mult (TEN).plus (charToDigit (c));
     }
+    return result;
+}
 {% endhighlight %}
 
 The `parseInt()` method iterates over array, but, fortunately, this can be done without use of integer variables or arithmetic operators.
@@ -407,32 +406,32 @@ The first test
 Finally, we are ready to write our assignment:
 
 {% highlight Java %}
-    public static void pythagorean (Peano1 N)
-    {
-        for (Peano1 c = ONE; c.leq (N); c = c.S ())
-            for (Peano1 b = ONE; b.lt (c); b = b.S ())
-                for (Peano1 a = ONE; a.lt (b); a = a.S ())
-                    if (a.square().plus (b.square()).equals (c.square()))
-                        System.out.println (a + " " + b + " " + c);
-    }
+public static void pythagorean (Peano1 N)
+{
+    for (Peano1 c = ONE; c.leq (N); c = c.S ())
+        for (Peano1 b = ONE; b.lt (c); b = b.S ())
+            for (Peano1 a = ONE; a.lt (b); a = a.S ())
+                if (a.square().plus (b.square()).equals (c.square()))
+                    System.out.println (a + " " + b + " " + c);
+}
 
-    public static void perfect (Peano1 N)
-    {
-        for (Peano1 i = ONE; i.leq (N); i = i.S ()) {
-            Peano1 sum = ZERO;
-            for (Peano1 j = ONE; j.lt (i); i = i.S ())
-                if (i.rem (j).isZero ())
-                    sum = sum.plus (j);
-            if (i.equals (sum))
-                System.out.println (i);
-        }
+public static void perfect (Peano1 N)
+{
+    for (Peano1 i = ONE; i.leq (N); i = i.S ()) {
+        Peano1 sum = ZERO;
+        for (Peano1 j = ONE; j.lt (i); i = i.S ())
+            if (i.rem (j).isZero ())
+                sum = sum.plus (j);
+        if (i.equals (sum))
+            System.out.println (i);
     }
+}
     
-    public static void main (String [] args)
-    {
-        pythagorean (new Peano1 ("100"));
-        perfect (new Peano1 ("100"));
-    }
+public static void main (String [] args)
+{
+    pythagorean (new Peano1 ("100"));
+    perfect (new Peano1 ("100"));
+}
 {% endhighlight %}
 
 When we run it, it just hangs and prints nothing. The program is way too slow. We agreed upfront that we wouldn't pursue high performance, but it looks like poor
@@ -475,16 +474,17 @@ It shows that the program hasn't even started running `pythagorean()`. It is sti
 Let's simplify the problem for now. We'll just print natural numbers, starting from zero and going up:
 
 {% highlight Java %}
-    static void inctest ()
-        Peano1 x = ZERO;
-        while (true) {
-            Debug.Timer.start ();
-            x = x.S ();
-            System.out.println (x);
-            Debug.Timer.stop ();
-            Debug.Timer.dump ();
-        }
+static void inctest ()
+{
+    Peano1 x = ZERO;
+    while (true) {
+        Debug.Timer.start ();
+        x = x.S ();
+        System.out.println (x);
+        Debug.Timer.stop ();
+        Debug.Timer.dump ();
     }
+}
 {% endhighlight %}
 
 This code slows down at about iteration 23:
@@ -590,24 +590,24 @@ The new class is called `Peano2`.
 We remove all constructors, except for the default one, so we have to make `parseInt()` public. We also introduce the field `next` that keeps the result of `S()`:
 
 {% highlight Java %}
-    private Peano2 next = null;
+private Peano2 next = null;
 
-    @Override
-    public boolean equals (Object o)
-    {
-        return this == o;
-    }
+@Override
+public boolean equals (Object o)
+{
+    return this == o;
+}
     
-    public Peano2 S()
-    {
-        if (next == null) {
-            Peano2 s = new Peano2 ();
-            s.addAll (this);
-            s.add (this);
-            next = s;
-        }
-        return next;
+public Peano2 S()
+{
+    if (next == null) {
+        Peano2 s = new Peano2 ();
+        s.addAll (this);
+        s.add (this);
+        next = s;
     }
+    return next;
+}
 {% endhighlight %}
 
 Note that what we have just done is dangerous and not generally recommended. We've introduced an asymmetric `equals()`: our object will not be equal to anything else
@@ -625,10 +625,10 @@ Since each number is now present in just one instance, we could use the address 
 implementation of `Object.hashCode()` does, which is also available via `System.identityHashCode()`. We can't, however, write
 
 {% highlight Java %}
-    public int hashCode ()
-    {
-        return System.identityHashCode (this);
-    }
+public int hashCode ()
+{
+    return System.identityHashCode (this);
+}
 {% endhighlight %}
 
 because the keyword `int` still does not work (this Anti-Numeric League is really beginning to annoy me; OK, their goals are fair, but the methods...).
@@ -674,6 +674,7 @@ public class Peano3
         }
         return next;
     }
+}
 {% endhighlight %}
 
 Some more minor modifications must be made, since `Peano3` isn't a `set` anymore.
@@ -704,42 +705,42 @@ We can memorise it. The new class is called `Peano4`:
 
 {% highlight Java %}
 
-    private final HashSet<Peano4> set;
-    private Peano4 next = null;
-    private final Peano4 prev;
+private final HashSet<Peano4> set;
+private Peano4 next = null;
+private final Peano4 prev;
     
-    private Peano4 (Peano4 prev, HashSet<Peano4> set)
-    {
-        this.prev = prev;
-        this.set = set;
-    }
+private Peano4 (Peano4 prev, HashSet<Peano4> set)
+{
+    this.prev = prev;
+    this.set = set;
+}
 
-    private Peano4 ()
-    {
-        this (null, new HashSet<Peano4> ());
-    }
+private Peano4 ()
+{
+    this (null, new HashSet<Peano4> ());
+}
  
-    public boolean isZero ()
-    {
-        return this == ZERO;
-    }
+public boolean isZero ()
+{
+    return this == ZERO;
+}
 
-    public Peano4 S()
-    {
-        if (next == null) {
-            HashSet<Peano4> newSet = new HashSet<Peano4> ();
-            newSet.addAll (set);
-            newSet.add (this);
-            next = new Peano4 (this, newSet);
-        }
-        return next;
+public Peano4 S()
+{
+    if (next == null) {
+        HashSet<Peano4> newSet = new HashSet<Peano4> ();
+        newSet.addAll (set);
+        newSet.add (this);
+        next = new Peano4 (this, newSet);
     }
+    return next;
+}
 
-    public Peano4 D()
-    {
-        if (isZero ()) throw new IllegalArgumentException ("D called on Zero");
-        return prev;
-    }
+public Peano4 D()
+{
+    if (isZero ()) throw new IllegalArgumentException ("D called on Zero");
+    return prev;
+}
 {% endhighlight %}
 
 The `inctest()` hasn't improved much, but the rest has. The `pythagorean()` finished the search up to 100 in 70 sec. It ran out of memory at 113 when left to run longer.
@@ -774,20 +775,20 @@ Possibly there are more options. Neither of these methods is the optimal, since 
 Let's try the option three (see the class `Peano5`):
 
 {% highlight Java %}
-    public boolean lt (Peano5 other)
-    {
-        if (this == other) return false;
-        Peano5 p = this;
-        Peano5 q = other;
-        while (true) {
-            p = p.next;
-            if (p == null) return false;
-            if (p == other) return true;
-            q = q.next;
-            if (q == null) return true;
-            if (q == this) return false;
-        }
+public boolean lt (Peano5 other)
+{
+    if (this == other) return false;
+    Peano5 p = this;
+    Peano5 q = other;
+    while (true) {
+        p = p.next;
+        if (p == null) return false;
+        if (p == other) return true;
+        q = q.next;
+        if (q == null) return true;
+        if (q == this) return false;
     }
+}
 {% endhighlight %}
 
 Here are the test results:
@@ -812,40 +813,40 @@ sequence onto the stack, interleaved with the return addresses and, possibly, st
 conventional iteration. Our code, however, isn't using tail recursion:
 
 {% highlight Java %}
-    public Peano5 plus (Peano5 other)
-    {
-        return other.isZero () ? this : plus (other.D ()).S ();
-    }
+public Peano5 plus (Peano5 other)
+{
+    return other.isZero () ? this : plus (other.D ()).S ();
+}
 {% endhighlight %}
 
 It is calling `S()` on the result of the recursive call. **Java** does not convert this recursion into iteration, which causes stack overflow when the call nesting level
 is too high. Even though this method looks pretty, we'll have to rewrite it into something that, as I think, is even prettier (see `Peano6`):
 
 {% highlight Java %}
-    public Peano6 plus (Peano6 other)
-    {
-        Peano6 result = this;
-        while (other != ZERO) {
-            result = result.S ();
-            other = other.D ();
-        }
-        return result;
+public Peano6 plus (Peano6 other)
+{
+    Peano6 result = this;
+    while (other != ZERO) {
+        result = result.S ();
+        other = other.D ();
     }
+    return result;
+}
 {% endhighlight %}
 
 Note that we could have gone another way and have used a similar transformation without optimisation of `D()` -- we'd just need to avoid using `D()`:
 
 {% highlight Java %}
-    public Peano6 plus (Peano6 other)
-    {
-        Peano6 result = this;
-        Peano6 count = ZERO;
-        while (count != other) {
-            result = result.S ();
-            count = sount.S ();
-        }
-        return result;
+public Peano6 plus (Peano6 other)
+{
+    Peano6 result = this;
+    Peano6 count = ZERO;
+    while (count != other) {
+        result = result.S ();
+        count = sount.S ();
     }
+    return result;
+}
 {% endhighlight %}
 
 Now such a change is unnecessary, since `D()` is equally efficient as `S()`.
@@ -869,8 +870,8 @@ Let's start with elimination of "less than" comparisons. We know in our implemen
 of this comparison (our program is no exception) is in loops:
 
 {% highlight Java %}
-    for (int i = low; i < high; i++) {
-    }
+for (int i = low; i < high; i++) {
+}
 {% endhighlight %}
 
 This tradition comes from **C**. This is indeed the most reliable way to write down a loop that would work with all combinations of `low` and `high` and (provided that the limits are
@@ -878,33 +879,33 @@ low enough to avoid arithmetic overflow) with the step values other than one. Ho
 with the equality test:
 
 {% highlight Java %}
-    for (int i = low; i != high; i++) {
-    }
+for (int i = low; i != high; i++) {
+}
 {% endhighlight %}
 
 We can do that in our assignment, too:
 
 {% highlight Java %}
-    public static void pythagorean2 (Peano6 N)
-    {
-        for (Peano6 c = ONE; c.leq (N); c = c.S ())
-            for (Peano6 b = ONE; b != c; b = b.S ())
-                for (Peano6 a = ONE; a != b; a = a.S ())
-                    if (a.square().plus (b.square()) == c.square())
-                        System.out.println (a + " " + b + " " + c);
-    }
+public static void pythagorean2 (Peano6 N)
+{
+    for (Peano6 c = ONE; c.leq (N); c = c.S ())
+        for (Peano6 b = ONE; b != c; b = b.S ())
+            for (Peano6 a = ONE; a != b; a = a.S ())
+                if (a.square().plus (b.square()) == c.square())
+                    System.out.println (a + " " + b + " " + c);
+}
 
-    public static void perfect2 (Peano6 N)
-    {
-        for (Peano6 i = ONE; i.leq (N); i = i.S ()) {
-            Peano6 sum = ZERO;
-            for (Peano6 j = ONE; j != i; j = j.S ())
-                if (i.rem (j) == ZERO)
-                    sum = sum.plus (j);
-            if (i == sum)
-                System.out.println (i);
-        }
+public static void perfect2 (Peano6 N)
+{
+    for (Peano6 i = ONE; i.leq (N); i = i.S ()) {
+        Peano6 sum = ZERO;
+        for (Peano6 j = ONE; j != i; j = j.S ())
+            if (i.rem (j) == ZERO)
+                sum = sum.plus (j);
+        if (i == sum)
+            System.out.println (i);
     }
+}
 {% endhighlight %}
 
 The `leq` comparisons in the outer loop do not affect general performance much, so we can leave them as they are.
@@ -919,20 +920,20 @@ Loop-invariant code motion
 This it the optimisation that virtually all the compilers perform, and **Java** VM is no exception. We'll have to do it by hand:
 
 {% highlight Java %}
-    public static void pythagorean3 (Peano6 N)
-    {
-        for (Peano6 c = ONE; c.leq (N); c = c.S ()) {
-            Peano6 c_square = c.square ();
-            for (Peano6 b = ONE; b != c; b = b.S ()) {
-                Peano6 b_square = b.square ();
-                for (Peano6 a = ONE; a != b; a = a.S ()) {
-                    if (a.square().plus (b_square) == c_square) {
-                        System.out.println (a + " " + b + " " + c);
-                    }
+public static void pythagorean3 (Peano6 N)
+{
+    for (Peano6 c = ONE; c.leq (N); c = c.S ()) {
+        Peano6 c_square = c.square ();
+        for (Peano6 b = ONE; b != c; b = b.S ()) {
+            Peano6 b_square = b.square ();
+            for (Peano6 a = ONE; a != b; a = a.S ()) {
+                if (a.square().plus (b_square) == c_square) {
+                    System.out.println (a + " " + b + " " + c);
                 }
             }
         }
     }
+}
 {% endhighlight %}
 
 This code ran up to 100 in 2.1 sec and up to 200 in 58 sec -- good progress from 7.2 sec and 202 sec. It is the first version that managed to get to 500 -- it took 5594 seconds.
@@ -943,33 +944,33 @@ Some more code motion
 This line
 
 {% highlight Java %}
-    if (a.square().plus (b_square) == c_square) {
+if (a.square().plus (b_square) == c_square) {
 {% endhighlight %}
 
 can be rewritten to create more loop-invariant code (some compilers do that, too):
 
 {% highlight Java %}
-    if (a.square() == c_square.minus (b_square)) {
+if (a.square() == c_square.minus (b_square)) {
 {% endhighlight %}
 
 This code may then be moved out of the loop:
 
 {% highlight Java %}
-    public static void pythagorean4 (Peano6 N)
-    {
-        for (Peano6 c = ONE; c.leq (N); c = c.S ()) {
-            Peano6 c_square = c.square ();
-            for (Peano6 b = ONE; b != c; b = b.S ()) {
-                Peano6 b_square = b.square ();
-                Peano6 c_square_minus_b_square = c_square.minus (b_square);
-                for (Peano6 a = ONE; a != b; a = a.S ()) {
-                    if (a.square() == c_square_minus_b_square) {
-                        System.out.println (a + " " + b + " " + c);
-                    }
+public static void pythagorean4 (Peano6 N)
+{
+    for (Peano6 c = ONE; c.leq (N); c = c.S ()) {
+        Peano6 c_square = c.square ();
+        for (Peano6 b = ONE; b != c; b = b.S ()) {
+            Peano6 b_square = b.square ();
+            Peano6 c_square_minus_b_square = c_square.minus (b_square);
+            for (Peano6 a = ONE; a != b; a = a.S ()) {
+                if (a.square() == c_square_minus_b_square) {
+                    System.out.println (a + " " + b + " " + c);
                 }
             }
         }
     }
+}
 {% endhighlight %}
 
 The effect is surprisingly big. This code runs to 100 in 770 ms, to 200 in 20 sec and to 500 in 1944 sec.
@@ -987,32 +988,32 @@ When a variable is incremented, its square changes in controllable way. Since
 we can maintain a square of the required variable and modify it accordingly:
 
 {% highlight Java %}
-    a_square += 2 * a + 1;
-    a ++;
+a_square += 2 * a + 1;
+a ++;
 {% endhighlight %}
 
 This way we reduce multiplication to additions, which are much cheaper. Most optimising compilers do it automatically. We'll have to do it by hand:
 
 {% highlight Java %}
-    public static void pythagorean5 (Peano6 N)
+public static void pythagorean5 (Peano6 N)
+{
+    for (Peano6 c = ONE, c_square = ONE; c.leq (N);
+         c_square = c_square.plus (c).plus (c).S (), c = c.S ())
     {
-        for (Peano6 c = ONE, c_square = ONE; c.leq (N);
-             c_square = c_square.plus (c).plus (c).S (), c = c.S ())
+        for (Peano6 b = ONE, b_square = ONE; b != c;
+             b_square = b_square.plus (b).plus (b).S (), b = b.S ())
         {
-            for (Peano6 b = ONE, b_square = ONE; b != c;
-                 b_square = b_square.plus (b).plus (b).S (), b = b.S ())
+            Peano6 c_square_minus_b_square = c_square.minus (b_square);
+            for (Peano6 a = ONE, a_square = ONE; a != b;
+                 a_square = a_square.plus (a).plus (a).S (), a = a.S ())
             {
-                Peano6 c_square_minus_b_square = c_square.minus (b_square);
-                for (Peano6 a = ONE, a_square = ONE; a != b;
-                     a_square = a_square.plus (a).plus (a).S (), a = a.S ())
-                {
-                    if (a_square == c_square_minus_b_square) {
-                        System.out.println (a + " " + b + " " + c);
-                    }
+                if (a_square == c_square_minus_b_square) {
+                    System.out.println (a + " " + b + " " + c);
                 }
             }
         }
     }
+}
 {% endhighlight %}
 
 This version gets to 100 in 95 ms, to 200 in 1.28 sec and to 500 in 45 sec. It gets to 1000 in 727 sec (85 times faster than before).
@@ -1023,33 +1024,33 @@ Another small optimisation
 The middle loop contains subtraction
 
 {% highlight Java %}
-    Peano6 c_square_minus_b_square = c_square.minus (b_square);
+Peano6 c_square_minus_b_square = c_square.minus (b_square);
 {% endhighlight %}
 
 Here both `b_square` and `c_square` are synthesized induction variables. Both are only used in the mentioned subtraction. We can replace one of them (`b_square`)
 with a new synthesized variable, containing subtraction result:
 
 {% highlight Java %}
-    public static void pythagorean6 (Peano6 N)
+public static void pythagorean6 (Peano6 N)
+{
+    for (Peano6 c = ONE, c_square = ONE; c.leq (N);
+         c_square = c_square.plus (c).plus (c).S (), c = c.S ())
     {
-        for (Peano6 c = ONE, c_square = ONE; c.leq (N);
-             c_square = c_square.plus (c).plus (c).S (), c = c.S ())
+        for (Peano6 b = ONE, c_square_minus_b_square = c.square ().D ();
+             b != c;
+             c_square_minus_b_square =
+             c_square_minus_b_square.minus (b).minus (b).D (), b = b.S ())
         {
-            for (Peano6 b = ONE, c_square_minus_b_square = c.square ().D ();
-                 b != c;
-                 c_square_minus_b_square =
-                 c_square_minus_b_square.minus (b).minus (b).D (), b = b.S ())
+            for (Peano6 a = ONE, a_square = ONE; a != b;
+                 a_square = a_square.plus (a).plus (a).S (), a = a.S ())
             {
-                for (Peano6 a = ONE, a_square = ONE; a != b;
-                     a_square = a_square.plus (a).plus (a).S (), a = a.S ())
-                {
-                    if (a_square == c_square_minus_b_square) {
-                        System.out.println (a + " " + b + " " + c);
-                    }
+                if (a_square == c_square_minus_b_square) {
+                    System.out.println (a + " " + b + " " + c);
                 }
             }
         }
     }
+}
 {% endhighlight %}
 
 This new code runs better: it reaches 100 in 70 ms, 200 in 730 ms, 500 in 22.3 sec and 1000 in 360 sec. This will be our final version of `pythagorean()`.
@@ -1062,48 +1063,48 @@ As often happens, the improvement comes with specialisation: we implement a spec
 `minus()` operation, which does not throw exception if the result is negative, but rather reports an error in the form of `null`:
 
 {% highlight Java %}
-    public Peano6 minus_special (Peano6 other)
-    {
-        Peano6 result = this;
-        while (other != ZERO) {
-            if (result == ZERO)
-                return null;
-            result = result.D ();
-            other = other.D ();
-        }
-        return result;
+public Peano6 minus_special (Peano6 other)
+{
+    Peano6 result = this;
+    while (other != ZERO) {
+        if (result == ZERO)
+            return null;
+        result = result.D ();
+        other = other.D ();
     }
+    return result;
+}
 {% endhighlight %}
 
 The divisibility test looks like this:
 
 {% highlight Java %}
-    public boolean divisible (Peano6 other)
-    {
-        Peano6 rem = this;
-        while (rem != ZERO) {
-            rem = rem.minus_special (other);
-            if (rem == null) return false;
-        }
-        return true;
+public boolean divisible (Peano6 other)
+{
+    Peano6 rem = this;
+    while (rem != ZERO) {
+        rem = rem.minus_special (other);
+        if (rem == null) return false;
     }
+    return true;
+}
 {% endhighlight %}
 
 All we need is to use the new method in `perfect()`:
 
 {% highlight Java %}
-    public static void perfect3 (Peano6 N)
-    {
-        for (Peano6 i = ONE; i.leq (N); i = i.S ()) {
-            Peano6 sum = ZERO;
-            for (Peano6 j = ONE; j != i; j = j.S ()) {
-                if (i.divisible (j))
-                    sum = sum.plus (j);
-            }
-            if (i == sum)
-                System.out.println (i);
+public static void perfect3 (Peano6 N)
+{
+    for (Peano6 i = ONE; i.leq (N); i = i.S ()) {
+        Peano6 sum = ZERO;
+        for (Peano6 j = ONE; j != i; j = j.S ()) {
+            if (i.divisible (j))
+                sum = sum.plus (j);
         }
+        if (i == sum)
+            System.out.println (i);
     }
+}
 {% endhighlight %}
 
 This method reaches 1000 in 800 ms and 10,000 in 648 sec, which is a good improvement over 3 sec and 3874 sec before.
@@ -1116,26 +1117,26 @@ to one very simple modification: running the inner loop to `i/2`. Division by 2 
 multiplication and introduce new induction variable:
 
 {% highlight Java %}
-    public static void perfect4 (Peano6 N)
-    {
-        int count = 0;
-        for (Peano6 i = TWO; i.leq (N); i = i.S ()) {
-            Peano6 sum = ZERO;
-            Peano6 j = ONE;
-            Peano6 j_times_2 = TWO;
-            while (true) {
-                if (i.divisible (j))
-                    sum = sum.plus (j);
-                if (j_times_2 == i) break;
-                j_times_2 = j_times_2.S ();
-                if (j_times_2 == i) break;
-                j_times_2 = j_times_2.S ();
-                j = j.S ();
-            }
-            if (i == sum)
-                System.out.println (i);
+public static void perfect4 (Peano6 N)
+{
+    int count = 0;
+    for (Peano6 i = TWO; i.leq (N); i = i.S ()) {
+        Peano6 sum = ZERO;
+        Peano6 j = ONE;
+        Peano6 j_times_2 = TWO;
+        while (true) {
+            if (i.divisible (j))
+                sum = sum.plus (j);
+            if (j_times_2 == i) break;
+            j_times_2 = j_times_2.S ();
+            if (j_times_2 == i) break;
+            j_times_2 = j_times_2.S ();
+            j = j.S ();
         }
+        if (i == sum)
+            System.out.println (i);
     }
+}
 {% endhighlight %}
 
 It reaches 1000 in 480 ms and 10,000 in 336 sec, which means it runs roughly twice as fast as before, which is what we expected.
