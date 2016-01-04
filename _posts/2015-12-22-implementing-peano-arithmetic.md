@@ -637,7 +637,7 @@ Besides, this code would suffer from similar problem to the one mentioned above 
 have different `hashCode()`. This may one day bring us a lot of fun when we put our numbers and other sets into the same `HashMap`.
 
 There is a solution, however: we must ignore the strict requirement of Peano model and replace inheritance with aggregation (it seems that this is almost always
-the better way) -- make a separate class that represents a number, which would contain the set as a field.
+the better way) -- make a separate class that represents a number, which will contain the set as a field.
 This will have an additional advantage that the class will not implement all the set methods
 and will therefore be safer -- no one will call those methods accidentally. The new class will be called `Peano3`:
 
@@ -797,7 +797,7 @@ The `inctest()` happily ran to 144,000 in one minute, the time mostly spent in p
 
 The `pythagorean()` took 9 sec to get to 100 (previously 70 sec) and slowed down after that. It reached 200 in 312 sec and then -- surprise! -- crashed with StackOverflowException
 
-The `perfect()` reached 1000 in 3.8 sec, 5000 in 571 sec and 10,000 in 5216 sec (the previous values were 2.5 sec, 598 sec and 6317 sec). It 
+The `perfect()` reached 1000 in 3.8 sec, 5000 in 571 sec and 10,000 in 5216 sec (the previous values were 2.5 sec, 598 sec and 6317 sec).
 
 Surprisingly, the new class isn't much faster than the previous one. Probably, the `lt()` method is called often, and the previous version was faster. The sets use memory but
 are still useful, sometimes.
@@ -849,7 +849,7 @@ public Peano6 plus (Peano6 other)
 }
 {% endhighlight %}
 
-Now such a change is unnecessary, since `D()` is equally efficient as `S()`.
+Now such a change is unnecessary, since `D()` is equally efficient to `S()`.
 
 Here are the results:
 
@@ -979,7 +979,7 @@ This version has made it to 1000, although it took rather long - 62,259 sec (17 
 Operation strength reduction
 ----------------------------
 
-When a variable is incremented, its square changes in controllable way. Since
+When a variable is incremented, its square changes in predictable way. Since
 
  <div class="formula">
   (a&nbsp;+&nbsp;1)<sup>2</sup>&nbsp;=&nbsp;a<sup>2</sup>&nbsp;+&nbsp;2a&nbsp;+1
@@ -1141,11 +1141,11 @@ public static void perfect4 (Peano6 N)
 
 It reaches 1000 in 480 ms and 10,000 in 336 sec, which means it runs roughly twice as fast as before, which is what we expected.
 
-The epiloque
+The epilogue
 ------------
 
 The appointment has been passed successfully, despite all the effort of the hackers to prevent it. We have implemented the number system without using any computing
-functionality in **Java**. Our program does not contain any numeric operations, and the only places it contains digits is in class and method names (`Peano6`, `iteration3`).
+functionality in **Java**. Our program does not contain any numeric operations, and the only places it contains digits are in class and method names (`Peano6`, `iteration3`).
 The manufacturers can as well remove digits from keyboards as unnecessary.
 
 Several days later the totally exhausted sysadmin tells you that the attack is over and the system has been restored.
