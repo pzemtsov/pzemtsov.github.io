@@ -912,7 +912,7 @@ The `leq` comparisons in the outer loop do not affect general performance much, 
 
 The `pythagorean2()` gets to 100 in the same 7.2s, and to 100 in 202 sec -- it doesn't run faster. Perhaps, multiplication dominates over everything else.
 
-The `perfect2()` reaches 1000 in 3 sec and 10,000 in 3874 sec -- a bit faster than previously (3.2 and 3874 sec).
+The `perfect2()` reaches 1000 in 3 sec and 10,000 in 3874 sec -- a bit faster than previously (3.2 and 4154 sec).
 
 Loop-invariant code motion
 --------------------------
@@ -1251,3 +1251,35 @@ Coming soon
 
 Our arithmetic represented the numbers as linear-sized structures, which requires linear space and linear or square time. Some other representation could allow us
 to do better than that. We'll try it soon.
+
+Update
+------
+
+When reviewing the article later, I discovered that I was not completely correct when talking about recursive `plus` and `minus`. The recursive `plus` caused stack overflow,
+and I attributed that to absence of tail recursion:
+
+{% highlight Java %}
+public Peano5 plus (Peano5 other)
+{
+    return other.isZero () ? this : plus (other.D ()).S ();
+}
+{% endhighlight %}
+
+What I overlooked is that it is easy to rewrite this with tail recursion -- all that's needed is to swap `plus()` and `S()`:
+
+{% highlight Java %}
+public Peano6 plus (Peano6 other)
+{
+    return other.isZero () ? this : S ().plus (other.D ());
+}
+{% endhighlight %}
+
+The problem is, it does not help -- this code also causes stack overflow. **Java** VM does not optimise tail recursion. This issue is even registered as a bug:
+
+[http://bugs.java.com/bugdatabase/view\_bug.do?bug\_id=6804517](http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6804517).
+
+One of the reasons mentioned for not implementing this optimisation in the VM is the problem of the stack trace -- **Java** VM has obligation to report,
+when asked, the precise stack trace, which is difficult if recursion is replaced with iteration.
+
+Fortunately, tail recursion is the case where transformation into iteration is mechanical and can easily be performed by hand; this is exactly what we've done. The resulting
+program isn't much longer and is just as readable.
