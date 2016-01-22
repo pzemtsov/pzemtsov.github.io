@@ -659,7 +659,7 @@ public void put (int x, int y)
 <table class="numeric">
 <tr><th>Class name</th>                   <th>Comment</th>              <th>Time, <b>Java&nbsp;7</b></th><th>Time, <b>Java&nbsp;8</b></th></tr>
 <tr><td class="label">Hash4</td>          <td class="ttext"><code>Entry</code> iterator in the loop       </td><td> 1044</td><td>  976</td></tr>
-<tr><td class="label">Hash5</td>          <td class="ttext"><code>ArrayList<Entry></code> introduced      </td><td> 1006</td><td>  975</td></tr>
+<tr><td class="label">Hash5</td>          <td class="ttext"><code>ArrayList&lt;Entry&gt;</code> introduced      </td><td> 1006</td><td>  975</td></tr>
 </table>
 
 Strangely, the improvement isn't great; I expected much better results.
@@ -699,8 +699,8 @@ public void step ()
 
 <table class="numeric">
 <tr><th>Class name</th>                   <th>Comment</th>              <th>Time, <b>Java&nbsp;7</b></th><th>Time, <b>Java&nbsp;8</b></th></tr>
-<tr><td class="label">Hash5</td>          <td class="ttext"><code>ArrayList<Entry></code> introduced      </td><td> 1006</td><td>  975</td></tr>
-<tr><td class="label">Hash6</td>          <td class="ttext">Re-used <code>ArrayList<Entry></code>         </td><td> 1097</td><td>  947</td></tr>
+<tr><td class="label">Hash5</td>          <td class="ttext"><code>ArrayList&lt;Entry&gt;</code> introduced      </td><td> 1006</td><td>  975</td></tr>
+<tr><td class="label">Hash6</td>          <td class="ttext">Re-used <code>ArrayList&lt;Entry&gt;</code>         </td><td> 1097</td><td>  947</td></tr>
 </table>
 
 Strangely, the improvement only happened on **Java 8**, and even there it isn't big. Does it mean that object allocation isn't such a big expense?
@@ -768,7 +768,7 @@ Here are the results:
 
 <table class="numeric">
 <tr><th>Class name</th>                   <th>Comment</th><th>Time, <b>Java&nbsp;7</b></th><th>Time, <b>Java&nbsp;8</b></th></tr>
-<tr><td class="label">Hash6</td>          <td class="ttext">Re-used <code>ArrayList<Entry></code>         </td><td> 1097</td><td>  947</td></tr>
+<tr><td class="label">Hash6</td>          <td class="ttext">Re-used <code>ArrayList&lt;Entry&gt;</code>         </td><td> 1097</td><td>  947</td></tr>
 <tr><td class="label">Hash7</td>          <td class="ttext"><code>ArrayList</code> replaced with an array </td><td> 1020</td><td>  904</td></tr>
 </table>
 
@@ -786,8 +786,8 @@ Here are the results for all the versions we tried today:
 <tr><td class="label">Hash2</td>          <td class="ttext">A unified hash map                            </td><td> 1309</td><td> 1163</td></tr>
 <tr><td class="label">Hash3</td>          <td class="ttext">Check in <code>set</code> removed             </td><td> 1312</td><td> 1151</td></tr>
 <tr><td class="label">Hash4</td>          <td class="ttext"><code>Entry</code> iterator in the loop       </td><td> 1044</td><td>  976</td></tr>
-<tr><td class="label">Hash5</td>          <td class="ttext"><code>ArrayList<Entry></code> introduced      </td><td> 1006</td><td>  975</td></tr>
-<tr><td class="label">Hash6</td>          <td class="ttext">Re-used <code>ArrayList<Entry></code>         </td><td> 1097</td><td>  947</td></tr>
+<tr><td class="label">Hash5</td>          <td class="ttext"><code>ArrayList&lt;Entry&gt;</code> introduced      </td><td> 1006</td><td>  975</td></tr>
+<tr><td class="label">Hash6</td>          <td class="ttext">Re-used <code>ArrayList&lt;Entry&gt;</code>         </td><td> 1097</td><td>  947</td></tr>
 <tr><td class="label">Hash7</td>          <td class="ttext"><code>ArrayList</code> replaced with an array </td><td> 1020</td><td>  904</td></tr>
 </table>
 
