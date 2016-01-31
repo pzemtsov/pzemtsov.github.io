@@ -106,7 +106,7 @@ After substitution and reduction, we get the following for _E[Num<sub>k</sub>]_:
   </table>
   </div>
   
-The average chain length <i>Len<sub>k</sub></i> if inversely proportional to the number of used slots:
+The average chain length <i>Len<sub>k</sub></i> is inversely proportional to the number of used slots:
 
   <div class="formula">
   <table>
@@ -356,7 +356,7 @@ This graph shows the absolute values of the total time, the GC time and the pure
 
 <img src="{{ site.url }}/images/life-hash-size-time-with-and-without-gc.png" width="652" height="375">
 
-Grows in GC time can't explain the entire observed increase in total time, but it is responsible for a significant portion of it.
+Growth in GC time can't explain the entire observed increase in total time, but it is responsible for a significant portion of it.
 
 The tree map
 ------------
