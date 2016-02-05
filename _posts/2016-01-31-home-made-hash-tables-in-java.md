@@ -193,7 +193,7 @@ This makes it three objects per data element, and, when implementing it by hand,
 key may be stored simply as `long`). Moreover, this way we also save a call to `equals` on the key objects: we can compare `long` values directly. Altogether this offers
 some improvement, we'll check now how big.
 
-All the code is available in [this repository]({{ site.REPO-LIFE }}/tree/8c4ac5e8c427c24c61477ed864fae0bc1694c603).
+All the code is available in [this repository]({{ site.REPO-LIFE }}/tree/1416a32afceacbc59f94d4c1be9ed42625736e32).
 
 First, we need an object to replace `Entry`, we'll call it `Cell`:
 
@@ -965,7 +965,7 @@ Each 10,000 steps we'll print the time it took to perform these 10,000 steps and
 <tr><td>2,500,000</td><td>1,126</td><td>119,481</td><td>416,713</td><td>2.70</td><td>92.2</td></tr>
 </table>
 
-The good news is that we managed to run two and a half million iteration on a rather big structure. The maximal number of live cells was 416K, which is not bad. The memory
+The good news is that we managed to run two and a half million iterations on a rather big structure. The maximal number of live cells was 416K, which is not bad. The memory
 consumption is also reasonable (92 megabytes these days can even be called "small").
 
 The bad news is that the progress slows down significantly as the structure grows. We started at less than a second for 10,000 steps, and ended up at 1,126 seconds for
@@ -977,7 +977,7 @@ simulation progresses. Here is the graph of this time over the number of steps:
 
 <img src="{{ site.url }}/images/life-home-made-hash-time-over-steps.png" width="639" height="391">
 
-We see that the time per cell is indeed monotonously growing with the number of steps, but the grows rate isn't always the same. There are even periods where the graph is nearly horizontal.
+We see that the time per cell is indeed monotonously growing with the number of steps, but the growth rate isn't always the same. There are even periods where the graph is nearly horizontal.
 In one place, however, the graph is very steep -- just before step 500,000. The time nearly triples -- it raises from about 0.5 ms to about 1.5 ms, reaching almost 2 ms
 at 1,000,000. We can explain this raise if we plot the time against the total memory use:
 
