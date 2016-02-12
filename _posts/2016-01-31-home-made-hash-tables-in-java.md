@@ -193,7 +193,7 @@ This makes it three objects per data element, and, when implementing it by hand,
 key may be stored simply as `long`). Moreover, this way we also save a call to `equals` on the key objects: we can compare `long` values directly. Altogether this offers
 some improvement, we'll check now how big.
 
-All the code is available in [this repository]({{ site.REPO-LIFE }}/tree/1416a32afceacbc59f94d4c1be9ed42625736e32).
+All the code is available in [this repository]({{ site.REPO-LIFE }}/tree/36d73f731497d0aa84b8587a862b410cb77121da).
 
 First, we need an object to replace `Entry`, we'll call it `Cell`:
 
@@ -768,28 +768,52 @@ The version based on multiplication by two big numbers allows yet another improv
 one 64-bit number), and the hash value
 
   <div class="formula">
-    hash = (Ax + By) mod 2<sup>32</sup>
+    hash = (Ax + By) mod 2<sup>N</sup>
   </div>
 
-where _A_ and _B_ are our constant factors. Both the _(x, y)_ pair and the hash value are updated when we move from a cell to its neighbour. But where are we using _x_ and _y_?
+where _A_ and _B_ are our constant factors. In our case N = 32, but we may use other values. Both the _(x, y)_ pair and the hash value are updated when we move from a cell to its neighbour. But where are we using _x_ and _y_?
 Apart from calculating the new _x_ and _y_ and reporting the final result of the simulation, in one place only: comparing the cell's position with the requested one in `get()`.
-If there was a one-to-one mapping between _x_ and <em>Ax&nbsp;mod&nbsp;2<sup>32</sup></em>
-(likewise, _y_ and <em>By&nbsp;mod&nbsp;2<sup>32</sup></em>),
-we wouldn't need _x_ and _y_ at all. Such mapping would allow us to recover _x_ and _y_ when we finally need them to get the simulation result. Before that,
+If there was a one-to-one mapping between _x_ and <em>(Ax&nbsp;mod&nbsp;2<sup>N</sup>)</em>
+(likewise, _y_ and <em>(By&nbsp;mod&nbsp;2<sup>N</sup>)</em>),
+we wouldn't need _x_ and _y_ at all. We could then store two values
+
+  <div class="formula">
+    x' = Ax mod 2<sup>N</sup><br/>
+    y' = By mod 2<sup>N</sup><br/>
+  </div>
+
+and calculate hash quickly as
+
+  <div class="formula">
+    hash = (x' + y') mod 2<sup>N</sup>
+  </div>
+
+The mapping would allow us to recover _x_ and _y_ when we finally need them to get the simulation result. Before that,
 we can do without these variables.
 
 Fortunately, such mapping exists. Our factors _A_ and _B_ are chosen as prime numbers, and a weaker condition is required for such mapping: for the numbers to
-be relatively prime with 2<sup>32</sup>, or, simply speaking, to be odd. All we need is to find the number _A'_, so that
+be relatively prime with 2<sup>N</sup>, or, simply speaking, to be odd. All we need is to find the number _A'_, so that
 
   <div class="formula">
-    (AA') mod 2<sup>32</sup> = 1
+    (AA') mod 2<sup>N</sup> = 1
   </div>
 
 Then  
 
   <div class="formula">
-    ((Ax mod 2<sup>32</sup>) A') mod 2<sup>32</sup> = x
+    ((Ax mod 2<sup>N</sup>) A') mod 2<sup>N</sup> = x
   </div>
+
+Before finding _A'_ and _B'_ we must decide on the value of _N_. It is attractive to set it to 32, but that will cause problems updating _x'_ and _y'_. We want to store them
+in  two 32-bit parts of a 64-bit number and update with just one add operation. An overflow, however, may happen when we add or subtract _B_ to the lower part.
+Previously we resolved this problem by adding offset of 0x80000000 or 0x8000000 to both parts. This prevented overflow when subtracting 1 from the value 0. An overflow might
+still happen when _|y|_ is big, but this was considered unlikely for any realistic simulation.
+
+Now we want to add or subrtact B = 7,436,369 to the lower part, and this can easily cause overflow. Just 288 such additions will outgrow 32 bits.
+
+Here is the plan. We'll set N to 31 and will keep the higher bits of both sides cleared. When applying negative offsets, we will add
+<em>(&minus;B&nbsp;&&nbsp;(2<sup>31</sup>&minus;1))</em> instead of
+subtracting B. This will avoid overflows at a cost of reducing our workspace to 31 bits instead of 32.
 
 For our numbers
 
@@ -798,42 +822,64 @@ For our numbers
     B = 7436369
   </div>
 
-we have
+we have, when N=31:
 
   <div class="formula">
     A' = 1651619427<br/>
     B' = 2058014897
   </div>
 
-The class `AdditiveCell` supports two formats of positions, traditional one and a hash-format, and conversion utilities:
+The class `AdditiveCell` supports conversion from the traditional format to the hash-format:
 
 {% highlight Java %}
-private static long tohash (long key)
-{
-    return w (hi (key) * A, lo (key) * B);
-}
+    public static long MASK = 0x7FFFFFFF7FFFFFFFL;
     
-private static long fromhash (long hash)
-{
-    return w (hi (hash) * Ar, lo(hash) * Br);
-}
+    public static long encode (int x, int y)
+    {
+        return w (x * A, y * B) & MASK;
+    }
+    
+    public static Point decode (long hash)
+    {
+        int x = (hi (hash) * Ar) << 1 >> 1;
+        int y = (lo (hash) * Br) << 1 >> 1;
+        return new Point (x, y);
+    }
 {% endhighlight %}
 
-The constructor and the output function `toPoint` must be changed in the obvious way:
+The change in the Life implementation is quite straightforward (see `Hash_Additive3`). Here, for instance, is new `set()` and new `inc()`:
 
 {% highlight Java %}
-private static long tohash (long key)
-{
-    return w (hi (key) * A, lo (key) * B);
-}
-    
-private static long fromhash (long hash)
-{
-    return w (hi (hash) * Ar, lo(hash) * Br);
-}
+    public static long AM = w (-AdditiveCell.A, 0) & MASK;
+    public static long BM = w (0, -AdditiveCell.B) & MASK;
+
+    void set (AdditiveCell c)
+    {
+        long w = c.pos;
+        inc (w+AM+BM);
+        inc (w+AM);
+        inc (w+AM+B);
+        inc (w+BM);
+        inc (w+B);
+        inc (w+A+BM);
+        inc (w+A);
+        inc (w+A+B);
+        c.set ();
+    }
+
+    private void inc (long w)
+    {
+        w &= MASK;
+        AdditiveCell c = get (w);
+        if (c == null) {
+            put (new AdditiveCell (w, 1));
+        } else {
+            c.inc ();
+        }
+    }
 {% endhighlight %}
 
-The change in the Life implementation is quite straightforward (see `Hash_Additive3`). The new hash function is worth noticing:
+The new hash function is worth looking at:
 
 {% highlight Java %}
 private int hash (long key)
@@ -882,8 +928,8 @@ Here is the entire change history:
 <tr><td class="label">Hash_HomeMade5</td> <td class="ttext">The action lists were introduced              </td><td> 395</td><td>  354</td></tr>
 <tr><td class="label">Hash_HomeMade6</td> <td class="ttext">The division-based hash function, hard coded  </td><td> 392</td><td>  353</td></tr>
 <tr><td class="label">Hash_Additive</td> <td class="ttext">The division-based hash function, additive     </td><td> 358</td><td>  327</td></tr>
-<tr><td class="label">Hash_Additive2</td> <td class="ttext">Multiplication by two big numbers, additive   </td><td> 349</td><td>  351</td></tr>
-<tr><td class="label">Hash_Additive3</td> <td class="ttext">Multiplication by two big numbers, ultimate additive</td><td> 343</td><td>  361</td></tr>
+<tr><td class="label">Hash_Additive2</td> <td class="ttext">Multiplication by two big numbers, additive   </td><td> 349</td><td>  351</td></tr>        // 7:381
+<tr><td class="label">Hash_Additive3</td> <td class="ttext">Multiplication by two big numbers, ultimate additive</td><td> 343</td><td>  361</td></tr>  // 7:373
 </table>
 
 Here is the same data as a graph (the **Java 8** time for `Hash_Reference` is excluded):
