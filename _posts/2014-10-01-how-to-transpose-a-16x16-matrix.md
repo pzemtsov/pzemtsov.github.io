@@ -19,7 +19,7 @@ The usual way to transpose this matrix is to divide it into small blocks that fi
 and transpose each block separately. We tried
 this using blocks of size 1&times;4, 1&times;8, 4&times;4, 4&times;16, 8&times;16, 4&times;32 and 8&times;32.
 The best results were achieved using 8&times;16 blocks with SSE (120 ms for 1,000,000 iterations),
-and 8&times;32 blocks with AVX (109 ms). The times were measured on the Intel(R) Xeon(R) CPU E5-2670 @ 2.60GHz.
+and 8&times;32 blocks with AVX (109 ms). The times were measured on the Intel&reg; Xeon&reg; CPU E5-2670 @ 2.60GHz.
 
 In the same article I briefly mentioned an attempt to use 16&times;16 blocks. I didn't go into the details then,
 to keep the article shorter. Now I changed my mind. Looking later at the code, I considered it rather beautiful. So
@@ -49,7 +49,10 @@ The second one took four SSE variables, interpreted them as a 4&times;4 matrix o
 and transposed this matrix:
 
 {% highlight C++ %}
-inline void transpose_4x4_dwords (__m128i w0, __m128i w1, __m128i w2, __m128i w3, __m128i &r0, __m128i &r1, __m128i &r2, __m128i &r3)
+inline void transpose_4x4_dwords (__m128i w0, __m128i w1,
+                                  __m128i w2, __m128i w3,
+                                  __m128i &r0, __m128i &r1,
+                                  __m128i &r2, __m128i &r3)
 {
     // 0  1  2  3
     // 4  5  6  7
@@ -110,14 +113,17 @@ in the following way:
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w01</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w02</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w03</p></div></td>
+</tr>
 <tr><td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w10</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w11</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w12</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w13</p></div></td>
+</tr>
 <tr><td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w20</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w21</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w22</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w23</p></div></td>
+</tr>
 <tr><td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w30</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w31</p></div></td>
     <td><table class="grid"><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table><div><p>w32</p></div></td>
@@ -142,19 +148,19 @@ transpose_4x4_dwords (w00, w10, w20, w30, x0, x1, x2, x3);
 Here is the content of `w00` ... `w30` before this operation:
 
 <table class="matrix">
-<tr><td class="mlabel">w00: <td class="l">00</td><td>10</td><td>20</td><td class="r">30</td><td class="l">01</td><td>11</td><td>21</td><td class="r">31</td><td class="l">02</td><td>12</td><td>22</td><td class="r">32</td><td class="l">03</td><td>13</td><td>23</td><td class="r">33</td></tr>
-<tr><td class="mlabel">w10: <td class="l">40</td><td>50</td><td>60</td><td class="r">70</td><td class="l">41</td><td>51</td><td>61</td><td class="r">71</td><td class="l">42</td><td>52</td><td>62</td><td class="r">72</td><td class="l">43</td><td>53</td><td>63</td><td class="r">73</td></tr>
-<tr><td class="mlabel">w20: <td class="l">80</td><td>90</td><td>A0</td><td class="r">B0</td><td class="l">81</td><td>91</td><td>A1</td><td class="r">B1</td><td class="l">82</td><td>92</td><td>A2</td><td class="r">B2</td><td class="l">83</td><td>93</td><td>A3</td><td class="r">B3</td></tr>
-<tr><td class="mlabel">w30: <td class="l">C0</td><td>D0</td><td>E0</td><td class="r">F0</td><td class="l">C1</td><td>D1</td><td>E1</td><td class="r">F1</td><td class="l">C2</td><td>D2</td><td>E2</td><td class="r">F2</td><td class="l">C3</td><td>D3</td><td>E3</td><td class="r">F3</td></tr>
+<tr><td class="mlabel">w00: </td><td class="l">00</td><td>10</td><td>20</td><td class="r">30</td><td class="l">01</td><td>11</td><td>21</td><td class="r">31</td><td class="l">02</td><td>12</td><td>22</td><td class="r">32</td><td class="l">03</td><td>13</td><td>23</td><td class="r">33</td></tr>
+<tr><td class="mlabel">w10: </td><td class="l">40</td><td>50</td><td>60</td><td class="r">70</td><td class="l">41</td><td>51</td><td>61</td><td class="r">71</td><td class="l">42</td><td>52</td><td>62</td><td class="r">72</td><td class="l">43</td><td>53</td><td>63</td><td class="r">73</td></tr>
+<tr><td class="mlabel">w20: </td><td class="l">80</td><td>90</td><td>A0</td><td class="r">B0</td><td class="l">81</td><td>91</td><td>A1</td><td class="r">B1</td><td class="l">82</td><td>92</td><td>A2</td><td class="r">B2</td><td class="l">83</td><td>93</td><td>A3</td><td class="r">B3</td></tr>
+<tr><td class="mlabel">w30: </td><td class="l">C0</td><td>D0</td><td>E0</td><td class="r">F0</td><td class="l">C1</td><td>D1</td><td>E1</td><td class="r">F1</td><td class="l">C2</td><td>D2</td><td>E2</td><td class="r">F2</td><td class="l">C3</td><td>D3</td><td>E3</td><td class="r">F3</td></tr>
 </table>
 
 And this is the result (stored back into `x0` ... `x3`):
 
 <table class="matrix">
-<tr><td class="mlabel">x0: <td class="l">00</td><td>10</td><td>20</td><td class="r">30</td><td class="l">40</td><td>50</td><td>60</td><td class="r">70</td><td class="l">80</td><td>90</td><td>A0</td><td class="r">B0</td><td class="l">C0</td><td>D0</td><td>E0</td><td class="r">F0</td></tr>
-<tr><td class="mlabel">x1: <td class="l">01</td><td>11</td><td>21</td><td class="r">31</td><td class="l">41</td><td>51</td><td>61</td><td class="r">71</td><td class="l">81</td><td>91</td><td>A1</td><td class="r">B1</td><td class="l">C1</td><td>D1</td><td>E1</td><td class="r">F1</td></tr>
-<tr><td class="mlabel">x2: <td class="l">02</td><td>12</td><td>22</td><td class="r">32</td><td class="l">42</td><td>52</td><td>62</td><td class="r">72</td><td class="l">82</td><td>92</td><td>A2</td><td class="r">B2</td><td class="l">C2</td><td>D2</td><td>E2</td><td class="r">F2</td></tr>
-<tr><td class="mlabel">x3: <td class="l">03</td><td>13</td><td>23</td><td class="r">33</td><td class="l">43</td><td>53</td><td>63</td><td class="r">73</td><td class="l">83</td><td>93</td><td>A3</td><td class="r">B3</td><td class="l">C3</td><td>D3</td><td>E3</td><td class="r">F3</td></tr>
+<tr><td class="mlabel">x0: </td><td class="l">00</td><td>10</td><td>20</td><td class="r">30</td><td class="l">40</td><td>50</td><td>60</td><td class="r">70</td><td class="l">80</td><td>90</td><td>A0</td><td class="r">B0</td><td class="l">C0</td><td>D0</td><td>E0</td><td class="r">F0</td></tr>
+<tr><td class="mlabel">x1: </td><td class="l">01</td><td>11</td><td>21</td><td class="r">31</td><td class="l">41</td><td>51</td><td>61</td><td class="r">71</td><td class="l">81</td><td>91</td><td>A1</td><td class="r">B1</td><td class="l">C1</td><td>D1</td><td>E1</td><td class="r">F1</td></tr>
+<tr><td class="mlabel">x2: </td><td class="l">02</td><td>12</td><td>22</td><td class="r">32</td><td class="l">42</td><td>52</td><td>62</td><td class="r">72</td><td class="l">82</td><td>92</td><td>A2</td><td class="r">B2</td><td class="l">C2</td><td>D2</td><td>E2</td><td class="r">F2</td></tr>
+<tr><td class="mlabel">x3: </td><td class="l">03</td><td>13</td><td>23</td><td class="r">33</td><td class="l">43</td><td>53</td><td>63</td><td class="r">73</td><td class="l">83</td><td>93</td><td>A3</td><td class="r">B3</td><td class="l">C3</td><td>D3</td><td>E3</td><td class="r">F3</td></tr>
 </table>
 
 You can see that the variables contain four first columns of the original matrix. If we perform this operation
@@ -235,14 +241,17 @@ public:
             byte * d15= dst [dst_num +15];
             for (size_t dst_pos = 0; dst_pos < DST_SIZE; dst_pos += 16) {
 
-#define LOADREG(i) __m128i w##i = _128i_load (&src [(dst_pos + i) * NUM_TIMESLOTS + dst_num])
+#define LOADREG(i) __m128i w##i = \
+                _128i_load (&src [(dst_pos + i) * NUM_TIMESLOTS + dst_num])
+
 #define STOREREG(i) _128i_store (&d##i [dst_pos], w##i)
 
                 LOADREG (0);  LOADREG (1);  LOADREG (2);  LOADREG (3);
                 LOADREG (4);  LOADREG (5);  LOADREG (6);  LOADREG (7);
                 LOADREG (8);  LOADREG (9);  LOADREG (10); LOADREG (11);
                 LOADREG (12); LOADREG (13); LOADREG (14); LOADREG (15);
-                transpose_16x16 (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15);
+                transpose_16x16 (w0,  w1, w2,  w3,  w4,  w5,  w6,  w7,
+                                 w8,  w9, w10, w11, w12, w13, w14, w15);
                 STOREREG (0);  STOREREG (1);  STOREREG (2);  STOREREG (3);
                 STOREREG (4);  STOREREG (5);  STOREREG (6);  STOREREG (7);
                 STOREREG (8);  STOREREG (9);  STOREREG (10); STOREREG (11);

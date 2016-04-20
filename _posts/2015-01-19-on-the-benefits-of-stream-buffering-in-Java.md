@@ -215,7 +215,7 @@ And this is the speed:
 This is a failure -- the code runs slower. This seems counter-intuitive and requires explanation.
 I don't have definite answer, only a theory. The problem may be in array index (and possibly `null`) checks.
 The old code allocated array of size `4` and immediately accessed its elements at constant indices. The compiler
-new that the array wasn't `null` and that all the indices were within range. When the array reference is read from a static field,
+knew that the array wasn't `null` and that all the indices were within range. When the array reference is read from a static field,
 the compiler doesn't know that; it has to generate `null` and index check code. The indirect argument in favour
 of this theory is that if we replace the entire `return` statement in `readInt` with
 

@@ -1,12 +1,9 @@
 name: Experiments in program optimisation
 author: Pavel Zemtsov
-markdown: redcarpet
-pygments: true
+markdown: kramdown
+highlighter: rouge
 timezone: Africa/Johannesburg
-
-collections:
-  ququ:
-    output: true
+coding: us-ascii
 
 TITLE-STORY-CACHE: "How cache affects performance"
 TITLE-STORY-BUFFERING: "Effects of stream buffering"
@@ -59,6 +56,6 @@ REPO-E1-CACHE: https://github.com/pzemtsov/article-e1-cache
 REPO-LIFE: https://github.com/pzemtsov/article-life
 REPO-PEANO: https://github.com/pzemtsov/article-peano
 
-redcarpet:
- extensions: [smart, tables]
- 
+kramdown:
+ input: GFM
+ smart_quotes: lsquo,rsquo,ldquo,rdquo

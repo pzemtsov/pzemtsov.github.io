@@ -194,7 +194,7 @@ First results
 -------------
 
 After all the preparations, we are finally ready to run the program. I'm going to use the server VM of **Java** version 1.7_40 on Linux, running on a Dell
-blade with Intel(R) Xeon(R) CPU E5-2670 @ 2.60GHz.
+blade with Intel&reg; Xeon&reg; CPU E5-2670 @ 2.60GHz.
 
     # Java -server E1
     E1.Reference: 2897 2860 2860 2860 2860
@@ -332,9 +332,9 @@ static final class Src_First_2 implements Demux
     {
         assert src.length % NUM_TIMESLOTS == 0;
             
-        for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
+        for (int dst_pos = 0; dst_pos < src.length/NUM_TIMESLOTS; ++ dst_pos) {
             for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-                dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
+                dst [dst_num][dst_pos] = src [dst_pos*NUM_TIMESLOTS + dst_num];
             }
             ++ dst_pos;
         }
@@ -372,9 +372,9 @@ static final class Src_First_2 implements Demux
     {
         assert src.length % NUM_TIMESLOTS == 0;
             
-        for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
+        for (int dst_pos = 0; dst_pos < src.length/NUM_TIMESLOTS; ++ dst_pos) {
             for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-                dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
+                dst [dst_num][dst_pos] = src [dst_pos*NUM_TIMESLOTS + dst_num];
             }
         }
     }
@@ -547,7 +547,7 @@ static final class Dst_First_3 implements Demux
 
         for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
             for (int dst_pos = 0; dst_pos < DST_SIZE; ++ dst_pos) {
-                dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
+                dst [dst_num][dst_pos] = src [dst_pos*NUM_TIMESLOTS + dst_num];
             }
         }
     }
@@ -854,7 +854,7 @@ Let's put all the results into one table. I've used the last result of each test
 times as percentages of the time or the `Reference` solution.
 
 <table class="numeric">
-<tr><th> Version </th><th> Comment </th> <th> Time </th> <th> Rel.Ref </th>
+<tr><th> Version </th><th> Comment </th> <th> Time </th> <th> Rel.Ref </th></tr>
 <tr><td class="label">Reference      </td><td class="ttext">Strictly follows hardware decoder            </td><td> 2860 </td><td> 100.0% </td></tr>
 <tr><td class="label">Src_First_1    </td><td class="ttext">Refactored the inner loop of Reference       </td><td> 2481 </td><td>  86.7% </td></tr>
 <tr><td class="label">Src_First_2    </td><td class="ttext">Nested loops with multiplication             </td><td> 2284 </td><td>  79.9% </td></tr>

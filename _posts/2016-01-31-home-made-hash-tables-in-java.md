@@ -143,10 +143,13 @@ Here is a quick recap of what we were doing before:
 - In ["{{ site.TITLE-HASH }}"]({{ site.ART-HASH }}) we implemented Life in **Java** using hash maps. We ran the program on the
 [`ACORN`](http://conwaylife.appspot.com/pattern/acorn) pattern:
 
+<p></p>
+<div>
 <canvas class="life" id="A" shape="acorn" width="255" height="255" style="outline: 1px black solid;"></canvas>
 <br/>
 <button class="life" id="A">start</button>
 <br/>
+</div>
 
 and measured time for 10,000 steps. The first result we achieved was 2763 ms, or 3619 frames/sec on
 **Java 7**.
@@ -542,7 +545,7 @@ Now, as we introduced the list, we can make the hash map capacity bigger. We cou
 but, as I mentioned before, small values involve some degree of cheating, so let's concentrate on higher values - around one million.
 
 <table class="numeric">
-<tr><th>Capacity</th><th><b>Java 7</b></th><th><b>Java 8</th></tr>
+<tr><th>Capacity</th><th><b>Java 7</b></th><th><b>Java 8</b></th></tr>
 <tr><td>  8192 </td><td>   480 </td><td>  433 </td></tr>
 <tr><td>  256K </td><td>   405 </td><td>  353 </td></tr>
 <tr><td>  512K </td><td>   419 </td><td>  369 </td></tr>
@@ -980,10 +983,12 @@ The glider gun
 
 In [the first article]({{ site.ART-HASH }}) I mentioned the Gosper glider gun -- a device that spawns gliders at regular intervals. Here it is:
 
+<div>
 <canvas class="life" id="gun" shape="gun" width="255" height="255" style="outline: 1px black solid;"></canvas>
 <br/>
 <button class="life" id="gun">start</button>
 <br/>
+</div>
 
 This gun has the period of 30 --
 it creates a new glider (5 cells) every 30 steps. This means that the total size of the structure grows by about 1,600 every 10,000 steps. This is a big challenge for our program.

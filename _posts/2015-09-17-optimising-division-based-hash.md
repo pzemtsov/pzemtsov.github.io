@@ -214,8 +214,9 @@ However, with the sign-extended versions of `hi` and `lo` we would have
   <ul> = &minus;1 + ((0 + &minus;1) << 32) <br>
        = 0xFFFFFFFFFFFFFFFF + 0xFFFFFFFF00000000 <br>
        = 0xFFFFFFFEFFFFFFFF
+  </ul>
  </div>
-
+ 
 The code using `uhi`, `ulo` works correctly:
 
  <div class="formula">
@@ -227,6 +228,7 @@ The code using `uhi`, `ulo` works correctly:
   <ul> = 0xFFFFFFFF + ((0 + 0xFFFFFFFF) << 32) <br>
        = 0xFFFFFFFF + 0xFFFFFFFF00000000 <br>
        = 0xFFFFFFFFFFFFFFF
+  </ul>
  </div>
 
 The `mult_unsigned_lopart` was shown here for completeness; we don't need it for our remainder problem.

@@ -172,10 +172,12 @@ lots of more complex objects. Certain initial patterns, albeit small, evolve for
 (R-pentamino piece) starts small, grows, lives a turbulent life and then deteriorates and fades away, never dying
 completely:
 
+<div>
 <canvas class="life" id="R" shape="rpenta" width="255" height="255" style="outline: 1px black solid;"></canvas>
 <br/>
 <button class="life" id="R">Start</button>
 <br/>
+</div>
 
 You can click "Start" and see how this one evolves.
 
@@ -212,10 +214,12 @@ It is not trivial to find a suitable test input for a Life program. An arbitrary
 to die very quickly. We've seen one simple structure that lived for a while, the R-pentamino. Here is another one,
 the acorn:
 
+<div>
 <canvas class="life" id="A" shape="acorn" width="255" height="255" style="outline: 1px black solid;"></canvas>
 <br/>
 <button class="life" id="A">start</button>
 <br/>
+</div>
 
 We'll be using the acorn as it lives a bit longer, and grows bigger -- it stabilises at 633 living cells while
 the R-pentamino does at 116.
@@ -233,10 +237,12 @@ if I could hit this limitation in real life -- that would mean that the program 
 reasonable time, and this is something yet to be achieved). Another consideration
 is memory. There are configurations that grow indefinitely, such as [Gosper Glider Gun](http://en.wikipedia.org/wiki/Gun_%28cellular_automaton%29):
 
+<div>
 <canvas class="life" id="gun" shape="gun" width="255" height="255" style="outline: 1px black solid;"></canvas>
 <br/>
 <button class="life" id="gun">start</button>
 <br/>
+</div>
 
 If we simulate this gun long enough, we'll run out of memory. However, a million or two iterations should still work.
 Perhaps, we'll do the gun next time.
@@ -654,8 +660,8 @@ diagonal line (0,0), (1,1), (2,2), ... into the single value 0:
 
 <table class="squaregrid">
 <tr><th class="legend" rowspan="2" colspan="2"></th><th class="legend" colspan="16">x</th></tr>
-<th class="header">0</th><th class="header">1</th><th class="header">2</th><th class="header">3</th><th class="header">4</th><th class="header">5</th><th class="header">6</th><th class="header">7</th><th class="header">8</th><th class="header">9</th><th class="header">10</th><th class="header">11</th><th class="header">12</th><th class="header">13</th><th class="header">14</th><th class="header">15</th></tr>
-<tr><th class="legend" rowspan="17">y </th>
+<tr><th class="header">0</th><th class="header">1</th><th class="header">2</th><th class="header">3</th><th class="header">4</th><th class="header">5</th><th class="header">6</th><th class="header">7</th><th class="header">8</th><th class="header">9</th><th class="header">10</th><th class="header">11</th><th class="header">12</th><th class="header">13</th><th class="header">14</th><th class="header">15</th></tr>
+<tr><th class="legend" rowspan="17">y </th></tr>
 <tr><th class="header">0</th><td class="C0">0</td><td class="C1">1</td><td class="C2">2</td><td class="C3">3</td><td class="C4">4</td><td class="C5">5</td><td class="C6">6</td><td class="C7">7</td><td class="C8">8</td><td class="C9">9</td><td class="C10">10</td><td class="C11">11</td><td class="C12">12</td><td class="C13">13</td><td class="C14">14</td><td class="C15">15</td></tr>
 <tr><th class="header">1</th><td class="C1">1</td><td class="C0">0</td><td class="C3">3</td><td class="C2">2</td><td class="C5">5</td><td class="C4">4</td><td class="C7">7</td><td class="C6">6</td><td class="C9">9</td><td class="C8">8</td><td class="C11">11</td><td class="C10">10</td><td class="C13">13</td><td class="C12">12</td><td class="C15">15</td><td class="C14">14</td></tr>
 <tr><th class="header">2</th><td class="C2">2</td><td class="C3">3</td><td class="C0">0</td><td class="C1">1</td><td class="C6">6</td><td class="C7">7</td><td class="C4">4</td><td class="C5">5</td><td class="C10">10</td><td class="C11">11</td><td class="C8">8</td><td class="C9">9</td><td class="C14">14</td><td class="C15">15</td><td class="C12">12</td><td class="C13">13</td></tr>
@@ -983,10 +989,10 @@ The probability of not hitting a specific slot in _k_ tries is
   <div class="formula">
   <table>
   <tr>
-    <td rowspan=3>q<sub>k</sub>&nbsp;=&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;</td>
+    <td rowspan="3">q<sub>k</sub>&nbsp;=&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;</td>
     <td class="num">1</td>
-    <td rowspan=3>&nbsp;<span class="big">)</span></td>
-    <td rowspan=3><span class="big"><sup><sup>k</sup></sup></span></td>
+    <td rowspan="3">&nbsp;<span class="big">)</span></td>
+    <td rowspan="3"><span class="big"><sup><sup>k</sup></sup></span></td>
   </tr>
   <tr>
     <td class="denom">M</td>
@@ -999,10 +1005,10 @@ The probability of hitting a specific slot at least once (in other words, of a s
   <div class="formula">
   <table>
   <tr>
-    <td rowspan=3>p<sub>k</sub>&nbsp;=&nbsp;1&nbsp;&minus;&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;</td>
+    <td rowspan="3">p<sub>k</sub>&nbsp;=&nbsp;1&nbsp;&minus;&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;</td>
     <td class="num">1</td>
-    <td rowspan=3>&nbsp;<span class="big">)</span></td>
-    <td rowspan=3><span class="big"><sup><sup>k</sup></sup></span></td>
+    <td rowspan="3">&nbsp;<span class="big">)</span></td>
+    <td rowspan="3"><span class="big"><sup><sup>k</sup></sup></span></td>
   </tr>
   <tr>
     <td class="denom">M</td>
@@ -1015,11 +1021,11 @@ and the expected value of the number of non-empty slots (random variable <i>Num<
   <div class="formula">
   <table>
   <tr>
-    <td rowspan=2>E[Num<sub>k</sub>]&nbsp;=&nbsp;M&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;</td>
+    <td rowspan="2">E[Num<sub>k</sub>]&nbsp;=&nbsp;M&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;</td>
     <td class="num">1</td>
-    <td rowspan=2>&nbsp;<span class="big">)</span></td>
-    <td rowspan=2><span class="big"><sup><sup>k</sup></sup></span></td>
-    <td rowspan=2><span class="big">)</span></td>
+    <td rowspan="2">&nbsp;<span class="big">)</span></td>
+    <td rowspan="2"><span class="big"><sup><sup>k</sup></sup></span></td>
+    <td rowspan="2"><span class="big">)</span></td>
   </tr>
   <tr>
     <td class="denom">M</td>
@@ -1079,7 +1085,7 @@ I don't know any easy way to convert it into a direct formula. Knuth (_The art o
   <div class="formula">
   <table>
   <tr>
-    <td rowspan="2">P<sub>k</sub>(n)&nbsp;=&nbsp;
+    <td rowspan="2">P<sub>k</sub>(n)&nbsp;=&nbsp;</td>
     <td class="num">M!<sup> </sup></td>
     <td rowspan="2"><span class="big">{</span></td>
     <td>k</td>
@@ -1138,7 +1144,7 @@ into the picture).
 Here are the results for the `counts` structure (element count 3938, E&nbsp;[Num]&nbsp;=&nbsp;3126.69, &sigma;&nbsp;[Num]&nbsp;=&nbsp;20.68), first as a table:
 
 <table class="numeric">
-<tr><th>Label<th>Hash</th><th>Num</th><th>Num&minus;E</th><th>(Num&minus;E)/&sigma;</th></tr>
+<tr><th>Label</th><th>Hash</th><th>Num</th><th>Num&minus;E</th><th>(Num&minus;E)/&sigma;</th></tr>
 <tr><td class="label">1</td><td class="ttext"><b>Long</b> default               </td><td> 302</td><td>-2824.69</td><td> -136.52</td></tr>
 <tr><td class="label">2</td><td class="ttext">Multiply by 3, 5                  </td><td>1108</td><td>-2018.69</td><td>  -97.57</td></tr>
 <tr><td class="label">3</td><td class="ttext">Multiply by 11, 17                </td><td>2252</td><td> -901.69</td><td>  -43.58</td></tr>
@@ -1201,7 +1207,7 @@ templates once again would have worked better than **Java** generics (I haven't 
 Here are the results as a table (again, each test was executed on its own):
 
 <table class="numeric">
-<tr><th>Label<th>Hash</th><th>Time, <b>Java 7</b></th><th>Time, <b>Java 8</b></th></tr>
+<tr><th>Label</th><th>Hash</th><th>Time, <b>Java 7</b></th><th>Time, <b>Java 8</b></th></tr>
 <tr><td class="label">Ref</td><td class="ttext">Multiply by 3, 5                </td><td>2763</td><td>4961</td></tr>
 <tr><td class="label">1</td><td class="ttext"><b>Long</b> default               </td><td>4273</td><td>6755</td></tr>
 <tr><td class="label">2</td><td class="ttext">Multiply by 3, 5                  </td><td>2602</td><td>4836</td></tr>

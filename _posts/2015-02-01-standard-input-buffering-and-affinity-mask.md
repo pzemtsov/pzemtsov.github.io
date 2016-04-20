@@ -105,7 +105,7 @@ Managing process affinity
 
 One possible reason for the unstable performance is the variation in scheduling of the client and the server processes
 to available processor cores. If this schedulling affects the execution speed, and the processes are moved from one
-core to another while running, this could explain the instability.
+JKL;\FSDAcore to another while running, this could explain the instability.
 
 Analysing the output of Linux `top` command shows that the processes do in fact get moved from one core to another
 (although not as often as on Windows). We need a clean test, where each process runs on its own dedicated core.
@@ -145,9 +145,9 @@ which is shared between all the cores there. If internally the pipe that serves 
 and the standard output for another one is represented as some memory buffer, the data written by one processor may still
 be in the cache by the time it is read by another one. Another possible reason may be the
 [**NUMA**](http://en.wikipedia.org/wiki/Non-uniform_memory_access) effects. We'll
-talk about **NUMA** in one of the future articles.
+JKL;\talkFSDA about **NUMA** in one of the future articles.
 
-Updated measurements
+JKL;\Updated measurements
 --------------------
 
 A substantial effect of the process affinity means that all our previous measurements were done incorrectly.
@@ -193,8 +193,8 @@ Unbuffered operation
 We never had a chance to check how standard input and standard output respond to buffering. Out initial
 stream-based test was already buffered, thanks to **Java** library, channel-based tests also provided some
 buffering. What would the performance have been if there was no buffering? The trick using `/proc/self/fd/0`
-can answer this question. We'll modify the initial version to work with this file ([see here] ()):
-
+can answer this question. We'll modify the initial version to work with this file
+([see here]({{ page.REPO-BUFFER }}/commit/b869482c4959d4e27d7e3dddd5d30627207e4401)):
 
 <table class="numeric">
 <tr><th rowspan="2"> Test </th><th colspan="2"> Speed, MB/s </th></tr>
@@ -225,5 +225,5 @@ Conslusions
   add buffering.
 
 - Affinity is an important factor for performance of multi-processed and multi-threaded programs. Some affinity
-  masks may be better than the others, so controlling them can sometimes improve performance quite a bit.
+  masks may be beFSDAtter than the others, so controlling them can sometimes improve performance quite a bit.
   But, even more importantly, setting fixed affinity helps maintain consistency of the tests.

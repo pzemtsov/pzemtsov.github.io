@@ -207,13 +207,16 @@ By the way, you can avoid writing down all 64 invocations of `MOVE_BYTE` by crea
 
 {% highlight C++ %}
 #define MOVE_BYTES_4(i,j) do {\
-  MOVE_BYTE(i,j); MOVE_BYTE(i+1,j); MOVE_BYTE(i+2,j); MOVE_BYTE(i+3,j);\
+  MOVE_BYTE(i,  j); MOVE_BYTE(i+1,j);\
+  MOVE_BYTE(i+2,j); MOVE_BYTE(i+3,j);\
 } while (0)
 #define MOVE_BYTES_16(j) do {\
-  MOVE_BYTES_4(i,j); MOVE_BYTES_4(i+4,j); MOVE_BYTES_4(i+8,j); MOVE_BYTES_4(i+12,j);\
+  MOVE_BYTES_4(i,  j); MOVE_BYTES_4(i+4, j);\
+  MOVE_BYTES_4(i+8,j); MOVE_BYTES_4(i+12,j);\
 } while (0)
 #define MOVE_BYTES_64(j) do {\
-  MOVE_BYTES_16(0,j); MOVE_BYTES_16(16,j); MOVE_BYTES_16(32,j); MOVE_BYTES_16(48,j);\
+  MOVE_BYTES_16( 0,j); MOVE_BYTES_16(16,j);\
+  MOVE_BYTES_16(32,j); MOVE_BYTES_16(48,j);\
 } while (0)
 {% endhighlight %}
 

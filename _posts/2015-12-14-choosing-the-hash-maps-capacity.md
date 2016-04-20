@@ -54,11 +54,11 @@ In the same article we've produced the formula for the expected value of <i>Num<
   <div class="formula">
   <table>
   <tr>
-    <td rowspan=2>E[Num<sub>k</sub>]&nbsp;=&nbsp;M&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;</td>
+    <td rowspan="2">E[Num<sub>k</sub>]&nbsp;=&nbsp;M&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;<span class="big">(</span>1&nbsp;&minus;&nbsp;</td>
     <td class="num">1</td>
-    <td rowspan=2>&nbsp;<span class="big">)</span></td>
-    <td rowspan=2><span class="big"><sup><sup>k</sup></sup></span></td>
-    <td rowspan=2><span class="big">)</span></td>
+    <td rowspan="2">&nbsp;<span class="big">)</span></td>
+    <td rowspan="2"><span class="big"><sup><sup>k</sup></sup></span></td>
+    <td rowspan="2"><span class="big">)</span></td>
   </tr>
   <tr>
     <td class="denom">M</td>
@@ -96,7 +96,7 @@ After substitution and reduction, we get the following for _E[Num<sub>k</sub>]_:
   <div class="formula">
   <table>
   <tr>
-    <td rowspan=2>E[Num<sub>k</sub>]&nbsp;=&nbsp;k&nbsp;+&nbsp;O&nbsp;<span class="big">(</span></td>
+    <td rowspan="2">E[Num<sub>k</sub>]&nbsp;=&nbsp;k&nbsp;+&nbsp;O&nbsp;<span class="big">(</span></td>
     <td class="num">1</td>
     <td rowspan="2"><span class="big">)</span></td>
   </tr>
@@ -154,7 +154,7 @@ private HashMap<LongPoint, Value> field =
 Here are the results we get for a range of the capacities  (these are the times for 10,000 steps of Life simulation, in milliseconds):
 
 <table class="numeric">
-<tr><th>Capacity</th><th><b>Java 7</b></th><th><b>Java 8</th></tr>
+<tr><th>Capacity</th><th><b>Java 7</b></th><th><b>Java 8</b></th></tr>
 <tr><td>     1 </td><td> 256372 </td><td>  1947 </td></tr>
 <tr><td>     2 </td><td> 110658 </td><td>  1917 </td></tr>
 <tr><td>     4 </td><td>  52715 </td><td>  1915 </td></tr>
@@ -248,7 +248,7 @@ Still, we can try using this class and check if it helps.
 This time we could run tests at bigger capacities -- up to 1G:
 
 <table class="numeric">
-<tr><th rowspan="2">Capacity</th><th colspan="2">Old time</th><th colspan="2">New time</tr>
+<tr><th rowspan="2">Capacity</th><th colspan="2">Old time</th><th colspan="2">New time</th></tr>
 <tr><th><b>Java&nbsp;7</b></th><th><b>Java&nbsp;8</b></th><th><b>Java&nbsp;7</b></th><th><b>Java&nbsp;8</b></th></tr>
 <tr><td>     1 </td><td> 256372 </td><td>  1947 </td><td> 261389 </td><td> 2083 </td></tr>
 <tr><td>     2 </td><td> 110658 </td><td>  1917 </td><td> 108080 </td><td> 1855 </td></tr>
@@ -328,7 +328,7 @@ This is what is printed when running on **Java 8** with the capacity of 8192 (ou
     1.665: [GC (Allocation Failure)  259200K->1010K(989184K), 0.0028201 secs]
     1.919: [GC (Allocation Failure)  259058K->1394K(989184K), 0.0069037 secs]
     2.229: [GC (Allocation Failure)  259442K->916K(1205760K), 0.0033108 secs]
-
+    
 
 Six GC invocation take 23ms in total, or 7ms per simulation, or roughly 1% of total execution time, which is reasonable.
 
@@ -338,10 +338,12 @@ Now let's look at the execution with the capacity 1G:
     3.367: [GC (Allocation Failure)  4453080K->4195216K(5442048K), 0.7838357 secs]
     5.528: [GC (Allocation Failure)  4711312K->4195120K(5442048K), 0.7899669 secs]
 
+<p>
 <ul>
 [A side note: I still can't get used to the heap size of 4Gb; I know these days it isn't even considered big, but I still remember the system in development of which I
 once took part: its heap was 8K bytes long, or half a million times smaller than now. And this was as recently as 1982! End of the side note]
 </ul>
+</p>
      
 Here we have three invocations, averaging to 790 ms, which is 41% of total execution time (1935 ms). This means that GC does indeed play a role in the slowdown at
 super-big capacities.

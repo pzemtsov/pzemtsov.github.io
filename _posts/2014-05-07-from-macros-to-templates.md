@@ -44,13 +44,15 @@ public:
 Using templates, we can write it like this:
 
 {% highlight C++ %}
-template<unsigned N> inline void move_bytes (const byte * src, byte * d, unsigned j)
+template<unsigned N> inline void move_bytes (const byte * src, byte * d,
+                                             unsigned j)
 {
     move_bytes<N-1> (src, d, j);
     d[N-1] = src [j + (N-1) * 32];
 }
 
-template<> inline void move_bytes<0> (const byte * src, byte * d, unsigned j) {}
+template<> inline void move_bytes<0> (const byte * src, byte * d, unsigned j)
+{}
 
 inline void move_timeslot (const byte * src, byte ** dst, unsigned j)
 {
@@ -127,13 +129,16 @@ We have `move_timeslot` function already, now we must provide a way to call it r
 the same way we did `move_bytes`:
 
 {% highlight C++ %}
-template<unsigned N> inline void move_timeslots (const byte * src, byte ** dst, unsigned j)
+template<unsigned N> inline void move_timeslots (const byte * src, byte ** dst,
+                                                 unsigned j)
 {
     move_timeslots<N-1> (src, dst, j);
     move_timeslot (src, dst, j+N-1);
 }
 
-template<> inline void move_timeslots<0> (const byte * src, byte ** dst, unsigned j) {}
+template<> inline void move_timeslots<0> (const byte * src, byte ** dst,
+                                          unsigned j)
+{}
 
 class Unrolled_2_Full : public Demux
 {

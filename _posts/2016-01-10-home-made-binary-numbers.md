@@ -142,20 +142,20 @@ high part of 10 (binary 101)
 Subtracting one is more complex, because we must take care of leading zeroes:
 
 {% highlight Java %}
-    private Binary D0 ()
-    {
-        if (lowest == Digit.ONE)
-            return next == null ? null : new Binary (Digit.ZERO, next);
-        if (next == null)
-            throw new IllegalArgumentException ("Negative number");
-        return new Binary (Digit.ONE, next.D0());
-    }
+private Binary D0 ()
+{
+    if (lowest == Digit.ONE)
+        return next == null ? null : new Binary (Digit.ZERO, next);
+    if (next == null)
+        throw new IllegalArgumentException ("Negative number");
+    return new Binary (Digit.ONE, next.D0());
+}
 
-    public Binary D ()
-    {
-        Binary r = D0 ();
-        return r == null ? ZERO : r;
-    }
+public Binary D ()
+{
+    Binary r = D0 ();
+    return r == null ? ZERO : r;
+}
 {% endhighlight %}
 
 We are temporarily representing zeroes as nulls, until we reach the top level of recursion. We'll use the same approach in subtraction.
@@ -920,7 +920,7 @@ Here is the full table of results:
 <tr><td class="label">Binary6X</td><td class="ttext">Best versions of both tests, no tree in memory</td> <td>32.7</td><td> 10.7</td></tr>
 <tr><td class="label">BinaryN</td><td class="ttext">null as zero, no object notation</td> <td>30.8</td><td> 10.4</td></tr>
 <tr><td class="label">BinaryB</td><td class="ttext">Booleans as digits</td> <td>30.0</td><td> 9.0</td></tr>
-<tr><td class="label">Native</td><td class="ttext">Classic <b>Java</b> implementation<td>0.571</td><td>0.28</td></tr>
+<tr><td class="label">Native</td><td class="ttext">Classic <b>Java</b> implementation</td><td>0.571</td><td>0.28</td></tr>
 </table>
 
 Conclusions

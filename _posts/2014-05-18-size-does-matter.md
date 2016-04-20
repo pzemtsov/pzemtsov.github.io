@@ -40,7 +40,7 @@ public:
 {% endhighlight %}
 
 We compiled it with function alignment and loop alignment set to 32 and loop unrolling switched on.
-[This is the assembly output](({{ site.REPO-E1-C }}/blob/c976a9f9d44345859ac6b4c4b81dc20527842575/e1.asm):
+[This is the assembly output]({{ site.REPO-E1-C }}/blob/c976a9f9d44345859ac6b4c4b81dc20527842575/e1.asm):
 
 {% highlight c-objdump %}
 _ZNK12Dst_First_3a5demuxEPKhjPPh:

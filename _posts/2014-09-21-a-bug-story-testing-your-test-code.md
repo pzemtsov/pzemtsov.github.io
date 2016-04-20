@@ -340,8 +340,8 @@ This is what we get when we run it:
 This looks much more realistic. The improvement is 50 ms, or 7%, which is very reasonable for loop unrolling.
 
 By the way, neither `Read4_Write4` nor `Read4_Write4_Unroll` shows any extraordinary performance. `Write4` is faster than both.
-SSE-based improvements were needed to achieve a real performance increase. See details in ["{{ site.TITLE-E1-C-SSE }}"]
-({{ site.ART-E1-C-SSE }}).
+SSE-based improvements were needed to achieve a real performance increase. See details in 
+["{{ site.TITLE-E1-C-SSE }}"]({{ site.ART-E1-C-SSE }}).
 
 Correctness check
 -----------------
@@ -376,8 +376,8 @@ void check (const Demux & demux)
 The procedure seems correct. We generate the input buffer and allocate two sets of outputs -- for `Reference` and
 for the implementation in question. Then we run both and compare. What's wrong?
 
-Maybe the comparison isn't done right? [Let's restore the incorrect unrolled version and dump the outputs]
-({{ site.REPO-BUG-TEST }}/commit/282c52ad06fffa5e3797ef0d3ccde9ed6af5a10a):
+Maybe the comparison isn't done right?
+[Let's restore the incorrect unrolled version and dump the outputs]({{ site.REPO-BUG-TEST }}/commit/282c52ad06fffa5e3797ef0d3ccde9ed6af5a10a):
 
 {% highlight C++ %}
 void dump (byte ** dst)
@@ -578,8 +578,8 @@ This explanation allows a prediction: if we comment out the test of `Read4_Write
 The fix
 -------
 
-The fix in our case is simple: [clear the memory after allocation]
-({{ site.REPO-BUG-TEST }}/commit/2f185f8b5e8b46079989caaef1aa5ff22bb203df):
+The fix in our case is simple:
+[clear the memory after allocation]({{ site.REPO-BUG-TEST }}/commit/2f185f8b5e8b46079989caaef1aa5ff22bb203df):
 
 {% highlight C++ %}
 byte ** allocate_dst ()

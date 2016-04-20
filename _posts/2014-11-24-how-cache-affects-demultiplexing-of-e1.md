@@ -9,7 +9,7 @@ story-title: "How cache affects performance"
 
 In the series of articles ([{{ site.TITLE-E1 }}]({{ site.ART-E1 }}), [{{ site.TITLE-E1-C }}]({{ site.ART-E1-C }}),
 [{{ site.TITLE-E1-C-SSE }}]({{ site.ART-E1-C-SSE }})) we optimised de-multiplexing of E1 streams, first in **Java**,
-then in **C++**. We tested it on Intel(R) Xeon(R) CPU E5-2670 @ 2.60GHz (a Sandy Bridge architecture).
+then in **C++**. We tested it on Intel&reg; Xeon&reg; CPU E5-2670 @ 2.60GHz (a Sandy Bridge architecture).
 The achieved de-multiplexing speed is 18.8 Gbytes/sec, or 73,400 times faster than real time. In the process of optimisation
 we improved the speed by the factor of 12.
 

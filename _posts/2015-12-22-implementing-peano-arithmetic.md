@@ -93,13 +93,13 @@ Here are some small numbers in this model:
  
 Here are some useful properties of the numbers in this model:
 
-- |n| = n (the number of elements in the set denoting a number equals that number)
+- \|n\| = n (the number of elements in the set denoting a number equals that number)
 
 - a <= b &hArr; a &sub; b  (_less-or-equal_ relation is equivalent to the _subset_ relation)
 
 - a < b &hArr; a &isin; b (_less_ relation is equivalent to the membership relation)
 
-- S (max (x | x &isin; a)) = a (the maximal element in _a_ is _a&minus;1_).
+- S (max (x \| x &isin; a)) = a (the maximal element in _a_ is _a&minus;1_).
 
 The last property allows us to define the operation _D&nbsp;(n)_, which is the inverse of _S&nbsp;(n)_:
 
@@ -112,7 +112,7 @@ We can then define addition and subtraction:
   <div class="formula">
   <table>
   <tr>
-    <td rowspan=2>a&nbsp;+&nbsp;b = <span class="big">{</span></td>
+    <td rowspan="2">a&nbsp;+&nbsp;b = <span class="big">{</span></td>
     <td class="left">S(a&nbsp;+&nbsp;D(b));</td>
     <td class="space"></td>
     <td class="left">b&nbsp;&ne;&nbsp;0</td>
@@ -128,7 +128,7 @@ We can then define addition and subtraction:
   <div class="formula">
   <table>
   <tr>
-    <td rowspan=2>a&nbsp;&minus;&nbsp;b = <span class="big">{</span></td>
+    <td rowspan="2">a&nbsp;&minus;&nbsp;b = <span class="big">{</span></td>
     <td class="left">D(a&nbsp;&minus;&nbsp;D(b));</td>
     <td class="space"></td>
     <td class="left">b&nbsp;&ne;&nbsp;0</td>
@@ -149,7 +149,7 @@ We can define multiplication, too:
   <div class="formula">
   <table>
   <tr>
-    <td rowspan=2>a&nbsp;&times;&nbsp;b = <span class="big">{</span></td>
+    <td rowspan="2">a&nbsp;&times;&nbsp;b = <span class="big">{</span></td>
     <td class="left">a&nbsp;&times;&nbsp;D(b)&nbsp;+&nbsp;a;</td>
     <td class="space"></td>
     <td class="left">b&nbsp;&ne;&nbsp;0</td>

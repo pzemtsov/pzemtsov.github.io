@@ -295,7 +295,7 @@ The code for `Dst_First_1a` looks better (I'll only show the inner loop, the res
 It is difficult to say why this code isn't faster than the original one. Perhaps an extra instruction got
 absorbed between the latencies of some other instructions, and the extra dependency that it creates was eliminated
 by dynamic instruction reordering. It is interesting to check how many CPU cycles it takes to perform the loop.
-This loop is executed ` 32 * 64 * 1000000`
+This loop is executed `32 * 64 * 1000000`
 times in 1454 ms, which makes it 0.71 ns per loop. The CPU runs at 2.6 GHz, or at
 0.38 ns per cycle. This means that these 7 instructions take 1.87 CPU cycles to execute. For this to happen,
 a lot of parallel execution must be going on, and who knows what the limit is? Perhaps, an extra instruction can be

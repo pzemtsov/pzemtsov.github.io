@@ -140,12 +140,12 @@ a:visited { color: #a0a; }
   font-weight: bold;
 }
 
-.highlight {
+figure.highlight {
   background-color: #eef;
   margin: 0 0 1em 0;
 }  
 
-.highlight pre code {
+figure.highlight pre code {
   overflow-x: auto;
   overflow-y: hidden;
   border: 1px solid #666;
@@ -164,10 +164,19 @@ a:visited { color: #a0a; }
   white-space: pre;
 }
 
-code.language-text {
+/* a code block indented by 4 generates <div class="highlighter-rouge"><pre class="highlight"><code>
+   which we use as a terminal view.
+
+   The formatted code blocks follow another pattern: <figure class="highlight"><pre><code="language-java">
+  
+*/
+
+div.highlighter-rouge pre code {
+ overflow-x: auto;
+ overflow-y: hidden;
  background-color: black;
  color: #D0D0D0;
- padding: 5px;
+ padding: 1px 0px 5px 5px;
  border-radius: 5px;
 }
 

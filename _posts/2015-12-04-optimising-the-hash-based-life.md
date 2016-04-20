@@ -836,7 +836,7 @@ different relative performance of the hash functions. Let's run the `Hash7` vers
 Here are the old and the new results:
 
 <table class="numeric">
-<tr><th rowspan="2">Class name</th>   <th rowspan="2">Comment</th>                             <th colspan="2"><code>Hash_LongPoint</code></th><th colspan="2"><code>Hash7</code></tr>
+<tr><th rowspan="2">Class name</th>   <th rowspan="2">Comment</th>                             <th colspan="2"><code>Hash_LongPoint</code></th><th colspan="2"><code>Hash7</code></th></tr>
                                                                                                <th>Java&nbsp;7</th><th>Java&nbsp;8</th><th>Java&nbsp;7</th><th>Java&nbsp;8</th></tr>
 <tr><td class="label">LongPoint1</td> <td class="ttext">Multiply by 3, 5                  </td><td> 2719</td><td> 4809</td><td> 1344</td><td> 2361</td></tr>
 <tr><td class="label">LongPoint3</td> <td class="ttext">Multiply by 11, 17                </td><td> 2257</td><td> 1928</td><td> 1139</td><td> 1109</td></tr>

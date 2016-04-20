@@ -811,7 +811,8 @@ affects the result. That's why such re-ordering is not allowed by **C** and **C+
 We can relax the standard compliance by specifying `-funsafe-math-optimizations`,
 this will allow vectorisation:
 
-    # c++ -std=c++0x -O3 -mavx -falign-functions=32 -falign-loops=32 -funroll-loops -funsafe-math-optimizations -o lambda-float lambda-float.cpp -lrt
+    # c++ -std=c++0x -O3 -mavx -falign-functions=32 -falign-loops=32 -funroll-loops
+    -funsafe-math-optimizations -o lambda-float lambda-float.cpp -lrt
     # ./lambda-float
     10Test_Macro: 3.32996e+16: 249
     10Test_Macro: 3.32996e+16: 228
