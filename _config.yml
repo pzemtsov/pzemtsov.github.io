@@ -59,3 +59,4 @@ REPO-PEANO: https://github.com/pzemtsov/article-peano
 kramdown:
  input: GFM
  smart_quotes: lsquo,rsquo,ldquo,rdquo
+ syntax_highlighter: rouge
