@@ -68,7 +68,7 @@ The general organisation of the new **C++** program follows that of the **Java**
 for Life  implementations. All the implementations will be checked against the default one, called `Hash_Reference`. This implementation works directly on `Point` values
 and uses the direct **C++** equivalents of **Java** classes `HashMap` and `HashSet`:
 
-``` C++
+{% highlight C++ %}
 std::unordered_set<Point, PointHash> field;
 std::unordered_map<Point, int, PointHash> counts;
 
@@ -82,7 +82,8 @@ public:
         return (HashType) (p.x * 3 + p.y * 5);
     }
 };
-```
+{% endhighlight %}
+
 The conversion of **Java** code is straightforward. This is what setting and resetting of cells looks like:
 
 {% highlight C++ %}
