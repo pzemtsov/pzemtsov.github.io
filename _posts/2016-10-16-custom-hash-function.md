@@ -41,7 +41,7 @@ public:
 {% endhighlight %}
 
 In this article we won't even consider working with four bytes separately, going instead straight to operating on 32-bit numbers.
-However, I'd like to keep this interface to retain possibility to add other implementations. I could have split it in two (this method plus another one that
+However, I'd like to keep this interface to retain the possibility to add other implementations. I could have split it in two (this method plus another one that
 takes a number as parameter), but it would be an unnecessary complication. Besides, many of the matchers implemented below are hard-coded for specific SIP constants.
 
 Operating on 32-bit numbers introduces non-portability (dependency on the processor endianness). We'll ignore that for now, concentrating on making it
@@ -482,7 +482,7 @@ inline uint32_t hash (uint32_t v) const
 {% endhighlight %}
 
 We'd like to make the `NBITS` value as small as possible, to make sure that the entire hash table is well cached.
-In our case, where we have 15 values, ideal would be to have `NBITS` equal to 4 (the hash table size of 16).
+In our case, where we have 15 values, the ideal would be to have `NBITS` equal to 4 (the hash table size of 16).
 Can we find a suitable `FACTOR`? Yes, we can: 239012. This leads to the following solution:
 
 {% highlight C++ %}

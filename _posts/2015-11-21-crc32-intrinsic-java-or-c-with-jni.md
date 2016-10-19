@@ -591,7 +591,7 @@ while in the intrinsic version it took six:
 0x00007f9a0131ba6d: shr    eax,0x8
 {% endhighlight %}
 
-Interestingly, the access to the array in both cases is done using the static address rather than indirectly using a reference. While in the intrinsic case thia may be
+Interestingly, the access to the array in both cases is done using the static address rather than indirectly using a reference. While in the intrinsic case this may be
 explained by the code not being written in **Java**, in **Java** case the compiler clearly made use of the fact that the
 array is `static final`, so its address is known at the time of compilation. The same applies to its size. The compiler knew the array size was 256 and it was accessed
 using byte-sized indices, which allowed to optimise out the index checking. This resulted in a nearly optimal code.
