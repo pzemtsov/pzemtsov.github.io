@@ -29,7 +29,12 @@ h1, h2, h3, h4, h5, h6 {
 h1 { margin-bottom: 1em; }
 p { margin: 1em 0; }
 
-p.quoute {font-family:Times;padding-left:100px;}
+blockquote { font-family:Times;
+             padding-left:50px;
+             font-size:75%;
+             line-height: 1.5em;
+             border: 1px solid #c0c0c0;
+           }
 
 a         { color: #00a; }
 a:hover   { color: #000; }
@@ -197,12 +202,12 @@ div.highlighter-rouge pre code {
 
 .post table td {
   border: 1px solid black;
-  padding: 1px 5px; 1px; 5px;
+  padding: 1px 5px 1px 5px;
 }
 
 .post table td.noborder {
   border: 0px;
-  padding: 1px 5px; 1px; 5px;
+  padding: 1px 5px 1px 5px;
 }
 
 .post table {
@@ -213,6 +218,14 @@ div.highlighter-rouge pre code {
   border: 2px solid black;
   padding: 5px;
   background-color: #C0C0C0;
+}
+
+.post table.numeric {
+  border-collapse: collapse;
+  border-left: 1px solid;
+  border-right: 1px solid;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
 }
 
 table.numeric td {
@@ -232,6 +245,22 @@ table.numeric td.ttext {
   text-align: left;
   font-family: inherit
 }
+
+tr.even {
+ background-color: #DDD;
+}
+
+tr.odd {
+ background-color: #E8E8E8;
+}
+
+td.h {
+ background-color: #80FF80;
+} 
+
+td.e {
+ background-color: #FFFF80;
+} 
 
 .post table.matrix {
   border-collapse: collapse;
