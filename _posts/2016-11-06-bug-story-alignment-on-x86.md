@@ -11,7 +11,7 @@ This sounds unusual. Who ever wants to do this in real life? Normally, we only s
 happened in real life.
 
 Well, the actual task was to verify the [IP header checksum](https://en.wikipedia.org/wiki/IPv4_header_checksum),
-which is a once-complement sum of two-byte words. Simply speaking, it means adding together all the words and all the carry bits produced in the process.
+which is a ones' complement sum of two-byte words. Simply speaking, it means adding together all the words and all the carry bits produced in the process.
 This procedure has several nice features:
 
 - it can be done very efficiently using the `ADC` processor instruction (unfortunately, this feature is not accessible from **C**)
