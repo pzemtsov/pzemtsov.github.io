@@ -680,3 +680,6 @@ and solutions based on SSE and AVX (although the latter ones may be very fast wh
 
 - There is, however, no proof that these tables can be built for any input sets. If there is one for your specific set, you can consider yourself lucky.
 
+<hr/>
+
+Comments are welcome below or on [reddit](https://www.reddit.com/r/programming/comments/57wgst/searching_in_a_constant_set_using_conflictfree/).

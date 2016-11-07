@@ -652,3 +652,7 @@ is to disable all possible instruction set extensions while compiling such code 
 
 - This story demonstrates that there is something useful in code coverage tools. Here I was lucky that the input data caused all the code to execute. It might be different
 some other time.
+
+<hr/>
+
+Comments are welcome below or on [reddit](https://www.reddit.com/r/programming/comments/5bl553/a_bug_story_data_alignment_on_x86/).
