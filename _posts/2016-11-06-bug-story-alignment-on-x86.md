@@ -653,6 +653,56 @@ is to disable all possible instruction set extensions while compiling such code 
 - This story demonstrates that there is something useful in code coverage tools. Here I was lucky that the input data caused all the code to execute. It might be different
 some other time.
 
+Update
+------
+
+On [/r/cpp on reddit]((https://www.reddit.com/r/cpp/comments/5bn8jx/a_bug_story_data_alignment_on_x86/)), [OldWolf2](https://www.reddit.com/user/OldWolf2)
+[pointed out](https://www.reddit.com/r/cpp/comments/5bn8jx/a_bug_story_data_alignment_on_x86/d9q4xcd/) that the checksum code contained a bug, in the last line:
+
+{% highlight C++ %}
+    } while (sum & ~0xFFFFL);
+{% endhighlight %}
+
+He is correct: `0xFFFFL` has type `unsigned long`, which is not necessarily the same as `uint64_t`. A `long` might be 32 bits, in which case the bit inversion would happen
+before expansion to 64 bits, and the actual constant used in the test would be `0x00000000FFFF0000`. It is easy to construct an input where such test would fail -- for instance,
+for the array of two words: `0xFFFFFFFF` and `0x00000001`.
+
+We can either perform bit inversion after cast:
+
+{% highlight C++ %}
+    } while (sum & ~(uint64_t) 0xFFFF);
+{% endhighlight %}
+
+or use comparison instead:
+
+{% highlight C++ %}
+    } while (sum > 0xFFFF);
+{% endhighlight %}
+
+Interestingly, GCC produces shorter code in the second case. Here is the version with the bit test:
+
+{% highlight asm %}
+.L15:
+        movzwl  %ax, %edx
+        shrq    $16, %rax
+        addq    %rdx, %rax
+        movq    %rax, %rdx
+        xorw    %dx, %dx
+        testq   %rdx, %rdx
+        jne     .L15
+{% endhighlight %}
+
+And this is with comparison:
+
+{% highlight asm %}
+.L44:
+        movzwl  %ax, %edx
+        shrq    $16, %rax
+        addq    %rdx, %rax
+        cmpq    $65535, %rax
+        ja      .L44
+{% endhighlight %}
+
 <hr/>
 
 Comments are welcome below or on [reddit](https://www.reddit.com/r/programming/comments/5bl553/a_bug_story_data_alignment_on_x86/).
