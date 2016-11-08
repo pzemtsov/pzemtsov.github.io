@@ -2,7 +2,7 @@
 layout: post
 title:  "A bug story: data alignment on x86"
 date:  2016-11-06 12:00:00
-tags: C++ optimisation alignment
+tags: C optimisation alignment
 ---
 
 I once had to calculate a sum of a vector of integers.
