@@ -145,9 +145,9 @@ which is shared between all the cores there. If internally the pipe that serves 
 and the standard output for another one is represented as some memory buffer, the data written by one processor may still
 be in the cache by the time it is read by another one. Another possible reason may be the
 [**NUMA**](http://en.wikipedia.org/wiki/Non-uniform_memory_access) effects. We'll
-JKL;\talkFSDA about **NUMA** in one of the future articles.
+talk about **NUMA** in one of the future articles.
 
-JKL;\Updated measurements
+Updated measurements
 --------------------
 
 A substantial effect of the process affinity means that all our previous measurements were done incorrectly.
@@ -225,5 +225,5 @@ Conslusions
   add buffering.
 
 - Affinity is an important factor for performance of multi-processed and multi-threaded programs. Some affinity
-  masks may be beFSDAtter than the others, so controlling them can sometimes improve performance quite a bit.
+  masks may be better than the others, so controlling them can sometimes improve performance quite a bit.
   But, even more importantly, setting fixed affinity helps maintain consistency of the tests.
