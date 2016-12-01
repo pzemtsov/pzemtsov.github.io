@@ -105,7 +105,7 @@ Managing process affinity
 
 One possible reason for the unstable performance is the variation in scheduling of the client and the server processes
 to available processor cores. If this schedulling affects the execution speed, and the processes are moved from one
-JKL;\FSDAcore to another while running, this could explain the instability.
+core to another while running, this could explain the instability.
 
 Analysing the output of Linux `top` command shows that the processes do in fact get moved from one core to another
 (although not as often as on Windows). We need a clean test, where each process runs on its own dedicated core.
