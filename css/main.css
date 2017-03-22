@@ -380,7 +380,17 @@ table.squaregrid td {
   padding: 0.1em;
 }
 
+td.green {
+  background-color: #C0FFC0;
+}
 
+td.yellow {
+  background-color: #FFFFC0;
+}
+
+td.red {
+  background-color: #FFC0C0;
+}
 
 /*****************************************************************************/
 

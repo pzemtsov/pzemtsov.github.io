@@ -28,6 +28,7 @@ ART-PEANO: /2015/12/22/implementing-peano-arithmetic.html
 ART-BINARY: /2016/01/10/home-made-binary-numbers.html 
 ART-HASH-HOMEMADE: /2016/01/31/home-made-hash-tables-in-java.html
 ART-RACE-AGAINST-JAVA: /2016/03/21/home-made-hash-tables-in-cpp-a-race-against-java.html
+ART-TURBO-BOOST: /2016/12/08/turbo-boost-and-performance.html
 
 TITLE-E1:   "De-multiplexing of E1 streams in Java"
 TITLE-E1-C: "De-multiplexing of E1 stream: converting to C"
@@ -59,6 +60,7 @@ REPO-E1-CACHE: https://github.com/pzemtsov/article-e1-cache
 REPO-LIFE: https://github.com/pzemtsov/article-life
 REPO-PEANO: https://github.com/pzemtsov/article-peano
 REPO-ALIGN: https://github.com/pzemtsov/article-align-x86
+REPO-STATS: https://github.com/pzemtsov/article-statistical-variables
 
 kramdown:
  input: GFM
