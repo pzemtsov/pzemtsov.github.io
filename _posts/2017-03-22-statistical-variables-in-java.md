@@ -1899,3 +1899,169 @@ I also want to investigate some other structures typically used in high-performa
 not very encouraging -- what if the classes we usually use are not optimal? What is the performance we can achieve?
 
 Comments are welcome below or on [reddit](https://www.reddit.com/r/programming/comments/6118ef/statistical_variables_in_java_not_quite_legal_but/).
+
+
+Update: `LongAccumulator` and `LongAdder`
+-----------------------------------------
+
+This article is based on the relatively old project. Since that time some new functionality has been added to **Java**. During discussion
+on [reddit](https://www.reddit.com/r/programming/comments/6118ef/statistical_variables_in_java_not_quite_legal_but/), [kevinherron](https://www.reddit.com/user/kevinherron)
+suggested two implementations based on the new classes, which were introduced in **Java 1.8** -- `LongAccumulator` and `LongAdder`, both from `java.util.concurrent.atomic` package.
+
+Here are the versions he suggested:
+
+{% highlight Java %}
+import java.util.concurrent.atomic.LongAccumulator;
+
+public class LongAccumulatorCounter extends ServerCounter {
+
+    private final LongAccumulator accumulator = new LongAccumulator(
+        (left, right) -> left + right,
+        0L
+    );
+
+    @Override
+    public void add(long increment) {
+        accumulator.accumulate(increment);
+    }
+
+    @Override
+    public long getAndReset() {
+        return accumulator.getThenReset();
+    }
+}
+{% endhighlight %}
+
+and
+
+{% highlight Java %}
+import java.util.concurrent.atomic.LongAdder;
+
+public class LongAdderCounter extends ServerCounter {
+
+    private final LongAdder adder = new LongAdder();
+
+    @Override
+    public void add(long increment) {
+        adder.add(increment);
+    }
+
+    @Override
+    public long getAndReset() {
+        return adder.sumThenReset();
+    }
+}
+{% endhighlight %}
+
+Both of the new utility classes offer distributed thread-random cache-aware accumulation, just the `Accumulator` is capable of performing any operations on the incoming
+numbers, while the `Adder` can only add. Both are suitable for counters, and both promise to be fast. Let's try them. Here are the times:
+
+<table class="numeric">
+<tr><th rowspan="2">Counter name</th><th rowspan="2">Delay factor</th><th rowspan="2">Base time</th><th colspan="4">Time, ns, for thread count</th></tr>
+<tr><th>1</th><th>2</th><th>6</th><th>12</th></tr>
+<tr class="even"><td class="label"> LongAccumulatorCounter </td><td>   0 </td><td>   1</td><td>  13</td><td>  13</td><td>  13</td><td>  13</td></tr>
+<tr class="even"><td class="label"> LongAccumulatorCounter </td><td>  10 </td><td>  47</td><td>   5</td><td>   6</td><td>   6</td><td>   7</td></tr>
+<tr class="even"><td class="label"> LongAccumulatorCounter </td><td>  50 </td><td> 347</td><td>  12</td><td>  13</td><td>  17</td><td>  20</td></tr>
+<tr class="even"><td class="label"> LongAccumulatorCounter </td><td> 100 </td><td> 887</td><td>   8</td><td>   7</td><td>  16</td><td>  21</td></tr>
+<tr><td class="label"> LongAdderCounter </td><td>   0 </td><td>   1</td><td>  14</td><td>  14</td><td>  14</td><td>  14</td></tr>
+<tr><td class="label"> LongAdderCounter </td><td>  10 </td><td>  47</td><td>   3</td><td>   4</td><td>   5</td><td>   5</td></tr>
+<tr><td class="label"> LongAdderCounter </td><td>  50 </td><td> 387</td><td>  12</td><td>  14</td><td>  17</td><td>  20</td></tr>
+<tr><td class="label"> LongAdderCounter </td><td> 100 </td><td> 887</td><td>   8</td><td>   8</td><td>  16</td><td>  21</td></tr>
+</table>
+
+The times are reasonable and they don't deteriorate much with the thread count -- exactly what we need. It is also worth mentioning that the `Accumulator` isn't slower than
+the `Adder` -- JIT has done a good job here.
+
+Unfortunately, the results are not correct. Here are some sample numbers for the `Adder` on
+12 threads and delay factor 0:
+
+    Counter sum:   8019220551
+    Correct sum:   8019220615
+
+And here are the results for the `Accumulator`:
+
+    Counter sum:   8478867056
+    Correct sum:   8478867115
+
+Even on one thread and delay of 100 we see errors -- for example, on `Accumulator`:
+
+    Counter sum:     11320241
+    Correct sum:     11320242
+
+This is to be expected, since neither the `Adder`, nor `Accumulator` offer correct real-time retrieval. They offer correct multi-threaded counting, but the results
+must be collected after the threads finish, otherwise some counts may be lost. This is from the `Adder` Javadoc:
+
+> If there are
+updates concurrent with this method, the returned value is
+**not** guaranteed to be the final value occurring before
+the reset.
+
+This, however, is very easy to fix. If some updates that happened right at the collection time, it is normal for them to be added to either of the two intervals,
+the one just finished or the one just started. After all, thread scheduling could have caused collection to happen a bit later or earlier. As long as the counts are
+not lost, it's all right. All we need to do is to run the adder (or accumulator) continuously and never reset it. The counter can compute and report the delta to the
+previous value:
+
+{% highlight Java %}
+public class LongAccumulatorCounter extends ServerCounter {
+
+    private long start = 0;
+    
+    private final LongAccumulator accumulator = new LongAccumulator(
+        (left, right) -> left + right,
+        0L
+    );
+
+    @Override
+    public void add(long increment) {
+        accumulator.accumulate(increment);
+    }
+
+    private long start = 0;
+
+    @Override
+    public long getAndReset() {
+        long current = accumulator.get();
+        long result = current - start;
+        start = current;
+        return result;
+    }
+}
+{% endhighlight %}
+
+and
+
+{% highlight Java %}
+public class LongAdderCounter extends ServerCounter {
+
+    private long start = 0;
+
+    private final LongAdder adder = new LongAdder();
+
+    @Override
+    public void add(long increment) {
+        adder.add(increment);
+    }
+
+    @Override
+    public long getAndReset() {
+        long current = adder.sum ();
+        long result = current - start;
+        start = current;
+        return result;
+    }
+}
+{% endhighlight %}
+
+Note that we don't need to protect the `start` variable or make it `volatile`: it is only ever accessed from the server thread.
+
+The results are now correct.
+
+We could make continuous accumulating the regular feature of the counter and move calculating of the delta to the server side. This would eliminate competition between server
+and client threads. It would, however, complicate our compound solutions.
+
+This means that my statement above ("When programming in **Java**, one still has to worry about cache lines and LOCK prefixes") is not completely correct. In **Java 1.8**
+there are built-in classes that take care of these complexities, and we can go quite far using these classes. Two points, however, keep the stament alive:
+
+- Our lazy compound implementation is still significantly faster (3 ns for `FastCounter` on 12 threads, delay 50 vs 20 ns for these two)
+
+- These two solutions are only applicable to counters, not for gauges.
