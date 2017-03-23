@@ -1898,3 +1898,4 @@ I want to try all these approaches in **C++**. Some might still be applicable th
 I also want to investigate some other structures typically used in high-performance computing, such as queues. Our exprerience with synchronised objects so far was
 not very encouraging -- what if the classes we usually use are not optimal? What is the performance we can achieve?
 
+Comments are welcome below or on [reddit](https://www.reddit.com/r/programming/comments/6118ef/statistical_variables_in_java_not_quite_legal_but/).
