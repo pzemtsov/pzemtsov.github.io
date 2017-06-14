@@ -1993,7 +1993,7 @@ updates concurrent with this method, the returned value is
 **not** guaranteed to be the final value occurring before
 the reset.
 
-This, however, is very easy to fix. If some updates that happened right at the collection time, it is normal for them to be added to either of the two intervals,
+This, however, is very easy to fix. If some updates happen right at the collection time, it is normal for them to be added to either of the two intervals,
 the one just finished or the one just started. After all, thread scheduling could have caused collection to happen a bit later or earlier. As long as the counts are
 not lost, it's all right. All we need to do is to run the adder (or accumulator) continuously and never reset it. The counter can compute and report the delta to the
 previous value:
