@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "The slow currentTimeMillis()"
-date:   2017-07-10 12:00:00
+date:   2017-07-23 12:00:00
 tags: Java optimisation real-time Linux Windows
 ---
 
