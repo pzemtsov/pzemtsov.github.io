@@ -22,6 +22,7 @@ ART-DIVISION-HASH: /2015/09/17/optimising-division-based-hash.html
 ART-DIVISION-HASH-MORE: /2015/10/20/more-optimisations-of-division-based-hash-karatsuba-method.html 
 ART-MICROBENCHMARK: /2015/10/28/dont-trust-a-micro-benchmark.html
 ART-REFACTORING: /2015/10/12/the-fun-and-the-cost-of-refactoring.html
+ART-CRC32-JNI: /2015/11/21/crc32-intrinsic-java-or-c-with-jni.html
 ART-HASH-CAPACITY: /2015/12/14/choosing-the-hash-maps-capacity.html
 ART-OPTIMISE-LIFE: /2015/12/04/optimising-the-hash-based-life.html 
 ART-PEANO: /2015/12/22/implementing-peano-arithmetic.html 
