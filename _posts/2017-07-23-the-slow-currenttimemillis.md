@@ -1081,3 +1081,5 @@ Conclusions
   If absolutely necessary, one can implement it her/himself using JNI. 
 
 - A Linux system call isn't as dramatically slow as I believed, but still takes substantial time (50 -- 100 ns).
+
+Comments are welcome below or on [reddit](https://www.reddit.com/r/programming/comments/6p7g2s/the_slow_currenttimemillis/).
