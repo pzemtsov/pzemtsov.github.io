@@ -1082,4 +1082,152 @@ Conclusions
 
 - A Linux system call isn't as dramatically slow as I believed, but still takes substantial time (50 -- 100 ns).
 
+Update: nanoTime
+----------------
+
+During the discussion on [reddit](https://www.reddit.com/r/programming/comments/6p7g2s/the_slow_currenttimemillis/) I received multiple comments pointing out that
+`System.currentTimeMillis()` is in fact a bad choise of call for the first three of the use cases listed in the beginning. The `System.nanoTime()` is the correct
+one. The reason is that `nanoTime()` is monotonic while `currentTimeMillis()` is not. The latter may be affected by time adjustments from NTP daemon or by leap seconds.
+Or, for that matter, by user-initiated time change.
+
+Even though these factors do not apply to our project (the machines are synchronised with the GPS time when booted, and later adjusted by sub-millisecond
+intervals; as a result, time never jumps back during program run: it only can stall for a bit), 
+I fully agree with this comment. I would gladly have used a monotonic coarse timer if there was one in **Java**.
+
+It is a bit awkward that **Java** provides two functions that differ by two parameters -- the nature of time and the resolution. These parameters are orthogonal
+and grant the need for four functions:
+
+- monotonic coarse
+- monotonic fine (`nanoTime`)
+- real-time coarse (`currentTimeMillis`)
+- real-time fine.
+
+Two are provided. There is, however, need for the remaining two. The last one, for instance, may be useful to timestamp events in high-frequency trading.
+And what we needed was actually the first one. In fact, the only reason we needed coarse timer in the first place was that it had a potential to be fast. Actually, this is the only reason for coarse timers to exist at all.
+If coarse timers are not much faster than fine ones, they are not needed. Two types of timers are sufficient then. This, unfortunately, seems to be the
+case: coarse timers are not faster, due to `currentTimeMillis` being implemented using `gettimeofday()`.
+
+Here are the evaluation times of `nanoTIme()` compared to `currentTimeMillis()`:
+
+<table class="numeric">
+<tr><th>Java method</th><th>Windows, ns</th><th>Linux, HPET, ns</th><th>Linux, TSC, ns</th></tr>
+<tr><td class="label"> currentTimeMillis() </td><td>   4 </td><td> 640 </td><td> 36 </td></tr>
+<tr><td class="label"> nanoTime()          </td><td>  16 </td><td> 639 </td><td> 35 </td></tr>
+</table>
+
+The nanosecond timer is a bit slower than the millisecond one on Windows, but it is still fast enough. The Linux version runs at the same speed as the milli timer.
+This is how the Linux version is implemented:
+
+{% highlight C++ %}
+jlong os::javaTimeNanos() {
+  if (Linux::supports_monotonic_clock()) {
+    struct timespec tp;
+    int status = Linux::clock_gettime(CLOCK_MONOTONIC, &tp);
+    assert(status == 0, "gettime error");
+    jlong result = jlong(tp.tv_sec) * (1000 * 1000 * 1000) + jlong(tp.tv_nsec);
+    return result;
+  } else {
+    timeval time;
+    int status = gettimeofday(&time, NULL);
+    assert(status != -1, "linux error");
+    jlong usecs = jlong(time.tv_sec) * (1000 * 1000) + jlong(time.tv_usec);
+    return 1000 * usecs;
+  }
+}
+{% endhighlight %}
+
+It calls `clock_gettime` function with `CLOCK_MONOTONIC` parameter, which ends up in the same `vDSO`, in the function `do_monotonic`:
+
+{% highlight C++ %}
+notrace static int __always_inline do_monotonic(struct timespec *ts)
+{
+    unsigned long seq;
+    u64 ns;
+    int mode;
+
+    do {
+        seq = gtod_read_begin(gtod);
+        mode = gtod->vclock_mode;
+        ts->tv_sec = gtod->monotonic_time_sec;
+        ns = gtod->monotonic_time_snsec;
+        ns += vgetsns(&mode);
+        ns >>= gtod->shift;
+    } while (unlikely(gtod_read_retry(gtod, seq)));
+
+    ts->tv_sec += __iter_div_u64_rem(ns, NSEC_PER_SEC, &ns);
+    ts->tv_nsec = ns;
+
+    return mode;
+}
+{% endhighlight %}
+
+The timer type is controlled by the same `vclock_mode` parameter as for `do_realtime`, which is used in `gettimeofday`. The execution ends up in the same `vgetsns()`,
+which either reads HPET registers or performs `rdtsc`. The only difference is in the coarse values it reads: `gtod->monotonic_time_*` instead of `gtod->wall_time_*`.
+No wonder it runs at the same speed.
+
+The fact that both real-time and monotonic clocks share the same mode is unfortunate. As I said earlier, the reason for us to use `HPET`
+was that it co-operated with the NTP daemon better. Since monotonic time isn't affected by NTP, it could have been based on TSC.
+
+When TSC is used, consecutive calls to `nanoTime()` return values that are about 80 ns apart. Consecutive calls to `clock_gettime()` return intervals of about 48 -- 50 ns.
+It looks like the accuracy of `nanoTime()` is only limited by its own duration (36 ns; the remaining 12 ns must be the test overhead).
+
+The Windows version looks like this:
+
+{% highlight C++ %}
+jlong os::javaTimeNanos() {
+  if (!has_performance_count) {
+    return javaTimeMillis() * NANOSECS_PER_MILLISEC; // the best we can do.
+  } else {
+    LARGE_INTEGER current_count;
+    QueryPerformanceCounter(&current_count);
+    double current = as_long(current_count);
+    double freq = performance_frequency;
+    jlong time = (jlong)((current/freq) * NANOSECS_PER_SEC);
+    return time;
+  }
+}
+{% endhighlight %}
+
+Here `performance_frequency` comes from the call to `QueryPerformanceFrequency`, which, on my PC, returns 2648441. This is the timer frequency in Hz, and it is
+rather low. Windows can measure time very fast (in 16 ns), but in rather big increments (one tick equals 377.5 ns). Test in **Java** confirms it: continuous
+calls to `nanoTime()` return results that differ by zeroes and occasional 377s.
+
+Out of curiosity, let's look at the code of `QueryPerformanceCounter` (this time in 64-bit mode only):
+
+{% highlight asm %}
+00007FFE4C272230  push        rbx  
+00007FFE4C272232  sub         rsp,20h  
+00007FFE4C272236  mov         al,byte ptr [7FFE03C6h]  
+00007FFE4C27223D  mov         rbx,rcx  
+00007FFE4C272240  cmp         al,1  
+00007FFE4C272242  jne         00007FFE4C272274  
+00007FFE4C272244  mov         rcx,qword ptr [7FFE03B8h]  
+00007FFE4C27224C  rdtsc  
+00007FFE4C27224E  shl         rdx,20h  
+00007FFE4C272252  or          rax,rdx  
+00007FFE4C272255  mov         qword ptr [rbx],rax  
+00007FFE4C272258  lea         rdx,[rax+rcx]  
+00007FFE4C27225C  mov         cl,byte ptr [7FFE03C7h]  
+00007FFE4C272263  shr         rdx,cl  
+00007FFE4C272266  mov         qword ptr [rbx],rdx  
+00007FFE4C272269  mov         eax,1  
+00007FFE4C27226E  add         rsp,20h  
+00007FFE4C272272  pop         rbx  
+00007FFE4C272273  ret  
+{% endhighlight %}
+
+I didn't include the code where `jne` goes if `al` (as loaded from `7FFE03C6h`) is not equal to 1, because in my case it is. Probably, this is the flag that tells
+it to use `rdtsc`. The value is read, added to the number from `7FFE03B8h` (probably, some base value), and then shifted right by the number in `7FFE03C7h`.
+This number is 10 in our case. This explains the magical value of 2648441 for the performance frequency: it is the clock frequency of the `TSC` on this computer
+(2.7&nbsp;GHz) divided by 1024. The resolution could have been higher if smaller shift factor was chosen.
+
+Conclusions of the Update
+-------------------------
+
+- Coarse timers in **Java** are not much faster than the fine timers. This means that fine timers could be used everywhere if fine real-time one was provided
+
+- on Linux, the `nanoTIme` performance in TSC mode is mostly satisfactory; in HPET mode it is not.
+
+- on Windows the `nanoTime` is four times slower than `currentTimeMillis` but still fast enough; the resolution, however, is far from ideal, for unknown reason.
+
 Comments are welcome below or on [reddit](https://www.reddit.com/r/programming/comments/6p7g2s/the_slow_currenttimemillis/).
