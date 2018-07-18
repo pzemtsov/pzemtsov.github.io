@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Building a fast queue between C++ and Java"
-date:   2018-01-10 12:00:00
+date:   2018-07-18 12:00:00
 tags: C++ Java optimisation real-time
 ---
 
