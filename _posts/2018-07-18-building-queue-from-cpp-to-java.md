@@ -159,7 +159,7 @@ However, it is worth noticing that it performs at least one `RDTSC` instruction 
 
 We'll use the queue size of 100,000. We'll check later how different queue types respond to a change of the queue size.
 
-The full source code can be found in [the repository]({{ site.REPO-QUEUE }})..
+The full source code can be found in [the repository]({{ site.REPO-QUEUE }}).
 
 Test precautions
 ----------------
@@ -1783,3 +1783,5 @@ some other, lower-level, tools, such as atomic variables and test-and-set instru
 - Surprisingly, **Java** showed better performance than **C++**
 
 - We've implemented very fast (50M messages/sec) queue between **C++** and **Java**. This creates a good framework to study the real-time behaviour of **Java**.
+
+Comments are welcome below or on [reddit](https://www.reddit.com/r/programming/comments/8zzti5/building_a_fast_queue_between_c_and_java/)
