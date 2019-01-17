@@ -213,17 +213,17 @@ differing only in their duration, frequency, and type ("`Allocation Failure`" an
 <table class="numeric">
 <tr><th> Case</th><th> Strategy</th><th> Max GC pause, ms</th><th>Avg GC pause, ms</th><th>GC count&nbsp;/ sec</th><th>GC fraction</th><th>Object count, mil</th><th>GC time&nbsp;/ object, ns</th></tr>
 <tr><td rowspan="3"><b>A&nbsp;</b></td><td class="ttext">Allocation </td><td>   44 </td><td>   9 </td><td>  4.5 </td><td>  4% </td><td> 0.045 </td><td> 194 </td></tr>
-<tr>                              </td><td class="ttext">Mix        </td><td>   35 </td><td>   6 </td><td>  1.9 </td><td>  1% </td><td> 0.639 </td><td>  10 </td></tr>
-<tr>                              </td><td class="ttext">Pooling    </td><td>  940 </td><td> 823 </td><td>  0.8 </td><td> 67% </td><td> 3.039 </td><td> 271 </td></tr>
+<tr>                                   <td class="ttext">Mix        </td><td>   35 </td><td>   6 </td><td>  1.9 </td><td>  1% </td><td> 0.639 </td><td>  10 </td></tr>
+<tr>                                   <td class="ttext">Pooling    </td><td>  940 </td><td> 823 </td><td>  0.8 </td><td> 67% </td><td> 3.039 </td><td> 271 </td></tr>
 
 <tr class="even">
     <td rowspan="3"><b>B&nbsp;</b></td><td class="ttext">Allocation </td><td>  176 </td><td>  66 </td><td>  4.5 </td><td> 30% </td><td> 1.134 </td><td>  58 </td></tr>
-<tr class="even">                 </td><td class="ttext">Mix        </td><td>   63 </td><td>  40 </td><td>  0.8 </td><td>  3% </td><td> 1.134 </td><td>  34 </td></tr>
-<tr class="even">                 </td><td class="ttext">Pooling    </td><td>  911 </td><td> 712 </td><td>  0.6 </td><td> 40% </td><td> 3.534 </td><td> 201 </td></tr>
+<tr class="even">                      <td class="ttext">Mix        </td><td>   63 </td><td>  40 </td><td>  0.8 </td><td>  3% </td><td> 1.134 </td><td>  34 </td></tr>
+<tr class="even">                      <td class="ttext">Pooling    </td><td>  911 </td><td> 712 </td><td>  0.6 </td><td> 40% </td><td> 3.534 </td><td> 201 </td></tr>
                                                                                                                                                           
 <tr><td rowspan="3"><b>C&nbsp;</b></td><td class="ttext">Allocation </td><td>  866 </td><td> 365 </td><td>  2.3 </td><td> 89% </td><td> 5.454 </td><td>  67 </td></tr>
-<tr>                              </td><td class="ttext">Mix        </td><td>  790 </td><td> 488 </td><td>  0.6 </td><td> 27% </td><td> 5.478 </td><td>  89 </td></tr>
-<tr>                              </td><td class="ttext">Pooling    </td><td>  576 </td><td> 446 </td><td>  0.6 </td><td> 29% </td><td> 5.508 </td><td>  81 </td></tr>
+<tr>                                   <td class="ttext">Mix        </td><td>  790 </td><td> 488 </td><td>  0.6 </td><td> 27% </td><td> 5.478 </td><td>  89 </td></tr>
+<tr>                                   <td class="ttext">Pooling    </td><td>  576 </td><td> 446 </td><td>  0.6 </td><td> 29% </td><td> 5.508 </td><td>  81 </td></tr>
 </table>
 
 Here "GC count" is the average number of GC invocations per second, and "GC fraction" is the percentage of execution time spent in GC.
@@ -360,15 +360,15 @@ doesn't stop the program execution.
 <table class="numeric">
 <tr><th> Case</th><th> Strategy</th><th> Max GC pause, ms</th><th>Avg GC pause, ms</th><th>GC count&nbsp;/ sec</th><th>GC fraction</th><th>Object count, mil</th><th>GC time&nbsp;/ object, ns</th></tr>
 <tr><td rowspan="3"><b>A&nbsp;</b></td><td class="ttext">Allocation </td><td>   56 </td><td>  20 </td><td>  2.4 </td><td>  5% </td><td> 0.045 </td><td> 444 </td></tr>
-<tr>                              </td><td class="ttext">Mix        </td><td>   43 </td><td>  24 </td><td>  0.5 </td><td>  1% </td><td> 0.639 </td><td>  38 </td></tr>
-<tr>                              </td><td class="ttext">Pooling    </td><td>   47 </td><td>  21 </td><td>  1.3 </td><td>  3% </td><td> 3.039 </td><td>   7 </td></tr>
+<tr>                                   <td class="ttext">Mix        </td><td>   43 </td><td>  24 </td><td>  0.5 </td><td>  1% </td><td> 0.639 </td><td>  38 </td></tr>
+<tr>                                   <td class="ttext">Pooling    </td><td>   47 </td><td>  21 </td><td>  1.3 </td><td>  3% </td><td> 3.039 </td><td>   7 </td></tr>
 <tr class="even">
     <td rowspan="3"><b>B&nbsp;</b></td><td class="ttext">Allocation </td><td>   85 </td><td>  48 </td><td>  5.8 </td><td> 28% </td><td> 1.134 </td><td>  42 </td></tr>
-<tr class="even">                 </td><td class="ttext">Mix        </td><td>   81 </td><td>  65 </td><td>  0.3 </td><td>  2% </td><td> 1.134 </td><td>  57 </td></tr>
-<tr class="even">                 </td><td class="ttext">Pooling    </td><td>   76 </td><td>  62 </td><td>  0.6 </td><td>  3% </td><td> 3.534 </td><td>  17 </td></tr>
+<tr class="even">                      <td class="ttext">Mix        </td><td>   81 </td><td>  65 </td><td>  0.3 </td><td>  2% </td><td> 1.134 </td><td>  57 </td></tr>
+<tr class="even">                      <td class="ttext">Pooling    </td><td>   76 </td><td>  62 </td><td>  0.6 </td><td>  3% </td><td> 3.534 </td><td>  17 </td></tr>
 <tr><td rowspan="3"><b>C&nbsp;</b></td><td class="ttext">Allocation </td><td>  732 </td><td> 118 </td><td>  2.4 </td><td> 28% </td><td> 5.454 </td><td>  21 </td></tr>
-<tr>                              </td><td class="ttext">Mix        </td><td>  172 </td><td> 110 </td><td>  2.3 </td><td> 25% </td><td> 5.478 </td><td>  20 </td></tr>
-<tr>                              </td><td class="ttext">Pooling    </td><td>  173 </td><td> 117 </td><td>  2.0 </td><td> 23% </td><td> 5.508 </td><td>  21 </td></tr>
+<tr>                                   <td class="ttext">Mix        </td><td>  172 </td><td> 110 </td><td>  2.3 </td><td> 25% </td><td> 5.478 </td><td>  20 </td></tr>
+<tr>                                   <td class="ttext">Pooling    </td><td>  173 </td><td> 117 </td><td>  2.0 </td><td> 23% </td><td> 5.508 </td><td>  21 </td></tr>
 </table>
 
 This looks much better than with CMS and promises a working solution for case **B**. Let's run the real-time test:
