@@ -32,6 +32,7 @@ ART-RACE-AGAINST-JAVA: /2016/03/21/home-made-hash-tables-in-cpp-a-race-against-j
 ART-TURBO-BOOST: /2016/12/08/turbo-boost-and-performance.html
 ART_SLOW_CURRENT_TIME_MILLIS: /2017/07/23/the-slow-currenttimemillis.html
 ART-STATS: /2017/03/22/statistical-variables-in-java.html
+ART-QUEUE: /2018/07/18/building-queue-from-cpp-to-java.html
 
 TITLE-E1:   "De-multiplexing of E1 streams in Java"
 TITLE-E1-C: "De-multiplexing of E1 stream: converting to C"
@@ -65,6 +66,7 @@ REPO-PEANO: https://github.com/pzemtsov/article-peano
 REPO-ALIGN: https://github.com/pzemtsov/article-align-x86
 REPO-STATS: https://github.com/pzemtsov/article-statistical-variables
 REPO-QUEUE: https://github.com/pzemtsov/article-building-queue
+REPO-ALLOC-OR-POOL: https://github.com/pzemtsov/article-allocate-or-pool
 
 kramdown:
  input: GFM
