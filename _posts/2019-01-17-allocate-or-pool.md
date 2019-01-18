@@ -765,3 +765,4 @@ Conclusions
   another layer in **C** and another intermediate queue of higher capacity. If our source queue
   could contain one second worth of packets, pooling version would work well even with CMS.
 
+Comments are welcome below or on [reddit](https://www.reddit.com/r/java/comments/ahaedh/to_allocate_or_to_pool/).
