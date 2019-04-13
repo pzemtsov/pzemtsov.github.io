@@ -67,6 +67,7 @@ REPO-ALIGN: https://github.com/pzemtsov/article-align-x86
 REPO-STATS: https://github.com/pzemtsov/article-statistical-variables
 REPO-QUEUE: https://github.com/pzemtsov/article-building-queue
 REPO-ALLOC-OR-POOL: https://github.com/pzemtsov/article-allocate-or-pool
+REPO-INDEXOF: https://github.com/pzemtsov/article-indexof
 
 kramdown:
  input: GFM
