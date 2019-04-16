@@ -2605,3 +2605,5 @@ I want to run similar tests in **C++**. It presents multiple challenges. On one 
 a pattern-matching library. On another one, it allows easy access to the CPU instructions, which
 provide both fast byte search (`SCAS`) and wide comparisons (64 bit in normal mode and up to 512 in
 SSE/AVX case).
+
+Comments are welcome below or at [reddit](https://www.reddit.com/r/java/comments/bds6hx/searching_for_a_better_indexof/).
