@@ -2562,6 +2562,56 @@ occupies 137 Mbytes, so searching for much longer patterns requires radical spac
 The time to build a tree is small, but not completely insignificant: for the same tree it is 310 ms.
 Some improvement may be needed there, too.
 
+Update: UTF-8
+-------------
+
+On [reddit](https://www.reddit.com/r/java/comments/bds6hx/searching_for_a_better_indexof/), user [pgris](https://www.reddit.com/user/pgris)
+asked how these algorithms would perform with UTF-8 data, e.g. long Chinese text. This is very
+valid question. First of all, will the algorithms work at all? Characters in UTF-8 take more than one
+byte and there is a risk of misaliginng the pattern (trying to match beginning of one character to the
+middle of another one). Fortunately, the design of UTF-8 makes this situation impossible. The first
+byte of each character has high bits `00`, `01` or `11`, while subsequent bytes start with `10`.
+This makes it possible to search for UTF-8 strings just like ordinary byte blobs.
+
+Performance, however, is a different issue. Multi-byte characters may affect some of the algorithms
+negatively. For instance, if Chinese characters use small set of first bytes, it will slow down the
+first byte matcher. If some last bytes are very frequent, the last byte matcher will suffer, etc.
+Let's try it.
+
+On the [Loyal Books site](http://www.loyalbooks.com/) I found a long enough (1.8M) Chinese text:
+["The Three Kingdoms Romance" by Guanzhong Luo](http://www.loyalbooks.com/book/%E4%B8%89%E5%9C%8B%E5%BF%97%E6%BC%94%E7%BE%A9-by-Guanzhong-Luo).
+The text contains Chinese characters, some punctuation and line breaks. It is in the repository
+under the name [Book-23950.txt](https://github.com/pzemtsov/article-indexof/blob/master/Book-23950.txt).
+We'll use some arbitrary chosen line as our pattern. Its length is 114 bytes
+(38 characters). When searching for substrings, their lengths must be adjusted to search for full
+characters.
+
+Here are the times:
+
+<table class="numeric">
+<tr><th> Matcher </th><th>6</th><th>9</th><th>18</th><th>33</th><th>66</th><th>96</th><th>114</th></tr>
+<tr><td class="ttext">Simple</td><td>              2.38</td><td>    2.36</td><td>    2.36</td><td>    2.36</td><td>    2.36</td><td>    3.14</td><td>    3.14</td></tr>
+<tr><td class="ttext">FirstByte</td><td>           1.04</td><td>    1.03</td><td>    1.03</td><td>    1.03</td><td>    1.03</td><td>    1.04</td><td>    1.04</td></tr>
+<tr><td class="ttext">FirstBytes</td><td>          0.97</td><td>    0.96</td><td>    0.96</td><td>    0.96</td><td>    0.96</td><td>    0.96</td><td>    0.96</td></tr>
+<tr><td class="ttext">LastByte</td><td>            0.84</td><td>    0.56</td><td class="red">    0.32</td><td class="green">    0.20</td><td class="yellow">    0.16</td><td class="yellow">    0.14</td><td class="green">    0.12</td></tr>
+<tr><td class="ttext">MultiByte</td><td>           1.24</td><td>    0.93</td><td>    0.64</td><td>    0.52</td><td>    0.40</td><td>    0.32</td><td>    0.29</td></tr>
+<tr><td class="ttext">LastByteSuffix</td><td>      0.83</td><td class="red">    0.54</td><td class="green">    0.30</td><td class="green">    0.20</td><td class="green">    0.15</td><td class="green">    0.13</td><td class="green">    0.12</td></tr>
+<tr><td class="ttext">RegexByte2</td><td>          0.84</td><td>    0.55</td><td class="yellow">    0.31</td><td class="green">    0.20</td><td class="green">    0.15</td><td class="green">    0.13</td><td class="green">    0.12</td></tr>
+<tr><td class="ttext">Suffix</td><td class="yellow">              0.63</td><td class="yellow">    0.49</td><td>    0.37</td><td class="yellow">    0.30</td><td class="red">    0.20</td><td class="red">    0.15</td><td class="yellow">    0.14</td></tr>
+<tr><td class="ttext">SmallSuffix</td><td class="red">         0.76</td><td>    0.58</td><td>    0.45</td><td class="red">    0.43</td><td>    0.33</td><td>    0.20</td><td class="red">    0.17</td></tr>
+<tr><td class="ttext">ChainSuffix</td><td>         0.85</td><td>    0.67</td><td>    0.54</td><td>    0.50</td><td>    0.30</td><td>    0.20</td><td class="red">    0.17</td></tr>
+<tr><td class="ttext">LightChainSuffix</td><td>    0.86</td><td>    0.68</td><td>    0.54</td><td>    0.47</td><td>    0.30</td><td>    0.20</td><td class="red">    0.17</td></tr>
+<tr><td class="ttext">LightestChainSuffix</td><td class="green"> 0.53</td><td class="green">    0.44</td><td>    0.54</td><td>    0.49</td><td>    0.31</td><td>    0.21</td><td>    0.18</td></tr>
+</table>
+
+The `LastByte` and its family (such as `Regex`) performed very well, while the `Suffix` matcher
+with friends fell a bit behind (although, not looking too bad, either). Perhaps, they need longer
+patterns to excel in the UTF-8 case.
+
+Another important feature of UTF-8 searching is [Unicode normalisation](https://unicode.org/reports/tr15/),
+but that falls beyond the limits of our study. The same applies to case-insensitive search.
+After all, initially we only wanted to search for bytes...
+
 Conclusions
 -----------
 
