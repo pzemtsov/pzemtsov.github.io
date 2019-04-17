@@ -18,6 +18,8 @@ The summary of all results is [here](#Summary). The other results of
 interest are [Big random patterns](#BigRandom) and
 [Big random patterns, huge data](#HugeRandom).
 
+One very good matcher suggested by a reader is [here](#Update2).
+
 The problem
 -----------
 
@@ -2415,6 +2417,9 @@ It is remarkable how the biggest improvements were obtained by algorithmic chang
 low-level optimisations. It is also worth noticing that the generic `Suffix` matcher was both neater
 and faster than the specialised `LastByteSuffix` matcher.
 
+**Note:** Since publishing of this article, a new, better matcher has been suggested, see
+[**Update 2**](#Update2).
+
 Random data
 -----------
 
@@ -2537,10 +2542,9 @@ the pattern. The search happens exactly once, to prevent caching.
 
 <table class="numeric">
 <tr><th> Matcher </th><th>16K</th><th>32K</th><th>64K</th><th>128K</th><th>256K</th><th>512K</th><th>1M</th></tr>
-<tr><td class="ttext">LastByte</td><td>  0.37&nbsp;  </td><td>  0.34&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td></tr>
-<tr><td class="ttext">Regex2  </td><td>  0.37&nbsp;  </td><td>  0.35&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td></tr>
-<tr><td class="ttext">Lightest</td><td>  0.022</td><td>  0.016</td><td>  0.0086</td><td>  0.0045</td><td>  0.0023</td><td>  0.0011</td><td>  0.0009</td></tr>
-</table>
+<tr><td class="ttext">LastByte</td><td>  0.37&nbsp;  </td><td>  0.34&nbsp;  </td><td>  0.35&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td></tr>
+<tr><td class="ttext">Regex2  </td><td>  0.37&nbsp;  </td><td>  0.35&nbsp;  </td><td>  0.35&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td></tr>
+<tr><td class="ttext">Lightest</td><td>  0.009</td><td>  0.005</td><td>  0.003</td><td>  0.0018</td><td>  0.0009</td><td>  0.0005</td><td>  0.0003</td></tr></table>
 
 It looks strange at first that the lightest chain suffix matcher is so much faster now than when the
 text was cached. Most probably, it is due to much less success rate (previously the pattern was found once in
@@ -2555,7 +2559,6 @@ all 16 gigabytes is 2150497, of which 2100280 were read when processing the part
 This makes it a good solution to find in files, too. So if one has a multi-terabyte file and needs
 to find a one-megabyte fragment inside, this is the way to go. This, however, doesn't seem like
 a realistic practical problem.
-
 
 Obviously, the `LightestChainSuffixMatcher` has weak points, too. The tree for a one-megabyte pattern
 occupies 137 Mbytes, so searching for much longer patterns requires radical space reduction.
@@ -2612,6 +2615,149 @@ Another important feature of UTF-8 searching is [Unicode normalisation](https://
 but that falls beyond the limits of our study. The same applies to case-insensitive search.
 After all, initially we only wanted to search for bytes...
 
+<div id="Update2"></div>
+
+Update 2: TwoByteHashShiftMatcher
+---------------------------------
+
+During discussion on [reddit](https://www.reddit.com/r/java/comments/bds6hx/searching_for_a_better_indexof/),
+user [john16384](https://www.reddit.com/user/john16384) suggested another solution, which outperforms
+those published above.
+
+The idea is similar to `LastByteMatcher`, except instead of a single last byte we look at the
+suffix of length 2. The shifts for those suffixes are pre-calculated and stored in an array.
+Storing shifts for all possible suffixes can be expensive (we need an array of 64K elements, or
+256K bytes, which is still smaller than many of our solutions), so we save space by using hash values.
+Of all possible hash functions, the simplest one is used:
+
+{% highlight Java %}
+    hash = (first_byte << shift_value) ^ second_byte;
+{% endhighlight %}
+
+Varying the shift, we can change the table size and the algorithm performance.
+
+The matcher looks like this (full text in [repository](https://github.com/pzemtsov/article-indexof/blob/master/byteIndexof/TwoByteHashShiftMatcher.java)):
+
+{% highlight Java %}
+public int indexOf (byte[] text, int fromIdx) {
+    int pattern_len = pattern.length;
+    int text_len = text.length;
+    int offset = pattern_len - 1;
+    int i = fromIdx + offset;
+    int maxLen = text_len - pattern_len + offset;
+
+    while(i < maxLen) {
+        int hash = ((text[i - 1] & 0xff) << p2) ^ (text[i] & 0xff);
+        int skip = shifts[hash];
+
+        if(skip == 0) {  // No skip, let's compare
+            if(compare (text, i - offset, pattern, pattern_len)) {
+                return i - offset;
+            }
+            i++;  // Compare failed, move ahead 1.
+        }
+        i += skip;  // Can be done always, if skip was zero it does nothing.
+    }
+    return -1;
+}
+{% endhighlight %}
+
+Another difference from `LastByteMatcher` is that it doesn't compare last bytes to those of the pattern;
+instead, it uses the shift value of zero to detect if they match. This reduces the shift achieved
+in this case (one instead of the shift to the second rightmost occurrence of these two bytes),
+but this happens very rarely.
+
+This matcher works very fast:
+
+<table class="numeric">
+<tr><th> Matcher </th><th>4</th><th>8</th><th>16</th><th>32</th><th>64</th><th>96</th><th>106</th></tr>
+<tr><td class="ttext">LastByte</td>           <td>  1.54</td><td>0.90</td><td>  0.56</td><td>  0.40</td><td>  0.30</td><td>  0.26</td><td>  0.22&nbsp;</td></tr>
+<tr><td class="ttext">Suffix</td>             <td>  1.89</td><td>1.33</td><td>  0.74</td><td>  0.41</td><td>  0.27</td><td>  0.22</td><td>  0.11&nbsp;</td></tr>
+<tr><td class="ttext">TwoByteHashShift(0)</td><td>  1.93</td><td>  0.87</td><td>  0.45</td><td>  0.27</td><td>  0.20</td><td>  0.17</td><td>  0.155</td></tr>
+<tr><td class="ttext">TwoByteHashShift(1)</td><td>  1.66</td><td>  0.74</td><td>  0.37</td><td>  0.20</td><td>  0.14</td><td>  0.12</td><td>  0.113</td></tr>
+<tr><td class="ttext">TwoByteHashShift(2)</td><td>  1.66</td><td>  0.74</td><td>  0.37</td><td>  0.20</td><td>  0.13</td><td>  0.11</td><td>  0.107</td></tr>
+<tr><td class="ttext">TwoByteHashShift(3)</td><td>  1.67</td><td>  0.76</td><td>  0.36</td><td>  0.19</td><td>  0.12</td><td>  0.10</td><td>  0.098</td></tr>
+<tr><td class="ttext">TwoByteHashShift(4)</td><td>  1.83</td><td>  0.81</td><td>  0.39</td><td>  0.21</td><td>  0.13</td><td>  0.10</td><td>  0.093</td></tr>
+<tr><td class="ttext">TwoByteHashShift(5)</td><td>  1.67</td><td>  0.72</td><td>  0.35</td><td>  0.19</td><td>  0.12</td><td>  0.09</td><td>  0.088</td></tr>
+</table>
+
+Results are improving with growth of the shift_value (called `p2` in the program), and after value 1
+are better than both `LastByte` and `Suffix`. The improvement rate slows down after two bits and
+stops after 5. To see why, let's look at the average shift values:
+
+<table class="numeric">
+<tr><th> Matcher </th><th>4</th><th>8</th><th>16</th><th>32</th><th>64</th><th>96</th><th>106</th></tr>
+<tr><td class="ttext">LastByte      </td><td> 3.5</td><td> 6.0</td><td> 9.6</td><td>13.9</td><td>19.2</td><td>22.2</td><td>24.8</td></tr>
+<tr><td class="ttext">TwoByteHashShift(0)</td><td>  2.8</td><td>  6.2</td><td>  12.1</td><td>  21.0</td><td>  33.1</td><td>  43.3</td><td>  47.1</td></tr>
+<tr><td class="ttext">TwoByteHashShift(1)</td><td>  2.9</td><td>  6.5</td><td>  13.2</td><td>  24.6</td><td>  43.0</td><td>  56.1</td><td>  60.2</td></tr>
+<tr><td class="ttext">TwoByteHashShift(2)</td><td>  2.9</td><td>  6.5</td><td>  13.2</td><td>  24.8</td><td>  44.2</td><td>  60.2</td><td>  62.9</td></tr>
+<tr><td class="ttext">TwoByteHashShift(3)</td><td>  2.9</td><td>  6.6</td><td>  13.6</td><td>  25.9</td><td>  47.3</td><td>  65.5</td><td>  70.7</td></tr>
+<tr><td class="ttext">TwoByteHashShift(4)</td><td>  2.9</td><td>  6.6</td><td>  13.6</td><td>  26.0</td><td>  47.9</td><td>  67.3</td><td>  74.9</td></tr>
+<tr><td class="ttext">TwoByteHashShift(5)</td><td>  2.9</td><td>  6.7</td><td>  13.7</td><td>  26.4</td><td>  48.9</td><td>  69.1</td><td>  75.3</td></tr>
+<tr><td class="ttext">TwoByteHashShift(8)</td><td>  2.9</td><td>  6.7</td><td>  13.7</td><td>  26.4</td><td>  48.9</td><td>  69.1</td><td>  75.3</td></tr>
+<tr><td class="ttext">Suffix </td><td> 3.9</td><td> 7.9</td><td> 15.9</td><td>31.9</td><td>63.9</td><td>95.8</td><td>105.9</td></tr>
+</table>
+
+The shifts are worse that those of `Suffix` but better than those of `LastByte`. They gradually improve
+with `shift_value` but saturate at 5. With the 5 bit shift (meaning the total number of bits 13 and
+the array size 8192 elements) the solution works just as with full 8 bits -- that's probably due to
+our small, 27-character, alphabet.
+
+The `compare()` rate varies between 0.9% for long patterns at 5 bits to 3% for short patterns and 0 bits,
+with a typical value of 1.5% in the middle.
+
+Now let's look at the binary data.
+
+<table class="numeric">
+<tr><th> Matcher </th><th>4</th><th>8</th><th>16</th><th>32</th><th>64</th><th>128</th><th>256</th></tr>
+<tr><td class="ttext">LastByte</td><td>  1.26</td><td>  0.64</td><td>  0.31</td><td>  0.16</td><td>  0.10&nbsp;</td><td>  0.07&nbsp;</td><td>  0.07&nbsp;</td></tr>
+<tr><td class="ttext">Suffix</td><td>  0.52</td><td>  0.28</td><td>  0.16</td><td>  0.10</td><td>  0.08&nbsp;</td><td>  0.06&nbsp;</td><td>  0.04&nbsp;</td></tr>
+<tr><td class="ttext">TwoByteHashShift(0)</td><td>  1.72</td><td>  0.74</td><td>  0.35</td><td>  0.18</td><td>  0.104</td><td>  0.073</td><td>  0.068</td></tr>
+<tr><td class="ttext">TwoByteHashShift(1)</td><td>  1.71</td><td>  0.73</td><td>  0.35</td><td>  0.16</td><td>  0.094</td><td>  0.060</td><td>  0.053</td></tr>
+<tr><td class="ttext">TwoByteHashShift(2)</td><td>  1.76</td><td>  0.76</td><td>  0.35</td><td>  0.16</td><td>  0.091</td><td>  0.055</td><td>  0.047</td></tr>
+<tr><td class="ttext">TwoByteHashShift(3)</td><td>  1.76</td><td>  0.75</td><td>  0.35</td><td>  0.16</td><td>  0.091</td><td>  0.056</td><td>  0.046</td></tr>
+<tr><td class="ttext">TwoByteHashShift(4)</td><td>  1.76</td><td>  0.76</td><td>  0.36</td><td>  0.16</td><td>  0.097</td><td>  0.059</td><td>  0.048</td></tr>
+</table>
+
+The results (except for very small patterns) are better than `LastByte` but slightly worse than `Suffix`.
+Still, it makes this matcher very attractive because of its simplicity. The shift factor of 2 is
+enough. Here are the shift factors for it, which are very good:
+
+<table class="numeric">
+<tr><th> Matcher </th><th>4</th><th>8</th><th>16</th><th>32</th><th>64</th><th>128</th><th>256</th></tr>
+<tr><td class="ttext">TwoByteHashShift(2)</td><td>  3.0</td><td>  6.7</td><td>  15.0</td><td> 30.5</td><td>  61.1</td><td>  119.4</td><td>  226.0</td></tr>
+</table>
+
+Now, the big patterns:
+
+<table class="numeric">
+<tr><th> Matcher </th><th>16K</th><th>32K</th><th>64K</th><th>128K</th><th>256K</th><th>512K</th><th>1M</th></tr>
+<tr><td class="ttext">LastByte</td><td>  0.053</td><td>  0.055</td><td>  0.063</td><td>  0.073</td><td>  0.095</td><td>  0.140</td><td>  0.227</td></tr>
+<tr><td class="ttext">LightestChain</td><td>  0.006</td><td>  0.010</td><td>  0.023</td><td>  0.046</td><td>  0.090</td><td>  0.177</td><td>  0.353</td></tr>
+<tr><td class="ttext">TwoByteHash(0)</td><td>  0.056</td><td>  0.060</td><td>  0.068</td><td>  0.076</td><td>  0.097</td><td>  0.141</td><td>  0.226</td></tr>
+<tr><td class="ttext">TwoByteHash(1)</td><td>  0.039</td><td>  0.042</td><td>  0.047</td><td>  0.057</td><td>  0.081</td><td>  0.123</td><td>  0.216</td></tr>
+<tr><td class="ttext">TwoByteHash(2)</td><td>  0.019</td><td>  0.023</td><td>  0.032</td><td>  0.041</td><td>  0.063</td><td>  0.108</td><td>  0.197</td></tr>
+<tr><td class="ttext">TwoByteHash(3)</td><td>  0.009</td><td>  0.012</td><td>  0.020</td><td>  0.032</td><td>  0.058</td><td>  0.106</td><td>  0.203</td></tr>
+<tr><td class="ttext">TwoByteHash(4)</td><td>  0.006</td><td>  0.009</td><td>  0.015</td><td>  0.028</td><td>  0.051</td><td>  0.098</td><td>  0.192</td></tr>
+</table>
+
+Again, it performs better than our previous solutions.
+
+Finally, the huge test:
+
+<table class="numeric">
+<tr><th> Matcher </th><th>16K</th><th>32K</th><th>64K</th><th>128K</th><th>256K</th><th>512K</th><th>1M</th></tr>
+<tr><td class="ttext">LastByte</td><td>  0.37&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.34&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td><td>  0.35&nbsp;&nbsp;  </td></tr>
+<tr><td class="ttext">Lightest</td><td>  0.0088</td><td>  0.0054</td><td>  0.0031</td><td>  0.0018</td><td>  0.0009</td><td>  0.0005</td><td>  0.0003</td></tr>
+<tr><td class="ttext">TBHS(4)</td><td>  0.0293</td><td>  0.0288</td><td>  0.0319</td><td>  0.0272</td><td>  0.0308</td><td>  0.0263</td><td>  0.0295</td></tr>
+<tr><td class="ttext">TBHS(8)</td><td>  0.0108</td><td>  0.0061</td><td>  0.0038</td><td>  0.0030</td><td>  0.0026</td><td>  0.0026</td><td>  0.0026</td></tr>
+</table>
+
+Only now the `Lightest` matcher managed to catch up with the Two-byte hashing one. However, while
+the `Lightest` is approaching its limit of applicability at the pattern length 1M, the Two-byte one
+does not have such a limit. Besides, there is a chance that for the huge array case the two-byte one can be upgraded to
+three-byte or four-byte, using some good enough hash function.
+
 Conclusions
 -----------
 
@@ -2638,15 +2784,19 @@ hits the memory limit on very long ones, where some additional work is required 
 
 - We tested two major cases: data with small alphabet size and some repeating patterns (simplified
 natural language), and completely random data. We didn't cover very exotic regular patterns.
-Some other algorithms may perform better for these cases.
+Some other algorithms may perform better for these cases;
 
 - Although generation of class files on the fly seems like the way to go in **Java**, it never
-worked: the performance was consistently worse than that achieved by a normal **Java** code.
+worked: the performance was consistently worse than that achieved by a normal **Java** code;
 
 - Our starting point was searching for small to medium-sized patterns in not-so-big byte arrays.
 In the process we accidentally came up with an algorithm suitable for searching for big patterns
-in huge arrays or even in files, which works 300+ times faster than any alternatives.
-There doesn't seem to be a demand for that, though.
+in huge arrays or even in files, which works 1000+ times faster than any alternatives.
+There doesn't seem to be a demand for that, though;
+
+- A solution was suggested that combines simplicity of the `LastByte` and performance of
+the `Suffux` by indexing suffixes of length 2 (`TwoByteHashShiftMatcher`). This one performs
+like magic.
 
 Things to do
 ------------
