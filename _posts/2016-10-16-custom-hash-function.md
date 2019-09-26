@@ -312,7 +312,7 @@ SSE matcher
 -----------
 
 The tradition of these articles requires trying, among others, low-level solutions using extended instruction sets. This became especially attractive since
-I got hold of a Haswell, which supports AVX2. Let's, however, start with SSE, whic can hold four 32-bit values in a register and perform operations on all four in parallel.
+I got hold of a Haswell, which supports AVX2. Let's, however, start with SSE, which can hold four 32-bit values in a register and perform operations on all four in parallel.
 
 {% highlight C++ %}
 class SSEMatcher : public Matcher

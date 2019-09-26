@@ -160,7 +160,8 @@ public:
                 byte b5 = src [(dst_pos + 5) * NUM_TIMESLOTS + dst_num];
                 byte b6 = src [(dst_pos + 6) * NUM_TIMESLOTS + dst_num];
                 byte b7 = src [(dst_pos + 7) * NUM_TIMESLOTS + dst_num];
-                * (uint64_t*) & d [dst_pos] = make_64 (b0, b1, b2, b3, b4, b5, b6, b7);
+                * (uint64_t*) & d [dst_pos] = make_64 (b0, b1, b2, b3,
+                                                       b4, b5, b6, b7);
             }
         }
     }

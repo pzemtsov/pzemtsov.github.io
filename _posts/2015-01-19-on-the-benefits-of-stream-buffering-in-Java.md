@@ -54,7 +54,7 @@ public class Client
         final byte[] buffer = new byte[expectedSize];
         int totalReadSize = 0;
         while (totalReadSize < expectedSize) {
-            int readSize = in.read(buffer, totalReadSize, expectedSize - totalReadSize);
+            int readSize = in.read(buffer + totalReadSize, totalReadSize, expectedSize - totalReadSize);
             if (readSize < 0) throw new EOFException ();
             totalReadSize += readSize;
         }
@@ -307,7 +307,7 @@ public class Client3
 The `ensure()` method looks like (and is) a spaghetti of buffer manipulation calls. It requires some explanation.
 What we do is allocate a big buffer (half a megabyte in our case) and read some portion of data from the socket channel into it.
 Then we consume that portion until what's left there is shorter than the next value we need. In such a case we read from
-the socket channel again, appending to the remaining data. This way the current position in the buffer keep moving forward,
+the socket channel again, appending to the remaining data. This way the current position in the buffer keeps moving forward,
 and finally it reaches the buffer's end. Then we copy the remaining data to the beginning of the buffer (`buf.compact()` takes care
 of that) and start all over. The `limit()` and `position()` manipulations toggle the buffer between the "read from socket"
 mode (`position` is where the data from the socket are written to; `limit` is the end of the available space, which is the same
@@ -427,7 +427,7 @@ Note 2
 ------
 
 If processing of each message is time-consuming, at some point it becomes irrelevant how fast the message receiving loop works. It must just be fast enough.
-The solution using `ByteArrayInputStream` can be just right for the purpose (although I still prefer using byte buffers due to easier operation).
+The solution using `BufferedInputStream` can be just right for the purpose (although I still prefer using byte buffers due to easier operation).
 
 Conclusions
 -----------

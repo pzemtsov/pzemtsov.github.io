@@ -130,7 +130,7 @@ becomes even more important, because we can't seriously embark on any optimisati
 are so unstable.
 
 Could it be that the compiler generates different code in different circumstances? Or perhaps the code is the same but
-some places in memory are better than the others? We'll look at it now. To do this, we don't need two functions any more,
+some places in memory are better than the others? We'll look at it now. To do this, we don't need two functions anymore,
 one is enough -- the one that's unstable.
 
 Testing the unstable
@@ -407,7 +407,7 @@ Fortunately, GCC has a special switch controlling loop alignment as well: `-fali
     11Dst_First_1: 1456
     11Dst_First_3: 1462
 
-This looks much better. In this case we don't need `-falign-functions` any more, since it is implied. A compiler
+This looks much better. In this case we don't need `-falign-functions` anymore, since it is implied. A compiler
 can't align the loops by 32 if the functions aren't aligned by 32. However, if we want to align functions without loops
 (such as our fully inlined version), we still need this switch. So let's use both.
 
@@ -435,7 +435,7 @@ the initial page loading and slows down program start-up. It also affects [TLB](
 performance. But these are all minor effects. What's important is that the alignment is achieved by inserting
 bytes that are not executed. The start of a function is just moved to the next aligned location.
 
-Aligning of loops isn't for free. Most loops are entered in a "fall through" way -- the control naturally arrives to the start of
+Aligning of loops isn't for free. Most loops are entered in a "fall through" way -- the control naturally arrives at the start of
 the loop from the top, all preceding code being executed. Let's have a look what this code looks like in our case (`Dst_First_3`).
 In e1-2:
 

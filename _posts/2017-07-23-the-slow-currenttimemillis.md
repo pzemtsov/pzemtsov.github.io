@@ -1226,7 +1226,7 @@ Conclusions of the Update
 
 - Coarse timers in **Java** are not much faster than the fine timers. This means that fine timers could be used everywhere if fine real-time one was provided
 
-- on Linux, the `nanoTIme` performance in TSC mode is mostly satisfactory; in HPET mode it is not.
+- on Linux, the `nanoTime` performance in TSC mode is mostly satisfactory; in HPET mode it is not.
 
 - on Windows the `nanoTime` is four times slower than `currentTimeMillis` but still fast enough; the resolution, however, is far from ideal, for unknown reason.
 

@@ -70,7 +70,8 @@ typedef unsigned char byte;
 class Demux
 {
 public:
-    virtual void demux (const byte * src, unsigned src_length, byte ** dst) const = 0;
+    virtual void demux (const byte * src, unsigned src_length, byte ** dst)
+            const = 0;
 };
 
 class Reference : public Demux
@@ -105,7 +106,7 @@ are dealing with bytes of general nature.
 
 We also need a timer (replacement for **Java**'s `System.currentTimeMillis ()`). I've moved it to separate header file
 `"timer.h"`. We'll copy the measurement and correctness test code from **Java** with only minor changes.
-We don't need to run test five times, since **C++** doesn't have any warm-up effect. We'll still run it twice,
+We don't need to run tests five times, since **C++** doesn't have any warm-up effect. We'll still run it twice,
 just to be safe. Another change is triggered by absence of a garbage collection in **C++**. All the memory we allocate
 must be freed. Finally, we'll run all out versions at once, so to improve stability of results, we'll run them in
 the same memory, re-using the buffers.
@@ -126,23 +127,23 @@ This is how Unrolled_1 can be written down using macros:
 #define MOVE_BYTE(i,j) d[i] = src [(j)+(i)*32]
 
 #define MOVE_BYTES_64(j) do {\
-        MOVE_BYTE ( 0, j); MOVE_BYTE ( 1, j); MOVE_BYTE ( 2, j); MOVE_BYTE ( 3, j);\
-        MOVE_BYTE ( 4, j); MOVE_BYTE ( 5, j); MOVE_BYTE ( 6, j); MOVE_BYTE ( 7, j);\
-        MOVE_BYTE ( 8, j); MOVE_BYTE ( 9, j); MOVE_BYTE (10, j); MOVE_BYTE (11, j);\
-        MOVE_BYTE (12, j); MOVE_BYTE (13, j); MOVE_BYTE (14, j); MOVE_BYTE (15, j);\
-        MOVE_BYTE (16, j); MOVE_BYTE (17, j); MOVE_BYTE (18, j); MOVE_BYTE (19, j);\
-        MOVE_BYTE (20, j); MOVE_BYTE (21, j); MOVE_BYTE (22, j); MOVE_BYTE (23, j);\
-        MOVE_BYTE (24, j); MOVE_BYTE (25, j); MOVE_BYTE (26, j); MOVE_BYTE (27, j);\
-        MOVE_BYTE (28, j); MOVE_BYTE (29, j); MOVE_BYTE (30, j); MOVE_BYTE (31, j);\
-        MOVE_BYTE (32, j); MOVE_BYTE (33, j); MOVE_BYTE (34, j); MOVE_BYTE (35, j);\
-        MOVE_BYTE (36, j); MOVE_BYTE (37, j); MOVE_BYTE (38, j); MOVE_BYTE (39, j);\
-        MOVE_BYTE (40, j); MOVE_BYTE (41, j); MOVE_BYTE (42, j); MOVE_BYTE (43, j);\
-        MOVE_BYTE (44, j); MOVE_BYTE (45, j); MOVE_BYTE (46, j); MOVE_BYTE (47, j);\
-        MOVE_BYTE (48, j); MOVE_BYTE (49, j); MOVE_BYTE (50, j); MOVE_BYTE (51, j);\
-        MOVE_BYTE (52, j); MOVE_BYTE (53, j); MOVE_BYTE (54, j); MOVE_BYTE (55, j);\
-        MOVE_BYTE (56, j); MOVE_BYTE (57, j); MOVE_BYTE (58, j); MOVE_BYTE (59, j);\
-        MOVE_BYTE (60, j); MOVE_BYTE (61, j); MOVE_BYTE (62, j); MOVE_BYTE (63, j);\
-    } while (0)
+   MOVE_BYTE ( 0, j); MOVE_BYTE ( 1, j); MOVE_BYTE ( 2, j); MOVE_BYTE ( 3, j);\
+   MOVE_BYTE ( 4, j); MOVE_BYTE ( 5, j); MOVE_BYTE ( 6, j); MOVE_BYTE ( 7, j);\
+   MOVE_BYTE ( 8, j); MOVE_BYTE ( 9, j); MOVE_BYTE (10, j); MOVE_BYTE (11, j);\
+   MOVE_BYTE (12, j); MOVE_BYTE (13, j); MOVE_BYTE (14, j); MOVE_BYTE (15, j);\
+   MOVE_BYTE (16, j); MOVE_BYTE (17, j); MOVE_BYTE (18, j); MOVE_BYTE (19, j);\
+   MOVE_BYTE (20, j); MOVE_BYTE (21, j); MOVE_BYTE (22, j); MOVE_BYTE (23, j);\
+   MOVE_BYTE (24, j); MOVE_BYTE (25, j); MOVE_BYTE (26, j); MOVE_BYTE (27, j);\
+   MOVE_BYTE (28, j); MOVE_BYTE (29, j); MOVE_BYTE (30, j); MOVE_BYTE (31, j);\
+   MOVE_BYTE (32, j); MOVE_BYTE (33, j); MOVE_BYTE (34, j); MOVE_BYTE (35, j);\
+   MOVE_BYTE (36, j); MOVE_BYTE (37, j); MOVE_BYTE (38, j); MOVE_BYTE (39, j);\
+   MOVE_BYTE (40, j); MOVE_BYTE (41, j); MOVE_BYTE (42, j); MOVE_BYTE (43, j);\
+   MOVE_BYTE (44, j); MOVE_BYTE (45, j); MOVE_BYTE (46, j); MOVE_BYTE (47, j);\
+   MOVE_BYTE (48, j); MOVE_BYTE (49, j); MOVE_BYTE (50, j); MOVE_BYTE (51, j);\
+   MOVE_BYTE (52, j); MOVE_BYTE (53, j); MOVE_BYTE (54, j); MOVE_BYTE (55, j);\
+   MOVE_BYTE (56, j); MOVE_BYTE (57, j); MOVE_BYTE (58, j); MOVE_BYTE (59, j);\
+   MOVE_BYTE (60, j); MOVE_BYTE (61, j); MOVE_BYTE (62, j); MOVE_BYTE (63, j);\
+} while (0)
 
 #define MOVE_TIMESLOT(j) do {\
         byte * const d = dst[j];\
@@ -279,14 +280,14 @@ A sad comment on meta-programming
 (all unrolled versions were generated). There are lots of external tools that perform some form of meta-programming
 (pre-processors, language converters, etc.), but the most convenient is when meta-programming is supported
 by the language itself. This means that some part of a program can be executed at compile-time, producing real program, which is then
-compiled into the executable code. As you could see in the previous section, it is very useful feature for
+compiled into the executable code. As you could see in the previous section, it is a very useful feature for
 high-performance programming, which involves lots of inlining and unrolling. Unfortunately, such a feature
 is a rare commodity in modern programming languages. **Java** does not have it (generics do not count and dynamic
 code generation is quite troublesome and heavy-weight), neither does **Go** or **Python**. **C** has a rudimentary version
 of it in the form of macro expansion. In addition, **C++** employs templates, which are very powerful but not easy
 to use and a bit ugly. They are not actually designed for full-scale meta-programming, but rather for generic
 type-independent programming, that's why the primary working mechanism there is pattern matching, which for
-me isn't the programming tool of choice. It is not impossible to implement the above examples using templates
+me isn't always the programming tool of choice. It is not impossible to implement the above examples using templates
 but the code won't look nice and it is yet to be seen how fast it would run.
 
 In the old days meta-programming was more common. It was widely available in macro-assemblers, where main language
@@ -321,8 +322,8 @@ In our **Java** code there is a version that involves 32 small functions (`Unrol
 I don't expect its performance to be any better than performance of other unrolled versions in **C++**;
 in addition you can recall that the very reason for its existence was HotSpot limitation of method size.
 However, for the sake of completeness I'll convert this function as well, using another handy feature of
-**C**'s macro language: token concatenation. A combination of two hash characters (`##`), used in macro, causes concatenation
-of text to the left and to the right of it without any whitespaces, allowing creation of new objects such
+**C**'s macro language: token concatenation. A combination of two hash characters (`##`), used in a macro, causes concatenation
+of text to the left and to the right of it without any whitespaces, allowing creation of new lexems such
 as function names.
 
 {% highlight C++ %}
@@ -385,7 +386,8 @@ There are three ways to write such a multiplier. The simplest (but the longest) 
 {% highlight C++ %}
 #define DUP_2(m)  do { m(0); m(1); } while (0)
 #define DUP_4(m)  do { m(0); m(1); m(2); m(3); } while (0)
-#define DUP_8(m)  do { m(0); m(1); m(2); m(3); m(4); m(5); m(6); m(7); } while (0)
+#define DUP_8(m)  do { m(0); m(1); m(2); m(3); m(4); m(5); m(6); m(7); }\
+                  while (0)
 {% endhighlight %}
 
 And so on -- definition of `DUP_64` will contain 64 calls to `m()`.
@@ -404,8 +406,10 @@ Another approach is to call each previous macro twice:
 
 {% highlight C++ %}
 #define DUP_2_(m, index)  do { m (index); m (index+1); } while (0)
-#define DUP_4_(m, index)  do { DUP_2_ (m, index); DUP_2_ (m, index+2); } while (0)
-#define DUP_8_(m, index)  do { DUP_4_ (m, index); DUP_4_ (m, index+4); } while (0)
+#define DUP_4_(m, index)  do { DUP_2_ (m, index); DUP_2_ (m, index+2); }\
+                          while (0)
+#define DUP_8_(m, index)  do { DUP_4_ (m, index); DUP_4_ (m, index+4); }\
+                          while (0)
 
 #define DUP_2(m)  DUP_2_ (m, 0)
 #define DUP_4(m)  DUP_4_ (m, 0)
@@ -428,14 +432,18 @@ Neither of these approaches works for `DEF_DEMUX`, because `DEF_DEMUX` does not 
 The macros above only work with argument macros that take one parameter. For more parameters, separate series of
 macros must be created. I called them `DUP2_xx`.
 
-Using this macros, for instance, the sequence of `CALL_DEMUX` in the previous example (`Unrolled_3`) will become just
+Using these macros, for instance, the sequence of `CALL_DEMUX` in the previous example (`Unrolled_3`) will become just
 
 {% highlight C++ %}
 DUP_32 (CALL_DEMUX)
 {% endhighlight %}
 
-Partially unrolled methods require service macro that relies on the name of the loop variable (`j`) and adds it to the
+Partially unrolled methods require a service macro that relies on the name of the loop variable (`j`) and adds it to the
 offset parameter:
+
+{% highlight C++ %}
+#define MOVE_TIMESLOT_J(offset) MOVE_TIMESLOT (j + offset)
+{% endhighlight %}
 
 What is nice is that `DUP_xx` macros are now generic and can be moved to a separate header file and later re-used
 in other projects. I've moved them to `mymacros.h` file.
@@ -533,7 +541,7 @@ sometimes **C++** is.
 
 - Relative speeds of different solutions aren't the same as in **Java**. In **Java** manual optimisation of `Dst_First_1`
 produced very slow result (`Dst_First_2`), while in **C++** it even improved speed a bit, which causes suspicion
-that optimiser in `gnu C++` isn't as good as one in HotSpot. `Src_First_3` didn't experience big slowdown
+that the optimiser in `gnu C++` isn't as good as one in HotSpot. `Src_First_3` didn't experience big slowdown
 either -- could be due to array index checking.
 
 - The difference between `Dst_First_3` and `Dst_First_1` is that the input size is hard-coded in the former one,

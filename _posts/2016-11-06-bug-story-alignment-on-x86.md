@@ -23,7 +23,7 @@ This procedure has several nice features:
 There was one important requirement: the input data was not aligned (the IP frames as received by hardware or read from a file).
 
 I didn't have to bother about portability, as the only platform the code had to run was Intel x64 (Linux and GCC 4.8.3). Intel has no restrictions on the alignment of integer
-operands (an unaligned access used to be slow, but isn't any more), and, since the endianness was not important, the little-endian case was also all right. So I quickly wrote:
+operands (an unaligned access used to be slow, but isn't anymore), and, since the endianness was not important, the little-endian case was also all right. So I quickly wrote:
 
 {% highlight C %}
 _Bool check_ip_header_sum (const char * p, size_t size)
@@ -411,7 +411,7 @@ by fewer instructions that precede the loop (no need to test alignment). What ha
 <tr><th rowspan="2">Size, words</th>
  <th colspan="3">Offset 0</th><th colspan="2">Offset 1</th><th colspan="3">Offset 4</th>
 </tr>
- <th>movdqa</th><th>movdqu</th><th>loop</th><th>movdqu</th><th>loop</th><th>movdqa</th><th>movdqu</th><th>loop</th></tr>
+<tr><th>movdqa</th><th>movdqu</th><th>loop</th><th>movdqu</th><th>loop</th><th>movdqa</th><th>movdqu</th><th>loop</th></tr>
 <tr><td>      1</td><td>2.91</td><td>2.90</td><td>1.94</td> <td>2.93</td><td>1.94</td> <td>2.90</td><td>2.90</td><td>1.94</td></tr>
 <tr><td>      5</td><td>0.84</td><td>0.77</td><td>0.79</td> <td>0.77</td><td>0.79</td> <td>0.84</td><td>0.79</td><td>0.78</td></tr>
 <tr><td>     16</td><td>0.46</td><td>0.41</td><td>0.46</td> <td>0.42</td><td>0.46</td> <td>0.52</td><td>0.40</td><td>0.46</td></tr>
@@ -422,7 +422,7 @@ by fewer instructions that precede the loop (no need to test alignment). What ha
 As we see, alignment introduces only slight variations in the times, except for one: `movdqa` version becomes a bit slower (0.52 ns instead of 0.46) at offset 4, size 16.
 The direct loop is still the best solution on small word counts; `movdqu` is the best on big ones. The compiler wasn't right using `movdqa`. A possible explanation
 is that it is optimising for an older model of the Intel processor. The `movdqu` instruction used to work quite a bit slower than `movdqa` on Xeon processors,
-even on fully aligned data. It looks like this isn't the case any more, so the compiler can be simplified (and the alignment requirements relaxed).
+even on fully aligned data. It looks like this isn't the case anymore, so the compiler can be simplified (and the alignment requirements relaxed).
 
 The original function
 ---------------------

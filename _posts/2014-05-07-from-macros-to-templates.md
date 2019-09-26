@@ -79,20 +79,20 @@ Some comments on this:
   somewhere at compile time. In our case each `move_bytes<N>` causes instantiation of `move_bytes<N-1>`.
   Here the parameter `N` indicated the number of bytes to be moved.
 
-- This chain of instantiations can go for ever, eventually causing stack overflow in the template processor, so
+- This chain of instantiations can go forever, eventually causing stack overflow in the template processor, so
   a terminating definition is required. The syntax `template<> inline void move_bytes<0>` means that the definition of
   `move_bytes<0>` does not follow the general pattern. It is implemented as an empty function, which is reasonable
   for a function that moves zero bytes.
 
-- There is no need for separate `MOVE_BYTE` function or macro any more: its code can be easily placed inside `move_bytes<N>`.
+- There is no need for separate `MOVE_BYTE` function or macro anymore: its code can be easily placed inside `move_bytes<N>`.
 
 - Hopefully the functions will be inlined into each other (I asked for that by using the `inline` keyword, but the
   compiler can do some inlining even without such a request), and in the end we'll get an unrolled loop.
 
 - Macros can access any variables from the context they are invoked; functions can't. That's why the entire
-  context these functions operate one must be passed to them as parameters
+  context these functions operate on must be passed to them as parameters
 
-- Unlike macros, the template functions are truly generic and do not depend on exact values of variables.
+- Unlike macros, the template functions are truly generic and do not depend on the exact values of variables.
   In our case we could even use the `DST_SIZE` (our tuning parameter) as a byte count. With macros we could
   construct macro name dynamically (using the `##` operator), but all the required macros must exist already.
 
@@ -169,7 +169,7 @@ public:
 {% endhighlight %}
 
 We can go further if we observe that the partially unrolled versions are now using the unroll factor (which is 4
-for `Unroll_1_4` directly rather that as part of a macro name, and this factor is the only difference between them.
+for `Unroll_1_4`) directly rather that as part of a macro name, and this factor is the only difference between them.
 It makes it possible to template the whole function:
 
 {% highlight C++ %}
@@ -438,8 +438,8 @@ _ZNK10Unrolled_15demuxEPKhjPPh:
 Conclusions
 -----------
 
-Using templates for meta-programming is not that bad. Effectively we are replacing loops with recursion,
-which is not the most intuitive thing to do. However, resulting code is quite small, more flexible and,
+Using templates for meta-programming isn't that bad. Effectively we are replacing loops with recursion,
+which is not the most intuitive thing to do. However, the resulting code is quite small, more flexible and,
 most important, it is efficient. A powerful function inlining engine that is built into the **C++** compiler makes
 the generated machine code identical to that of macro version.
 

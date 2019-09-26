@@ -931,8 +931,8 @@ Here is the entire change history:
 <tr><td class="label">Hash_HomeMade5</td> <td class="ttext">The action lists were introduced              </td><td> 395</td><td>  354</td></tr>
 <tr><td class="label">Hash_HomeMade6</td> <td class="ttext">The division-based hash function, hard coded  </td><td> 392</td><td>  353</td></tr>
 <tr><td class="label">Hash_Additive</td> <td class="ttext">The division-based hash function, additive     </td><td> 358</td><td>  327</td></tr>
-<tr><td class="label">Hash_Additive2</td> <td class="ttext">Multiplication by two big numbers, additive   </td><td> 349</td><td>  351</td></tr>        // 7:381
-<tr><td class="label">Hash_Additive3</td> <td class="ttext">Multiplication by two big numbers, ultimate additive</td><td> 343</td><td>  361</td></tr>  // 7:373
+<tr><td class="label">Hash_Additive2</td> <td class="ttext">Multiplication by two big numbers, additive   </td><td> 349</td><td>  351</td></tr> 
+<tr><td class="label">Hash_Additive3</td> <td class="ttext">Multiplication by two big numbers, ultimate additive</td><td> 343</td><td>  361</td></tr>
 </table>
 
 Here is the same data as a graph (the **Java 8** time for `Hash_Reference` is excluded):
@@ -1048,7 +1048,7 @@ The point of this study was not to develop the fastest implementation of Life. I
 It is clear that better data structures exist, it's sufficient to look at the [HashLife](http://en.wikipedia.org/wiki/Hashlife),
 which, despite the name, is much more advanced than anything we've produced.
 
-If we concentrate on the simple and naive Life implementations, the hash-based one has some advantages:
+If we concentrate on the simple and na&iuml;ve Life implementations, the hash-based one has some advantages:
 
 - It is very simple to implement (even the most advanced of our implementations is very small in code size and quite readable).
 

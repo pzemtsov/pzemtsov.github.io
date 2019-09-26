@@ -313,7 +313,7 @@ public:
 };
 {% endhighlight %}
 
-It is unlikely that in the `std::deque` was the bottleneck in the previous implementation, so we shouldn't expect big performance gain, and, in fact, it got slower:
+It is unlikely that the `std::deque` was the bottleneck in the previous implementation, so we shouldn't expect big performance gain, and, in fact, it got slower:
 
 <table class="numeric">
 <tr><th>Queue name</th><th>Writing time, ns</th><th>Good interval, ns</th><th>Throughput, Mil/sec</th><th>Avg size</th></tr>

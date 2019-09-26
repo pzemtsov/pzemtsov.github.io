@@ -116,7 +116,7 @@ the easiest is to use Linux `taskset` utility. It accepts a mask (int value; it 
 input) and a command line; it runs the specified command using the specified affinity.
 
 The system I use for testing has two physical processors with eight cores each (four real cores and four hyper-threading
-cores). This makes `16` logical cores, numbered from `0` to `15`. Even numbers correspond to one physical processor
+cores). This makes 16 logical cores, numbered from `0` to `15`. Even numbers correspond to one physical processor
 and odd numbers to another one. This isn't guarranteed; another machine where I run my tests allocates logical
 cores `0` to `7` to one processor and those from `8` to `15` to the other one. The exact numbering can be established
 by analysing file `/proc/cpuinfo` -- that's what I did to establish mine.

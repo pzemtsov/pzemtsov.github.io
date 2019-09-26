@@ -611,7 +611,7 @@ Observations:
 
 - The entire `Dst_First_1a` was 123 bytes long; became 451 byte
 
-- The entire `Dst_First_3a` was 123 bytes long; became 246 byte
+- The entire `Dst_First_3a` was 123 bytes long; became 246 bytes
 
 - The loop unrolling killed the loop alignment in `Dst_First_1a`: the loop starts at `0x410c2f`,
   still explicitly aligned. A possible reason is that the loop entry is also a target for a normal branch.

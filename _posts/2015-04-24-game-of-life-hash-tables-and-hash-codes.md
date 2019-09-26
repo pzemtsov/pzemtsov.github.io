@@ -585,7 +585,7 @@ fact, the hash value will be exactly the same: 0x80000000 multiplied by 3 (or 5)
 and the two added together will cancel each other out.
 
 Since there is no more boxing, the code is a little bit longer, but it is also clearer and safer -- arbitrary number
-can't be passed as a point any more. Again, I'll run it alone. Here is the result (I'll quote all three):
+can't be passed as a point anymore. Again, I'll run it alone. Here is the result (I'll quote all three):
 
       Hash_Reference: time for 10000:  2937  2719  2763: 3619.3 frames/sec
            Hash_Long: time for 10000:  4290  4237  4273: 2340.3 frames/sec
@@ -869,7 +869,7 @@ hashtest (new Hash () { public int hash (Point p) {
                           return lo(x) ^ hi(x);}} );
 {% endhighlight %}
 
-Note that we can't ignore adding `OFFSET` any more; it affects the value of the hash function. That's why we use `fromPoint (p.x, p.y)`
+Note that we can't ignore adding `OFFSET` anymore; it affects the value of the hash function. That's why we use `fromPoint (p.x, p.y)`
 and not just `w (p.x, p.y)`:
 
     Field size: 1034; slots used:  969; avg= 1.07

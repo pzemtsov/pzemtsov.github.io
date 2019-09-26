@@ -55,7 +55,7 @@ that optimisation is useless: we can de-multiplex more than one E1 stream on one
 The reference implementation
 ----------------------------
 
-We are ready to start coding. We'll start with the most naive and straightforward version possible, which we'll
+We are ready to start coding. We'll start with the most na&iuml;ve and straightforward version possible, which we'll
 call the reference implementation. The name indicates that both correctness and performance of other implementations
 will be tested against this one.
 
@@ -104,7 +104,7 @@ first byte in each input buffer belongs to output zero (it sets `dst_num` to 0).
 the interface and implementation (I'll skip the demonstration). This is typical for reference implementations: they are usually more flexible than the
 highly optimised ones. You will see that other implementations can't be modified so easily.
 
-The method does not check the size of destination arrays but rather relies on a run-time exception being thrown if the arrays are too small.
+The method does not check sizes of destination arrays but rather relies on a run-time exception being thrown if the arrays are too small.
 
 I especially like the line `for (byte b : src)` in this code. It uses the iterator syntax, which was added to **Java** relatively late (in version 1.5),
 and which has great value in making programs look nicer. Here the loop written using such syntax immediately makes it clearly visible that the entire
@@ -222,7 +222,7 @@ recall that we measure time for 1,000,000 iterations, each time decoding a buffe
 1000000 * 2048 * 1000 / 2860 = 716M bytes (I'm using the metric megabyte, which is exactly 1,000,000 bytes). Recalling also that the speed of E1 stream it 256,000
 bytes/sec, we can calculate that our de-multiplexing speed is roughly 2,800 times faster than the transmission speed. In ideal world this would have meant that
 we could process 2800 streams in real time on one processor core, but the reality, as usual, is far from ideal, and the number will be somewhat less.
-One reason is that 2800 source buffer won't fit into the processor cache, so our caching pre-condition won't be met. Let's leave exact measurements of
+One reason is that 2800 source buffers won't fit into the processor cache, so our caching pre-condition won't be met. Let's leave exact measurements of
 this effect for later articles.
 
 The speed we achieved is very impressive, probably sufficient for any practical application. This means that we can stop the optimisation exercise right here.
@@ -316,7 +316,7 @@ variables, which are not independent. It is easy to see that these variables mai
 `src_pos = dst_pos * NUM_TIMESLOTS + dst_num`
 
 Why not try replacing `src_pos` with the expression on the right hand side? The outer loop then runs on `dst_pos`,
-and we mustn't forget to use the correct loop limit. Since the loop variable isn't modified inside the loop any more,
+and we mustn't forget to use the correct loop limit. Since the loop variable isn't modified inside the loop anymore,
 we can replace the `while` loop with a `for` loop, which is my personal aesthetic preference. Strictly speaking,
 **Java** does not have a true `for` loop in the same sense as **Pascal** has -- its `for` is just another syntax for `while`.
 However, I prefer to follow a convention that `for` loop contains a dedicated loop variable (or variables) with
@@ -448,11 +448,11 @@ to order 2048 elements, which is roughly 1.67*10<sup>5894</sup>. I can think of 
 others. The first reason is that the order of memory reads and writes can affect performance, and the second is that
 different structure of iterations can cause the compiler to generate better code.
 
-I think the effect of memory access order is unlikely to be big -- after all, we deliberately made input buffer small
+I think the effect of memory access order is unlikely to be big -- after all, we deliberately made the input buffer small
 enough to fit into the cache. The processor has several levels of [cache](http://en.wikipedia.org/wiki/CPU_cache),
 the fastest of them being also the smallest -- [level 1 cache](http://www.cpu-world.com/Glossary/L/Level_1_cache.html).
 Our processor belongs to the [Sandy Bridge](http://en.wikipedia.org/wiki/Sandy_Bridge)
-family and has L1 data cache of 32 Kbytes.
+family and has the level 1 (L1) data cache of 32 Kbytes.
 That's more than enough for the entire input buffer, all output buffers and all the references. However, cache
 bank conflicts may cause some uncached memory access even when there is cache space available. That's why some
 effect of memory access re-ordering is possible, but the difference in code generation has more chances to affect
@@ -473,8 +473,8 @@ static final class Dst_First_1 implements Demux
         assert src.length % NUM_TIMESLOTS == 0;
 
         for (int dst_num = 0; dst_num < NUM_TIMESLOTS; ++ dst_num) {
-            for (int dst_pos = 0; dst_pos < src.length / NUM_TIMESLOTS; ++ dst_pos) {
-                dst [dst_num][dst_pos] = src [dst_pos * NUM_TIMESLOTS + dst_num];
+            for (int dst_pos=0; dst_pos < src.length/NUM_TIMESLOTS; ++dst_pos){
+                dst [dst_num][dst_pos] = src [dst_pos*NUM_TIMESLOTS + dst_num];
             }
         }
     }
@@ -739,7 +739,7 @@ The entire piece of code takes 649 lines. Running it, we get the following:
 This is slower than 659 ms obtained using `Unrolled_1`. Possibly, we have hit a code cache size limitation.
 
 We can try reducing code size. In `Unrolled_3` it is clearly visible that all `demux_xx` methods are very similar.
-They differ from each other only in indexing of the src array. We can make the offset into this array a method
+They differ from each other only in indexing of the `src` array. We can make the offset into this array a method
 parameter. There will be one extra addition operation when indexing the array but I hope it will be absorbed by
 the addressing mode of memory access instruction, or maybe get removed completely by eliminating common sub-expression
 `&(src[0])+i` (I used **C** notation here, for **Java** has no pointer arithmetic).
@@ -890,7 +890,7 @@ because I'm not a performance freak.
 Conclusions
 -----------
 
-This is where the **Java** part of the E1-demultiplexing story ends. Let's summarize what we learned along the way:
+This is where the **Java** part of the E1-demultiplexing story ends. Let's summarise what we learned along the way:
 
 -   There is something to optimise even for such a simple task
 
@@ -900,7 +900,7 @@ This is where the **Java** part of the E1-demultiplexing story ends. Let's summa
 
 -   The order of iterations is important. In our case iterating the output arrays worked twice as fast as iterating over the source array
 
--   Reorganizing the code while keeping the iteration order also helps, which means that the optimising power of the compiler is limited
+-   Reorganising the code while keeping the iteration order also helps, which means that the optimising power of the compiler is limited
 
 -   The compiler is good with simple things like common sub-expression elimination, moving invariant code out of loops, operation strength reduction, etc. Trying to help the compiler to do this kind of work often makes things slower
 

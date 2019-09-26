@@ -862,7 +862,7 @@ one field that must be updated in one transaction. We'll see it in our implement
 There is no synchronisation anywhere, so the class is still not suitable for simultaneous multi-threaded update. In a multi-client environment it can only be used as a thread-local
 view of a compound counter. It does, however, improve over the `TrivialCounter` and `VolatileCounter`: it completely eliminates the second effect
 (missing the reset of the counter). At some point after the swap (and rather quickly, due to the `volatile` reference), the counter will start updating the new value. This means that
-our results can't be totally out any more.
+our results can't be totally out anymore.
 
 Does it mean that this is a completely correct solution? We know it can't be. No multi-threaded **Java** program can be completely correct without using some
 synchronisation primitives (although, as we'll see later, some degree of cheating may help incorrect program produce sufficiently correct results).
@@ -901,7 +901,7 @@ Indirect counter: lazy retrieval
 
 As said before, the reason for the counter difference is that the last update by the client thread
 may coincide with the retrieval by the server thread. The time window for that is very small, though -- most likely, not more than 10 CPU cycles. Here comes a solution:
-the server must delay using the value until quite sure it is completely stable and isn't going to change any more -- we'll call it the **cool-down period**.
+the server must delay using the value until quite sure it is completely stable and isn't going to change anymore -- we'll call it the **cool-down period**.
 A couple of hundred of nanoseconds should be enough. Let's, however, be completely paranoid and make this period half the collection interval (30 seconds in the real program, half a second in our tests).
 The server thread will run twice as often as before and collect the values on the even iterations, while using them on odd ones. This is where our `IndirectCounter` interface
 becomes handy. We'll change our test loop in the following way:

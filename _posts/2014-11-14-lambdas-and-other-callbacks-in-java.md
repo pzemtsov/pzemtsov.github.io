@@ -8,7 +8,7 @@ story-title: "Performance of various callback mechanisms"
 ---
 
 In [the previous article]({{ site.ART-JENSEN-DEVICE}}) we constructed a **Jensen's device** in **C++**. This device is a procedure that calculates
-a sum of arbitrary expression over a range of indices. The expressions are passed to this procedure using various types
+a sum of an arbitrary expression over a range of indices. The expressions are passed to this procedure using various types
 of callbacks. **Java** also has several callback mechanisms, and using these mechanisms is a regular and recommended
 practice in **Java**. Let's check the performance and compare to **C++**. The code can be found in
 [the repository]({{ site.REPO-JAVA-CALLBACK }}).
@@ -191,7 +191,6 @@ static int sum_static_reflection (int lo, int hi, Method f)
     } catch (Exception e) {
         throw new AssertionError ();
     }
-    
 }
 
 static class Test_Static_Reflection implements Test
