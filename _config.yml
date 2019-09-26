@@ -33,6 +33,8 @@ ART-TURBO-BOOST: /2016/12/08/turbo-boost-and-performance.html
 ART_SLOW_CURRENT_TIME_MILLIS: /2017/07/23/the-slow-currenttimemillis.html
 ART-STATS: /2017/03/22/statistical-variables-in-java.html
 ART-QUEUE: /2018/07/18/building-queue-from-cpp-to-java.html
+ART-ALIGNMENT-BUG: /2016/11/06/bug-story-alignment-on-x86.html
+ART-INDEXOF: /2019/04/13/searching-for-better-indexof.html
 
 TITLE-E1:   "De-multiplexing of E1 streams in Java"
 TITLE-E1-C: "De-multiplexing of E1 stream: converting to C"
@@ -52,7 +54,8 @@ TITLE-PEANO: "Implementing Peano arithmetic"
 TITLE-BINARY: "Home-made binary numbers"
 TITLE-HASH-HOMEMADE: "Home-made hash tables in Java"
 TITLE-RACE-AGAINST-JAVA: "Home-made hash tables in C++: a race against Java"
-
+TITLE-ALIGNMENT-BUG: "A bug story: data alignment on x86"
+TITLE-INDEXOF: "Searching for a better indexOf"
 
 REPO-E1:   https://github.com/pzemtsov/article-E1-demux-Java
 REPO-E1-C: https://github.com/pzemtsov/article-E1-demux-C
@@ -68,6 +71,7 @@ REPO-STATS: https://github.com/pzemtsov/article-statistical-variables
 REPO-QUEUE: https://github.com/pzemtsov/article-building-queue
 REPO-ALLOC-OR-POOL: https://github.com/pzemtsov/article-allocate-or-pool
 REPO-INDEXOF: https://github.com/pzemtsov/article-indexof
+REPO-CHAR-SEARCHER: https://github.com/pzemtsov/article-char-searcher
 
 kramdown:
  input: GFM

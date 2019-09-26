@@ -392,6 +392,27 @@ td.red {
   background-color: #FFC0C0;
 }
 
+td.gray {
+ background-color: #CCC;
+}
+
+td.p1 {
+  background-color: #C0FFC0;
+}
+
+td.p2 {
+  background-color: #FFFFC0;
+}
+
+td.p3 {
+  background-color: #FFC0C0;
+}
+
+td.gray {
+ background-color: #CCC;
+}
+
+
 /*****************************************************************************/
 
 button {
