@@ -1380,3 +1380,5 @@ Things to do
 ------------
 
 Now it's time to look at string searching in **C**/**C++**.
+
+Comments are welcome below or at [reddit](https://www.reddit.com/r/programming/comments/d9llcu/making_a_char_searcher_in_c/).
