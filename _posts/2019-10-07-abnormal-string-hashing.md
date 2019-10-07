@@ -162,3 +162,5 @@ Conclusion
 
 Hash map is a very powerful tool to achieve good performance. Still, abnormal cases of unusually
 bad performance do occur, so be careful.
+
+Comments are welcome below or at [reddit](https://www.reddit.com/r/java/comments/dejtni/abnormal_string_hashing/).
