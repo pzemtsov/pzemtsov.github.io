@@ -72,6 +72,7 @@ REPO-QUEUE: https://github.com/pzemtsov/article-building-queue
 REPO-ALLOC-OR-POOL: https://github.com/pzemtsov/article-allocate-or-pool
 REPO-INDEXOF: https://github.com/pzemtsov/article-indexof
 REPO-CHAR-SEARCHER: https://github.com/pzemtsov/article-char-searcher
+REPO-ABNORMAL-STRINGS: https://github.com/pzemtsov/article-abnormal-string-hashing
 
 kramdown:
  input: GFM
