@@ -127,7 +127,7 @@ out of four billion strings.
 
 Most of these strings look very artificial and very few make grammatical sense.
 Still, meaningful ones occur, too. I started this study after reading a Russian article on the issue, where they
-came up with a very beautiful example: `"лжеотожлествление электровиолончели"`
+came up with a very beautiful example: `"лжеотождествление электровиолончели"`
 (false identification of an electric cello). So I took a list of 58K English words and tried combining them.
 
 No single English word produced zero hash code (perhaps, some super-long hyphenated ones could, but
